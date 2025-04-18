@@ -1,0 +1,21 @@
+.zone-label {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--color-text);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+}
+
+.zone-label:hover {
+  background-color: var(--color-primary-bg-hover);
+  color: var(--color-primary-dark);
+}
+
+.zone-label.active {
+  background-color: var(--color-primary);
+  color: white;
+}

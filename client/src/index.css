@@ -1,0 +1,19 @@
+:root {
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f9fafb;
+  --color-border: #e5e7eb;
+
+  --color-text: #1f2937;
+  --color-text-subtle: #6b7280;
+
+  --color-primary: #2563eb;           /* 안정적인 파랑 */
+  --color-primary-dark: #1d4ed8;
+  --color-primary-bg-hover: #e0e7ff;  /* 연한 파랑 */
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, sans-serif;
+}
