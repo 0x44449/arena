@@ -1,10 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { PrismaClient } from "@prisma/client";
 import { plainToInstance } from "class-transformer";
 import { Server, Socket } from 'socket.io';
 import { ChatMessageDto } from "./dto/chat-message.dto";
-import { PublicUserDto } from "@/user/dto/public-user.dto";
+import { ChatService } from "./chat.service";
 
 interface JoinPayload {
   vaultId: string;
@@ -12,7 +11,7 @@ interface JoinPayload {
   userId: string;
 }
 
-interface MessagePayload {
+export interface MessagePayload {
   vaultId: string;
   zoneId: string;
   userId: string;
@@ -33,7 +32,7 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @SubscribeMessage("join")
   async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: JoinPayload) {
@@ -60,28 +59,10 @@ export class ChatGateway {
     const { vaultId, zoneId, userId, content } = payload;
     const roomId = createRoomId(vaultId, zoneId);
 
-    const message = await this.prisma.message.create({
-      data: {
-        vaultId,
-        zoneId,
-        userId,
-        content,
-      },
-    });
+    const message = await this.chatService.createMessage(payload);
 
-    const user = await this.prisma.user.findUnique({
-      where: {
-        loginId: message.userId,
-      },
-    });
-
-    const response = new ChatMessageDto(message);
-    if (user) {
-      response.sender = new PublicUserDto(user);
-    }
-
-    client.to(roomId).emit("message", plainToInstance(ChatMessageDto, response));
-    client.emit("message", plainToInstance(ChatMessageDto, response));
+    client.to(roomId).emit("message", plainToInstance(ChatMessageDto, message));
+    client.emit("message", plainToInstance(ChatMessageDto, message));
     console.log(`Message from ${userId} in vault ${vaultId} zone ${zoneId}: ${content}`);
   }
 }

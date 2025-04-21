@@ -7,10 +7,11 @@ import { ChatController } from './chat/chat.controller';
 import { VaultService } from './vault/vault.service';
 import { ZoneService } from './zone/zone.service';
 import { UserService } from './user/user.service';
+import { ChatService } from './chat/chat.service';
 
 @Module({
   imports: [],
   controllers: [VaultController, ZoneController, ChatController],
-  providers: [ChatGateway, PrismaClient, VaultService, ZoneService, UserService],
+  providers: [ChatGateway, ChatService, PrismaClient, VaultService, ZoneService, UserService],
 })
 export class AppModule {}
