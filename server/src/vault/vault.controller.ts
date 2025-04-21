@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { VaultService } from "./vault.service";
 import { ZoneService } from "@/zone/zone.service";
 import { VaultDto } from "./dto/vault.dto";
@@ -6,6 +6,7 @@ import { ApiBody, ApiOkResponse } from "@nestjs/swagger";
 import { plainToInstance } from "class-transformer";
 import { ZoneDto } from "@/zone/dto/zone.dto";
 import { CreateVaultDto } from "./dto/create-vault.dto";
+import { UpdateVaultDto } from "./dto/update-vault.dto";
 
 @Controller('api/v1/vaults')
 export class VaultController {
@@ -17,11 +18,25 @@ export class VaultController {
   @Post()
   @ApiOkResponse({ type: VaultDto })
   @ApiBody({ type: CreateVaultDto })
-  async createVault(@Body() dto: CreateVaultDto): Promise<VaultDto> {
-    console.log('param:', dto, dto.constructor.name);
-    const vault = await this.vaultService.createVault(dto, 'zina-001');
+  async createVault(@Body() param: CreateVaultDto): Promise<VaultDto> {
+    const vault = await this.vaultService.createVault(param, 'zina-001');
 
     return plainToInstance(VaultDto, vault);
+  }
+
+  @Put(':vaultId')
+  @ApiOkResponse({ type: VaultDto })
+  @ApiBody({ type: UpdateVaultDto })
+  async updateVault(@Param('vaultId') vaultId: string, @Body() param: UpdateVaultDto): Promise<VaultDto | null> {
+    const vault = await this.vaultService.updateVault(vaultId, param, 'zina-001');
+
+    if (!vault) return null;
+    return plainToInstance(VaultDto, vault);
+  }
+
+  @Delete(':vaultId')
+  async deleteVault(@Param('vaultId') vaultId: string): Promise<undefined> {
+    await this.vaultService.deleteVault(vaultId, 'zina-001');
   }
 
   @Get()
