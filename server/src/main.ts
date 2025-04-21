@@ -23,20 +23,20 @@ async function bootstrap() {
   });
 
   // DTO 생성을 위한 class-transformer 설정
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-        excludeExtraneousValues: false,
-      },
-    })
-  );
+  app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     transform: true,
+  //     whitelist: true,
+  //     transformOptions: {
+  //       excludeExtraneousValues: true,
+  //       enableImplicitConversion: true,
+  //     },
+  //   })
+  // );
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
   console.log(`🚀 Arena Nest 서버가 ${port}번 포트에서 실행 중입니다`);
 }
 bootstrap();
-

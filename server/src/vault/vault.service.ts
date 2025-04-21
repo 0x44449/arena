@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { VaultDto } from "./dto/vault.dto";
 import { UserService } from "@/user/user.service";
 import { PublicUserDto } from "@/user/dto/public-user.dto";
+import { CreateVaultDto } from "./dto/create-vault.dto";
+import { nanoid } from "nanoid";
 
 @Injectable()
 export class VaultService {
@@ -11,15 +13,24 @@ export class VaultService {
     private readonly userService: UserService
   ) {}
 
-  async createVault(name: string, description: string, ownerId: string) {
+  async createVault(param: CreateVaultDto, ownerId: string): Promise<VaultDto> {
+    const { name, description } = param;
     const vault = await this.prisma.vault.create({
       data: {
+        vaultId: nanoid(12),
         name,
         description,
         ownerId,
       }
     });
-    return vault;
+    const vaultDto = new VaultDto(vault);
+
+    // User 매핑
+    const user = await this.userService.getUser(ownerId);
+    if (user) {
+      vaultDto.owner = new PublicUserDto(user);
+    }
+    return vaultDto;
   }
 
   async getVaults(): Promise<VaultDto[]> {
