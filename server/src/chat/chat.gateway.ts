@@ -1,7 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { PrismaClient } from "@prisma/client";
+import { plainToInstance } from "class-transformer";
 import { Server, Socket } from 'socket.io';
+import { ChatMessageDto } from "./dto/chat-message.dto";
+import { PublicUserDto } from "@/user/dto/public-user.dto";
 
 interface JoinPayload {
   vaultId: string;
@@ -66,15 +69,19 @@ export class ChatGateway {
       },
     });
 
-    const response: MessagePayload = {
-      vaultId: message.vaultId,
-      zoneId: message.zoneId,
-      userId: message.userId,
-      content: message.content,
-    };
+    const user = await this.prisma.user.findUnique({
+      where: {
+        loginId: message.userId,
+      },
+    });
 
-    client.to(roomId).emit("message", response);
-    client.emit("message", response);
+    const response = new ChatMessageDto(message);
+    if (user) {
+      response.sender = new PublicUserDto(user);
+    }
+
+    client.to(roomId).emit("message", plainToInstance(ChatMessageDto, response));
+    client.emit("message", plainToInstance(ChatMessageDto, response));
     console.log(`Message from ${userId} in vault ${vaultId} zone ${zoneId}: ${content}`);
   }
 }

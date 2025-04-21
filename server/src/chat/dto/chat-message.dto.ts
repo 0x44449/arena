@@ -1,11 +1,15 @@
+import { PublicUserDto } from "@/user/dto/public-user.dto";
+import { Exclude } from "class-transformer";
+
 export class ChatMessageDto {
-  id: string;
+  messageId: string;
   vaultId: string;
   zoneId: string;
-  senderId: string;
+  @Exclude()
+  userId: string;
   content: string;
   createdAt: Date;
-  updatedAt: Date;
+  sender: PublicUserDto;
 
   constructor(input: Partial<ChatMessageDto>) {
     Object.assign(this, input);

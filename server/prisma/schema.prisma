@@ -31,23 +31,32 @@ model User {
 }
 
 model Vault {
-  vaultId String  @id @default(uuid())
-  name    String
+  vaultId     String  @id @default(uuid())
+  name        String
+  description String
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime? @updatedAt
 }
 
 model Zone {
-  zoneId    String   @id @default(uuid())
-  name      String
-  hasChat   Boolean  @default(false)
-  hasBoard  Boolean  @default(false)
-  vaultId String
+  zoneId      String   @id @default(uuid())
+  name        String
+  description String
+  hasChat     Boolean  @default(false)
+  hasBoard    Boolean  @default(false)
+  vaultId     String
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime? @updatedAt
 }
 
 model Message {
   messageId String   @id @default(cuid())
   vaultId   String
   zoneId    String
-  userId    String
+  senderId    String
   content   String   @db.Text
   createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
 }

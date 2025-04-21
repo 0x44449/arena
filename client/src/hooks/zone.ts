@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getZones } from '@/api/zone';
 import { Zone } from '@/types/api';
+import { getZone, getZones } from '@/api/vault';
 
-export function useZoneQuery(vaultId: string | undefined) {
+export function useZonesQuery(vaultId: string | undefined) {
   return useQuery({
-    queryKey: ['vaults', vaultId],
+    queryKey: ['vaults', vaultId, 'zones'],
     queryFn: () => {
       if (!vaultId) throw new Error('vaultId is required');
       return getZones(vaultId);
@@ -26,7 +26,10 @@ export function useZoneQueryById(vaultId: string | undefined, zoneId: string | u
     queryKey: ['vaults', vaultId, 'zones', zoneId],
     queryFn: () => {
       if (!vaultId || !zoneId) throw new Error('vaultId and zoneId are required');
-      return getZones(vaultId).then((zones) => zones.find((zone) => zone.zoneId === zoneId));
+      return getZone(vaultId, zoneId).then((zone) => {
+        if (!zone) throw new Error('Zone not found');
+        return zone;
+      });
     },
     enabled: !!vaultId && !!zoneId,
   });

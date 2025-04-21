@@ -1,21 +1,16 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { plainToInstance } from "class-transformer";
+import { ChatMessageDto } from "./dto/chat-message.dto";
+import { ChatService } from "./chat.service";
 
-@Controller('chat')
+@Controller('api/v1/chat')
 export class ChatController {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly chatService: ChatService) { }
 
   @Get('messages/:vaultId/:zoneId')
-  async getMessages(@Param('vaultId') vaultId: string, @Param('zoneId') zoneId: string) {
-    return await this.prisma.message.findMany({
-      where: {
-        vaultId: vaultId,
-        zoneId: zoneId,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-      take: 50,
-    });
+  async getMessages(@Param('vaultId') vaultId: string, @Param('zoneId') zoneId: string): Promise<ChatMessageDto[]> {
+    const messages = await this.chatService.getMessages(vaultId, zoneId);
+
+    return plainToInstance(ChatMessageDto, messages);
   }
 }

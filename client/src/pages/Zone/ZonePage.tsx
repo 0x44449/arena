@@ -1,14 +1,14 @@
-import { useZoneQuery } from '@/hooks/zone';
+import { useZonesQuery } from '@/hooks/zone';
 import { useNavigate, useParams } from 'react-router-dom';
 import ZoneLabel from './ZoneLabel';
 import VaultBanner from './VaultBanner';
-import { useCachedVault } from '@/hooks/vault';
+import { useValutQueryById } from '@/hooks/vault';
 
 function ZonePage() {
   const navigate = useNavigate();
   const { vaultId, zoneId } = useParams<{ vaultId: string, zoneId: string }>();
-  const vault = useCachedVault(vaultId);
-  const { data: zones, isLoading, error } = useZoneQuery(vaultId);
+  const { data: vault } = useValutQueryById(vaultId);
+  const { data: zones, isLoading, error } = useZonesQuery(vaultId);
 
   const handleSpaceLabelClick = (id: string) => {
     navigate(`/vault/${vaultId}/zone/${id}`);

@@ -1,14 +1,19 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { ZoneService } from "./zone.service";
+import { plainToInstance } from "class-transformer";
+import { ZoneDto } from "./dto/zone.dto";
+import { ApiOkResponse } from "@nestjs/swagger";
 
-@Controller('zones')
+@Controller('api/v1/zones')
 export class ZoneController {
-  constructor(private readonly prisma: PrismaClient) {}
-  
-  @Get(':vaultId')
-  async getZones(@Param('vaultId') vaultId: string) {
-    return await this.prisma.zone.findMany({
-      where: { vaultId },
-    });
+  constructor(private readonly zoneService: ZoneService) {}
+
+  @Get(':zoneId')
+  @ApiOkResponse({ type: ZoneDto })
+  async getZone(@Param('zoneId') zoneId: string): Promise<ZoneDto | null> {
+    const zone = await this.zoneService.getZone(zoneId);
+
+    if (!zone) return null;
+    return plainToInstance(ZoneDto, zone);
   }
 }
