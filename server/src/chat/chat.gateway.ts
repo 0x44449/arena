@@ -2,25 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { plainToInstance } from "class-transformer";
 import { Server, Socket } from 'socket.io';
-import { ChatMessageDto } from "./dto/chat-message.dto";
 import { ChatService } from "./chat.service";
-
-interface JoinPayload {
-  vaultId: string;
-  zoneId: string;
-  userId: string;
-}
-
-export interface MessagePayload {
-  vaultId: string;
-  zoneId: string;
-  userId: string;
-  content: string;
-}
-
-const createRoomId = (vaultId: string, zoneId: string) => {
-  return `vault:${vaultId}:zone:${zoneId}`;
-}
+import { ChatJoinPayload } from "./payload/join-chat.payload";
+import { LeaveChatPayload } from "./payload/leave-chat.payload";
+import { ChatMessagePayload } from "./payload/chat-message.payload";
+import { ChatMessageDto } from "@/dto/chat-message.dto";
 
 @WebSocketGateway({
   cors: {
@@ -35,34 +21,34 @@ export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
 
   @SubscribeMessage("join")
-  async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: JoinPayload) {
-    const { vaultId, zoneId, userId } = payload;
-    const roomId = createRoomId(vaultId, zoneId);
+  async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: ChatJoinPayload) {
+    const { featureId } = payload;
+    const userId = 'admin';
 
-    await client.join(roomId);
-    client.to(roomId).emit("system", `${userId} has entered the zone.`);
-    console.log(`User ${userId} joined zone ${zoneId}`);
+    await client.join(featureId);
+    client.to(featureId).emit("system", `${userId} has entered the chat.`);
+    console.log(`User ${userId} joined zone ${featureId}`);
   }
 
   @SubscribeMessage("leave")
-  async handleLeave(@ConnectedSocket() client: Socket, @MessageBody() payload: JoinPayload) {
-    const { vaultId, zoneId, userId } = payload;
-    const roomId = createRoomId(vaultId, zoneId);
+  async handleLeave(@ConnectedSocket() client: Socket, @MessageBody() payload: LeaveChatPayload) {
+    const { featureId } = payload;
+    const userId = 'admin';
 
-    await client.leave(roomId);
-    client.to(roomId).emit("system", `${userId} has left the zone.`);
-    console.log(`User ${userId} left zone ${zoneId}`);
+    await client.leave(featureId);
+    client.to(featureId).emit("system", `${userId} has left the chat.`);
+    console.log(`User ${userId} left zone ${featureId}`);
   }
 
   @SubscribeMessage("message")
-  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: MessagePayload) {
-    const { vaultId, zoneId, userId, content } = payload;
-    const roomId = createRoomId(vaultId, zoneId);
+  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: ChatMessagePayload) {
+    const { featureId, content } = payload;
+    const userId = 'admin';
 
-    const message = await this.chatService.createMessage(payload);
+    const message = await this.chatService.createMessage(payload, 'admin');
 
-    client.to(roomId).emit("message", plainToInstance(ChatMessageDto, message));
+    client.to(featureId).emit("message", plainToInstance(ChatMessageDto, message));
     client.emit("message", plainToInstance(ChatMessageDto, message));
-    console.log(`Message from ${userId} in vault ${vaultId} zone ${zoneId}: ${content}`);
+    console.log(`Message from ${userId} in ${featureId}: ${content}`);
   }
 }

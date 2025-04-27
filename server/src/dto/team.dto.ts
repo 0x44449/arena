@@ -1,12 +1,12 @@
-import { PublicUserDto } from "@/user/dto/public-user.dto";
+import { TeamEntity } from "@/entity/team.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { Vault } from "@prisma/client";
 import { Exclude, Expose } from "class-transformer";
+import { PublicUserDto } from "./public-user.dto";
 
-export class VaultDto {
+export class TeamDto {
   @ApiProperty()
   @Expose()
-  vaultId: string;
+  teamId: string;
 
   @ApiProperty()
   @Expose()
@@ -27,11 +27,11 @@ export class VaultDto {
   @Exclude()
   ownerId: string;
 
-  @ApiProperty({ type: PublicUserDto})
+  @ApiProperty({ type: PublicUserDto })
   @Expose()
   owner: PublicUserDto | null;
 
-  constructor(input: Partial<VaultDto> | Vault) {
+  constructor(input: Partial<TeamDto> | TeamEntity) {
     Object.assign(this, input);
   }
 }

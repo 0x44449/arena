@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AvatarType, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 
 export class PublicUserDto {
@@ -22,7 +22,7 @@ export class PublicUserDto {
   password: string;
 
   @Exclude()
-  avatarType: AvatarType;
+  avatarType: string;
 
   @Exclude()
   avatarKey: string;
@@ -42,7 +42,7 @@ export class PublicUserDto {
   constructor(input: Partial<PublicUserDto> | User) {
     Object.assign(this, input);
 
-    if (this.avatarType === AvatarType.default) {
+    if (this.avatarType === 'default') {
       this.avatarUrl = `/image/default-avatar/${this.avatarKey}`;
     }
     else {

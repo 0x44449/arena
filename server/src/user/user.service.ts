@@ -1,14 +1,16 @@
+import { UserEntity } from "@/entity/user.entity";
 import { Injectable } from "@nestjs/common";
-import { PrismaClient, User } from "@prisma/client";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>
+  ) {}
 
-  async getUser(userId: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { userId },
-    });
-    return user;
+  async getUserByUserId(userId: string): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { userId } });
   }
-}
+} 

@@ -1,16 +1,20 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { plainToInstance } from "class-transformer";
-import { ChatMessageDto } from "./dto/chat-message.dto";
 import { ChatService } from "./chat.service";
+import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
+import { ApiResult } from "@/dto/api-result.dto";
+import { ChatMessageDto } from "@/dto/chat-message.dto";
 
 @Controller('api/v1/chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) { }
 
-  @Get('messages/:vaultId/:zoneId')
-  async getMessages(@Param('vaultId') vaultId: string, @Param('zoneId') zoneId: string): Promise<ChatMessageDto[]> {
-    const messages = await this.chatService.getMessages(vaultId, zoneId);
+  @Get('/:featureId/messages')
+  @ApiOkResponseWithResult(ChatMessageDto, { isArray: true })
+  async getMessages(@Param('featureId') featureId: string): Promise<ApiResult<ChatMessageDto[]>> {
+    const messages = await this.chatService.getMessages(featureId);
 
-    return plainToInstance(ChatMessageDto, messages);
+    const result = new ApiResult<ChatMessageDto[]>({ data: messages });
+    return plainToInstance(ApiResult<ChatMessageDto[]>, result);
   }
 }

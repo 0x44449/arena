@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
 
-export class UpdateVaultDto {
+export class CreateWorkspaceDto {
   @ApiProperty()
   @IsString()
-  name?: string;
+  name: string;
 
   @ApiProperty()
   @IsString()
-  description?: string;
+  description: string;
 }
