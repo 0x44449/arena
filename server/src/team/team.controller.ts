@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { TeamService } from "./team.service";
 import { WorkspaceService } from "@/workspace/workspace.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
@@ -10,8 +10,12 @@ import { plainToInstance } from "class-transformer";
 import { UpdateTeamDto } from "./dto/update-team.dto";
 import { WorkspaceDto } from "@/dto/workspace.dto";
 import { CreateWorkspaceDto } from "@/workspace/dto/create-workspace.dto";
+import { AuthGuard } from "@/auth/auth.guard";
+import { User } from "@/auth/user.decorator";
+import { UserEntity } from "@/entity/user.entity";
 
 @Controller('api/v1/team')
+@UseGuards(AuthGuard)
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,
@@ -21,8 +25,8 @@ export class TeamController {
   @Post()
   @ApiOkResponseWithResult(TeamDto)
   @ApiBody({ type: CreateTeamDto })
-  async createTeam(@Body() param: CreateTeamDto): Promise<ApiResult<TeamDto>> {
-    const team = await this.teamService.createTeam(param, 'admin');
+  async createTeam(@Body() param: CreateTeamDto, @User() user: UserEntity): Promise<ApiResult<TeamDto>> {
+    const team = await this.teamService.createTeam(param, user.userId);
 
     const result = new ApiResult<TeamDto>({ data: team });
     return plainToInstance(ApiResult<TeamDto>, result);
@@ -31,7 +35,9 @@ export class TeamController {
   @Put(':teamId')
   @ApiOkResponseWithResult(TeamDto)
   @ApiBody({ type: UpdateTeamDto })
-  async updateTeam(@Param('teamId') teamId: string, @Body() param: UpdateTeamDto): Promise<ApiResult<TeamDto | null>> {
+  async updateTeam(
+    @Param('teamId') teamId: string, @Body() param: UpdateTeamDto, @User() user: UserEntity
+  ): Promise<ApiResult<TeamDto | null>> {
     const team = await this.teamService.updateTeam(teamId, param, 'admin');
 
     const result = new ApiResult<TeamDto | null>({ data: team ? team : null });
@@ -40,7 +46,7 @@ export class TeamController {
 
   @Delete(':teamId')
   @ApiOkResponseWithResult()
-  async deleteTeam(@Param('teamId') teamId: string): Promise<ApiResult<null>> {
+  async deleteTeam(@Param('teamId') teamId: string, @User() user: UserEntity): Promise<ApiResult<null>> {
     await this.teamService.deleteTeam(teamId, 'admin');
 
     const result = new ApiResult<null>({ data: null });
@@ -49,7 +55,7 @@ export class TeamController {
 
   @Get()
   @ApiOkResponseWithResult(TeamDto, { isArray: true })
-  async getTeams(): Promise<ApiResult<TeamDto[]>> {
+  async getTeams(@User() user: UserEntity): Promise<ApiResult<TeamDto[]>> {
     const teams = await this.teamService.getTeams();
 
     const result = new ApiResult<TeamDto[]>({ data: teams });
@@ -58,7 +64,7 @@ export class TeamController {
 
   @Get(':teamId')
   @ApiOkResponseWithResult(TeamDto)
-  async getTeam(@Param('teamId') teamId: string): Promise<ApiResult<TeamDto | null>> {
+  async getTeam(@Param('teamId') teamId: string, @User() user: UserEntity): Promise<ApiResult<TeamDto | null>> {
     const team = await this.teamService.getTeamByTeamId(teamId);
 
     const result = new ApiResult<TeamDto | null>({ data: team ? team : null });
@@ -68,7 +74,9 @@ export class TeamController {
   @Post(':teamId/workspaces')
   @ApiOkResponseWithResult(WorkspaceDto)
   @ApiBody({ type: CreateWorkspaceDto })
-  async createWorkspace(@Param('teamId') teamId: string, @Body() param: CreateWorkspaceDto): Promise<ApiResult<WorkspaceDto>> {
+  async createWorkspace(
+    @Param('teamId') teamId: string, @Body() param: CreateWorkspaceDto, @User() user: UserEntity
+  ): Promise<ApiResult<WorkspaceDto>> {
     const workspace = await this.workspaceService.createWorkspace(param, teamId, 'admin');
 
     const result = new ApiResult<WorkspaceDto>({ data: workspace });
@@ -77,7 +85,7 @@ export class TeamController {
 
   @Get(':teamId/workspaces')
   @ApiOkResponseWithResult(WorkspaceDto, { isArray: true })
-  async getWorkspaces(@Param('teamId') teamId: string): Promise<ApiResult<WorkspaceDto[]>> {
+  async getWorkspaces(@Param('teamId') teamId: string, @User() user: UserEntity): Promise<ApiResult<WorkspaceDto[]>> {
     const workspaces = await this.workspaceService.getWorkspacesByTeamId(teamId);
 
     const result = new ApiResult<WorkspaceDto[]>({ data: workspaces });

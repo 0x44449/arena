@@ -1,11 +1,13 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { plainToInstance } from "class-transformer";
 import { ChatService } from "./chat.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
 import { ApiResult } from "@/dto/api-result.dto";
 import { ChatMessageDto } from "@/dto/chat-message.dto";
+import { AuthGuard } from "@/auth/auth.guard";
 
 @Controller('api/v1/chat')
+@UseGuards(AuthGuard)
 export class ChatController {
   constructor(private readonly chatService: ChatService) { }
 

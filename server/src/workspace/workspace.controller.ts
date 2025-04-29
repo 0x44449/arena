@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { WorkspaceService } from "./workspace.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
 import { WorkspaceDto } from "@/dto/workspace.dto";
@@ -8,8 +8,10 @@ import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
 import { plainToInstance } from "class-transformer";
 import { WorkspaceFeatureDto } from "@/dto/workspace-feature.dto";
 import { CreateWorkspaceFeatureDto } from "./dto/create-workspace-feature.dto";
+import { AuthGuard } from "@/auth/auth.guard";
 
 @Controller('api/v1/workspace')
+@UseGuards(AuthGuard)
 export class WorkspaceController {
   constructor(
     private readonly workspaceService: WorkspaceService

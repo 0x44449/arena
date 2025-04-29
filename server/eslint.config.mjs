@@ -45,6 +45,8 @@ export default tseslint.config(
       //   "arrowParens": "avoid",
       // }],
       'prettier/prettier': 'off',
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "warn"
     },
   },
 );
