@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nes
 import { WorkspaceService } from "./workspace.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
 import { WorkspaceDto } from "@/dto/workspace.dto";
-import { ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { ApiResult } from "@/dto/api-result.dto";
 import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
 import { plainToInstance } from "class-transformer";
@@ -12,6 +12,7 @@ import { AuthGuard } from "@/auth/auth.guard";
 
 @Controller('api/v1/workspace')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('access-token')
 export class WorkspaceController {
   constructor(
     private readonly workspaceService: WorkspaceService

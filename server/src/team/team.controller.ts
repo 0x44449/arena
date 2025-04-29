@@ -3,7 +3,7 @@ import { TeamService } from "./team.service";
 import { WorkspaceService } from "@/workspace/workspace.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
 import { TeamDto } from "@/dto/team.dto";
-import { ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { CreateTeamDto } from "./dto/create-team.dto";
 import { ApiResult } from "@/dto/api-result.dto";
 import { plainToInstance } from "class-transformer";
@@ -16,6 +16,7 @@ import { UserEntity } from "@/entity/user.entity";
 
 @Controller('api/v1/team')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('access-token')
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,

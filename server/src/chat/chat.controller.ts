@@ -5,9 +5,11 @@ import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with
 import { ApiResult } from "@/dto/api-result.dto";
 import { ChatMessageDto } from "@/dto/chat-message.dto";
 import { AuthGuard } from "@/auth/auth.guard";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
 @Controller('api/v1/chat')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('access-token')
 export class ChatController {
   constructor(private readonly chatService: ChatService) { }
 
