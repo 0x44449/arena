@@ -10,7 +10,7 @@ import { WorkspaceFeatureDto } from "@/dto/workspace-feature.dto";
 import { CreateWorkspaceFeatureDto } from "./dto/create-workspace-feature.dto";
 import { AuthGuard } from "@/auth/auth.guard";
 
-@Controller('api/v1/workspace')
+@Controller('api/v1/workspaces')
 @UseGuards(AuthGuard)
 @ApiBearerAuth('access-token')
 export class WorkspaceController {

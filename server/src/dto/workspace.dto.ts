@@ -7,11 +7,11 @@ import { WorkspaceFeatureDto } from "./workspace-feature.dto";
 export class WorkspaceDto {
   @ApiProperty()
   @Expose()
-  zoneId: string;
+  workspaceId: string;
 
   @ApiProperty()
   @Expose()
-  vaultId: string;
+  teamId: string;
 
   @ApiProperty()
   @Expose()

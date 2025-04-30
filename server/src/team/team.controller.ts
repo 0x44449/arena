@@ -14,7 +14,7 @@ import { AuthGuard } from "@/auth/auth.guard";
 import { User } from "@/auth/user.decorator";
 import { UserEntity } from "@/entity/user.entity";
 
-@Controller('api/v1/team')
+@Controller('api/v1/teams')
 @UseGuards(AuthGuard)
 @ApiBearerAuth('access-token')
 export class TeamController {

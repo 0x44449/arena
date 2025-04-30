@@ -32,7 +32,7 @@ import { ChatController } from './chat/chat.controller';
         database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/entity/*.entity.{ts,js}'],
         synchronize: true, // 개발용: 엔티티 변경 시 DB 자동 싱크
-        logging: true, // 개발 중 SQL 로그 보기
+        logging: false, // 개발 중 SQL 로그 보기
       }),
     }),
     TypeOrmModule.forFeature([

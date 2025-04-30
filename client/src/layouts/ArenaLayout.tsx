@@ -1,25 +1,19 @@
+import TeamSidebar from "@/pages/Team/TeamSidebar";
 import { Outlet } from "react-router-dom";
-import VaultPage from "@/pages/Vault/VaultPage";
 
 function ArenaLayout() {
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <aside
-        style={{
-          width: 80,
-          borderRight: '1px solid #e5e7eb',
-          background: '#f9fafb',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}
-      >
-        <VaultPage />
-      </aside>
+    <div className="flex h-screen w-screen">
+      <div className="flex flex-1 flex-row">
+        {/* 팀 사이드바 */}
+        <aside className="w-20 bg-gray-100 border-r border-gray-300 overflow-y-auto overflow-x-hidden">
+          <TeamSidebar />
+        </aside>
 
-      <main style={{ flex: 1 }}>
-        <Outlet />
-      </main>
+        <div className="flex flex-1">
+          <Outlet />
+        </div>
+      </div>
     </div>
   )
 }

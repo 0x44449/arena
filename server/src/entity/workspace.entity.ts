@@ -17,7 +17,7 @@ export class WorkspaceEntity {
   @Column({ name: 'OwnerId' })
   ownerId: string;
 
-  @Column({ name: 'DefaultFeatureId' })
+  @Column({ name: 'DefaultFeatureId', nullable: true })
   defaultFeatureId: string;
 
   @CreateDateColumn({ name: 'CreatedAt' })

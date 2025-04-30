@@ -1,20 +1,21 @@
 import { Routes, Route } from 'react-router-dom';
 import ArenaLayout from '@/layouts/ArenaLayout';
-import VaultLayout from '@/layouts/VaultLayout';
-import ZoneLayout from '@/layouts/ZoneLayout';
-import DeckLayout from './layouts/DeckLayout';
+import TeamLayout from './layouts/TeamLayout';
+import WorkspaceLayout from './layouts/WorkspaceLayout';
+import LoginPage from './pages/Login/LoginPage';
+import ProtectedRoute from './pages/Login/ProtectedRoute';
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<ArenaLayout />}>
-        <Route index element={<div>Vault를 선택하세요</div>} />
-        <Route path="vault/:vaultId" element={<VaultLayout />}>
-          <Route index element={<div>Zone을 선택하세요</div>} />
-          <Route path="zone/:zoneId" element={<ZoneLayout />}>
-            <Route index element={<DeckLayout />} />
-            <Route path="deck/chat" element={<DeckLayout />} />
-            <Route path="deck/board" element={<DeckLayout />} />
+      <Route path="login" element={<LoginPage />} />
+      <Route path="/arena" element={
+        <ProtectedRoute>
+          <ArenaLayout />
+        </ProtectedRoute>
+      }>
+        <Route path=":teamId" element={<TeamLayout />}>
+          <Route path=":workspaceId" element={<WorkspaceLayout />}>
           </Route>
         </Route>
       </Route>
