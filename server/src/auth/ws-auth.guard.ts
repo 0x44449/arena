@@ -15,12 +15,11 @@ export class WsAuthGuard implements CanActivate {
         ? client.handshake.headers.authorization.split(' ')[1]
         : undefined;
 
+    console.log('token', token);
+    
     if (!token) {
       return false;
     }
-
-    // (실제 JWT 디코딩 로직은 생략)
-    const userId = 'mock-user-id'; // 예시
 
     const user = await this.userService.getUserByUserId('admin');
 

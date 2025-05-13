@@ -14,6 +14,6 @@ export class WorkspaceFeatureEntity {
   @Column({ name: 'Order' })
   order: number;
 
-  @CreateDateColumn({ name: 'CreatedAt' })
+  @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
   createdAt: Date;
 }

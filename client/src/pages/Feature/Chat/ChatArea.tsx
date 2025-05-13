@@ -1,4 +1,4 @@
-import { ChatMessageDto } from '@/types/chat-message.dto';
+import ChatMessageDto from "@/types/chat-message.dto";
 
 interface ChatAreaProps {
   messages: ChatMessageDto[];

@@ -20,9 +20,9 @@ export class WorkspaceEntity {
   @Column({ name: 'DefaultFeatureId', nullable: true })
   defaultFeatureId: string;
 
-  @CreateDateColumn({ name: 'CreatedAt' })
+  @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'UpdatedAt', nullable: true })
+  @UpdateDateColumn({ name: 'UpdatedAt', type: 'timestamptz', nullable: true })
   updatedAt: Date;
 }

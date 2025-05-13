@@ -1,7 +1,6 @@
-import { ChatMessageDto } from "@/types/chat-message.dto";
 import ChatArea from "./Chat/ChatArea";
 import ChatInputArea from "./Chat/ChatInputArea";
-import { useState } from "react";
+import { useChatFeature, useChatFeatureConnectionSync } from "./Chat/chat.hook";
 
 interface ChatFeatureProps {
   teamId: string;
@@ -11,14 +10,16 @@ interface ChatFeatureProps {
 
 export default function ChatFeature(props: ChatFeatureProps) {
   const { teamId, workspaceId, featureId } = props;
-  const [messages, setMessages] = useState<ChatMessageDto[]>([]);
+  useChatFeatureConnectionSync({ featureId });
+  const { messages, sendMessage } = useChatFeature({ featureId });
 
   const handleSend = (input: string) => {
     console.log("Sending message:", input);
+    sendMessage(input);
   };
 
   return (
-    <div>
+    <div className="flex flex-col flex-1">
       <ChatArea messages={messages} />
       <ChatInputArea onSend={handleSend} />
     </div>

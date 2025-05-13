@@ -25,12 +25,12 @@ export function useWorkspaceQueryByWorkspaceId(workspaceId: string | undefined) 
     queryFn: async () => {
       if (!workspaceId) throw new Error("workspaceId is required");
 
-      const response = await getWorkspacesByTeamId(workspaceId);
+      const response = await getWorkspaceByWorkspaceId(workspaceId);
       if (!response.success) {
-        throw new Error("Failed to fetch workspaces");
+        throw new Error("Failed to fetch workspace");
       }
 
-      return response.data.find((workspace) => workspace.workspaceId === workspaceId) || null;
+      return response.data;
     },
     enabled: !!workspaceId,
   });
