@@ -14,6 +14,9 @@ import { WorkspaceFeatureEntity } from './entity/workspace-feature.entity';
 import { ChatService } from './chat/chat.service';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatController } from './chat/chat.controller';
+import { AuthService } from './auth/auth.service';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -41,9 +44,20 @@ import { ChatController } from './chat/chat.controller';
       WorkspaceEntity,
       WorkspaceFeatureEntity,
       ChatMessageEntity,
-    ])
+    ]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN'),
+          algorithm: 'HS256',
+        },
+      }),
+    }),
   ],
-  controllers: [TeamController, WorkspaceController, ChatController],
-  providers: [UserService, TeamService, WorkspaceService, ChatService, ChatGateway],
+  controllers: [TeamController, WorkspaceController, ChatController, AuthController],
+  providers: [UserService, TeamService, WorkspaceService, ChatService, ChatGateway, AuthService],
 })
 export class AppModule {}

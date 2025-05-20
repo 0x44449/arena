@@ -25,12 +25,13 @@ export class TeamService {
 
     // TODO: 권한처리
     // Team 생성
-    const team = await this.teamRepository.save<Partial<TeamEntity>>({
+    const teamEntity = this.teamRepository.create({
       teamId: nanoid(12),
       name,
       description,
       ownerId,
     });
+    const team = await this.teamRepository.save(teamEntity);
     if (!team) {
       throw new Error("Failed to create team");
     }

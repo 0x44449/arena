@@ -2,8 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 async function bootstrap() {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+
   const app = await NestFactory.create(AppModule);
 
   // Swagger 설정

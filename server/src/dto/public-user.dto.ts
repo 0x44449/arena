@@ -1,5 +1,5 @@
+import { UserEntity } from '@/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 
 export class PublicUserDto {
@@ -39,7 +39,7 @@ export class PublicUserDto {
   @Expose()
   updatedAt: Date;
 
-  constructor(input: Partial<PublicUserDto> | User) {
+  constructor(input: Partial<PublicUserDto> | UserEntity) {
     Object.assign(this, input);
 
     if (this.avatarType === 'default') {
