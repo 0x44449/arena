@@ -17,6 +17,7 @@ import { ChatController } from './chat/chat.controller';
 import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth/auth.controller';
+import { RefreshTokenEntity } from './entity/refresh-token.entity';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AuthController } from './auth/auth.controller';
       WorkspaceEntity,
       WorkspaceFeatureEntity,
       ChatMessageEntity,
+      RefreshTokenEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],

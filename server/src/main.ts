@@ -5,12 +5,16 @@ import { ValidationPipe } from '@nestjs/common';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { GlobalExceptionFilter } from './common/exception-manage/global-exception-filter';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 async function bootstrap() {
-  dayjs.extend(utc);
-  dayjs.extend(timezone);
-
   const app = await NestFactory.create(AppModule);
+
+  // Global error 핸들링
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Swagger 설정
   const config = new DocumentBuilder()

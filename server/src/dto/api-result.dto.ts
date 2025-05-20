@@ -10,7 +10,15 @@ export class ApiResult<T> {
   @Expose()
   data?: T;
 
-  constructor(param?: { success?: boolean; data?: T }) {
+  @ApiProperty()
+  @Expose()
+  errorMessage?: string;
+
+  @ApiProperty()
+  @Expose()
+  errorCode?: string;
+
+  constructor(param?: { success?: boolean; data?: T; errorMessage?: string; errorCode?: string }) {
     this.success = true;
     this.data = undefined;
 
@@ -21,6 +29,11 @@ export class ApiResult<T> {
       if (param.data !== undefined) {
         this.data = param.data;
       }
+    }
+
+    if (param && !this.success) {
+      this.errorMessage = param.errorMessage;
+      this.errorCode = param.errorCode;
     }
   }
 }

@@ -11,6 +11,7 @@ import { LoginUserResultDto } from "./dto/login-user-result.dto";
 import { randomUUID } from "crypto";
 import { RefreshTokenEntity } from "@/entity/refresh-token.entity";
 import dayjs from "dayjs";
+import { nanoid } from "nanoid";
 
 @Injectable()
 export class AuthService {
@@ -50,11 +51,15 @@ export class AuthService {
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const userId = nanoid(12);
     const userEntity = this.userRepository.create({
+      userId,
       loginId,
       email,
       displayName,
       password: hashedPassword,
+      avatarType: 'default',
+      avatarKey: '1',
     });
     const user = await this.userRepository.save(userEntity);
     const userDto = new PublicUserDto(user);
