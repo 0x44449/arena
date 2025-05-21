@@ -1,13 +1,18 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
-import { ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { ApiResult } from "@/dto/api-result.dto";
 import { plainToInstance } from "class-transformer";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { LoginUserResultDto } from "./dto/login-user-result.dto";
 import { PublicUserDto } from "@/dto/public-user.dto";
+import { RefreshTokenResultDto } from "./dto/refresh-token-result.dto";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { AuthGuard } from "./auth.guard";
+import { User } from "./user.decorator";
+import { UserEntity } from "@/entity/user.entity";
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -33,5 +38,17 @@ export class AuthController {
 
     const result = new ApiResult<LoginUserResultDto>({ data: loginResult });
     return plainToInstance(ApiResult<LoginUserResultDto>, result);
+  }
+
+  @Post('refresh')
+  @ApiOkResponseWithResult(RefreshTokenResultDto)
+  @ApiBody({ type: RefreshTokenDto })
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  async refreshToken(@Body() param: RefreshTokenDto, @User() user: UserEntity): Promise<ApiResult<RefreshTokenResultDto>> {
+    const refreshResult = await this.authService.refreshToken(user.userId, param.refreshToken);
+
+    const result = new ApiResult<RefreshTokenResultDto>({ data: refreshResult });
+    return plainToInstance(ApiResult<RefreshTokenResultDto>, result);
   }
 }

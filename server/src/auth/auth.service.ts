@@ -13,6 +13,7 @@ import { RefreshTokenEntity } from "@/entity/refresh-token.entity";
 import dayjs from "dayjs";
 import { nanoid } from "nanoid";
 import { WellKnownError } from "@/common/exception-manage/well-known-error";
+import { RefreshTokenResultDto } from "./dto/refresh-token-result.dto";
 
 @Injectable()
 export class AuthService {
@@ -130,5 +131,56 @@ export class AuthService {
     loginUserResultDto.refreshToken = refreshToken;
 
     return loginUserResultDto;
+  }
+
+  async refreshToken(userId: string, token: string): Promise<RefreshTokenResultDto> {
+    const refreshTokenEntities = await this.refreshTokenRepository.find({
+      where: { userId, isRevoked: false },
+    });
+
+    if (!refreshTokenEntities) {
+      throw new WellKnownError({
+        message: "Refresh token not found",
+        errorCode: "REFRESH_TOKEN_NOT_FOUND",
+      });
+    }
+
+    const matched = await Promise.all(refreshTokenEntities.map(async (entity) => ({
+      entity,
+      isMatch: await bcrypt.compare(token, entity.token),
+    })));
+
+    const foundEntity = matched.find((x) => x.isMatch)?.entity;
+    if (!foundEntity) {
+      throw new WellKnownError({
+        message: "Refresh token not found",
+        errorCode: "REFRESH_TOKEN_NOT_FOUND",
+      });
+    }
+
+    if (dayjs(foundEntity.expiredAt).isBefore(dayjs())) {
+      throw new WellKnownError({
+        message: "Refresh token expired",
+        errorCode: "REFRESH_TOKEN_EXPIRED",
+      });
+    }
+
+    // Access token 재발급
+    const accessToken = this.jwtService.sign({
+      userId: foundEntity.userId,
+    });
+
+    // Refresh token 재발급
+    const newRefreshToken = randomUUID();
+    const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
+    foundEntity.token = newRefreshTokenHash;
+    foundEntity.expiredAt = dayjs().add(7, 'day').toDate();
+    await this.refreshTokenRepository.save(foundEntity);
+
+    const refreshTokenResultDto = new RefreshTokenResultDto();
+    refreshTokenResultDto.accessToken = accessToken;
+    refreshTokenResultDto.refreshToken = newRefreshToken;
+
+    return refreshTokenResultDto;
   }
 }
