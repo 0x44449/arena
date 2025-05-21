@@ -1,12 +1,17 @@
 export class WellKnownError extends Error {
+  statusCode?: number;
+  errorCode?: string;
+  
   constructor(
-    public message: string,
-    public statusCode: number,
-    public errorCode: string,
+    public param?: {
+      message: string;
+      statusCode?: number;
+      errorCode?: string;
+    }
   ) {
-    super(message);
+    super(param?.message);
     this.name = 'WellKnownError';
-    this.statusCode = statusCode;
-    this.errorCode = errorCode;
+    this.statusCode = param?.statusCode;
+    this.errorCode = param?.errorCode;
   }
 }

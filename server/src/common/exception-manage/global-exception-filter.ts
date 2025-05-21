@@ -13,8 +13,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const { message, errorCode } = exception;
-    response.status(200).json(new ApiResult({
+    const { message, errorCode, statusCode } = exception;
+    response.status(statusCode ?? 200).json(new ApiResult({
       success: false,
       errorMessage: message,
       errorCode: errorCode,

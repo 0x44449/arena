@@ -12,6 +12,7 @@ import { randomUUID } from "crypto";
 import { RefreshTokenEntity } from "@/entity/refresh-token.entity";
 import dayjs from "dayjs";
 import { nanoid } from "nanoid";
+import { WellKnownError } from "@/common/exception-manage/well-known-error";
 
 @Injectable()
 export class AuthService {
@@ -26,13 +27,19 @@ export class AuthService {
   async registerUser(param: RegisterUserDto): Promise<PublicUserDto> {
     const { loginId, email, displayName, password } = param;
     if (!loginId || !email || !displayName || !password) {
-      throw new Error("All fields are required");
+      throw new WellKnownError({
+        message: "Login ID, email, display name, and password are required",
+        errorCode: "REGISTER_USER_REQUIRED_FIELDS",
+      });
     }
 
     // email 체크
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if (!emailRegex.test(email)) {
-      throw new Error("Invalid email format");
+      throw new WellKnownError({
+        message: "Invalid email format",
+        errorCode: "REGISTER_USER_INVALID_EMAIL_FORMAT",
+      });
     }
 
     // loginId, email 중복체크
@@ -41,10 +48,16 @@ export class AuthService {
     });
     if (existingUser) {
       if (existingUser.loginId === loginId) {
-        throw new Error("Login ID already exists");
+        throw new WellKnownError({
+          message: "Login ID already exists",
+          errorCode: "REGISTER_USER_LOGIN_ID_DUPLICATE",
+        });
       }
       if (existingUser.email === email) {
-        throw new Error("Email already exists");
+        throw new WellKnownError({
+          message: "Email already exists",
+          errorCode: "REGISTER_USER_EMAIL_DUPLICATE",
+        });
       }
     }
 
@@ -69,7 +82,10 @@ export class AuthService {
   async loginUser(param: LoginUserDto): Promise<LoginUserResultDto> {
     const { id, password } = param;
     if (!id || !password) {
-      throw new Error("Login ID and password are required");
+      throw new WellKnownError({
+        message: "Login ID or password is required",
+        errorCode: "LOGIN_USER_ID_OR_PASSWORD_REQUIRED",
+      });
     }
 
     // id is loginId or email
@@ -78,12 +94,18 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new WellKnownError({
+        message: "Id or password is incorrect",
+        errorCode: "LOGIN_USER_ID_OR_PASSWORD_INCORRECT",
+      });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error("Invalid password");
+      throw new WellKnownError({
+        message: "Id or password is incorrect",
+        errorCode: "LOGIN_USER_ID_OR_PASSWORD_INCORRECT",
+      });
     }
 
     const accessToken = this.jwtService.sign({
