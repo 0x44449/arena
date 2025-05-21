@@ -1,9 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { ArenaRequest } from './arena-request';
 
-export const User = createParamDecorator(
+export const FromCredential = createParamDecorator(
   (_, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<ArenaRequest>();
-    return request.user;
+    return request.credential;
   },
 );

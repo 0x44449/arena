@@ -1,13 +1,16 @@
 import { UserService } from '@/user/user.service';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
 import { ArenaSocket } from './arena-socket';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class WsAuthGuard implements CanActivate {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const client = context.switchToWs().getClient<ArenaSocket>();
     const token: string | undefined = typeof client.handshake.auth?.token === 'string'
       ? client.handshake.auth.token
@@ -15,21 +18,18 @@ export class WsAuthGuard implements CanActivate {
         ? client.handshake.headers.authorization.split(' ')[1]
         : undefined;
 
-    console.log('token', token);
-    
     if (!token) {
       return false;
     }
 
-    const user = await this.userService.getUserByUserId('admin');
-
-    if (!user) {
+    const payload = this.authService.getPayloadFromAccessToken(token);
+    if (!payload) {
       return false;
     }
 
-    // ✅ socket 객체에 user 정보 저장
-    client.user = user;
-
+    client.credential = {
+      userId: payload.userId,
+    };
     return true;
   }
 }

@@ -7,10 +7,10 @@ import { LeaveChatPayload } from "./payload/leave-chat.payload";
 import { ChatMessagePayload } from "./payload/chat-message.payload";
 import { ChatMessageDto } from "@/dto/chat-message.dto";
 import { WsAuthGuard } from "@/auth/ws-auth.guard";
-import { WsUser } from "@/auth/ws-user.decorator";
-import { UserEntity } from "@/entity/user.entity";
 import { JoinChatPayload } from "./payload/join-chat.payload";
 import { formatDate } from "@/common/util/time";
+import { FromWsCredential } from "@/auth/ws-credential.decorator";
+import ArenaCredential from "@/auth/arena-credential";
 
 @WebSocketGateway({
   cors: {
@@ -27,9 +27,11 @@ export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
 
   @SubscribeMessage("chat:join")
-  async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: JoinChatPayload, @WsUser() user: UserEntity) {
+  async handleJoin(
+    @ConnectedSocket() client: Socket, @MessageBody() payload: JoinChatPayload, @FromWsCredential() credential: ArenaCredential
+  ) {
     const { featureId } = payload;
-    const userId = 'admin';
+    const userId = credential.userId;
 
     await client.join(featureId);
     client.to(featureId).emit("system", `${userId} has entered the chat.`);
@@ -37,9 +39,11 @@ export class ChatGateway {
   }
 
   @SubscribeMessage("chat:leave")
-  async handleLeave(@ConnectedSocket() client: Socket, @MessageBody() payload: LeaveChatPayload, @WsUser() user: UserEntity) {
+  async handleLeave(
+    @ConnectedSocket() client: Socket, @MessageBody() payload: LeaveChatPayload, @FromWsCredential() credential: ArenaCredential
+  ) {
     const { featureId } = payload;
-    const userId = 'admin';
+    const userId = credential.userId;
 
     await client.leave(featureId);
     client.to(featureId).emit("system", `${userId} has left the chat.`);
@@ -47,9 +51,11 @@ export class ChatGateway {
   }
 
   @SubscribeMessage("chat:message")
-  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: ChatMessagePayload, @WsUser() user: UserEntity) {
+  async handleMessage(
+    @ConnectedSocket() client: Socket, @MessageBody() payload: ChatMessagePayload, @FromWsCredential() credential: ArenaCredential
+  ) {
     const { featureId, content } = payload;
-    const userId = 'admin';
+    const userId = credential.userId;
 
     const message = await this.chatService.createMessage(payload, 'admin');
 

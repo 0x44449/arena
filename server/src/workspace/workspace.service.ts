@@ -22,7 +22,7 @@ export class WorkspaceService {
     private readonly userService: UserService
   ) {}
 
-  async createWorkspace(param: CreateWorkspaceDto, teamId: string, ownerId: string): Promise<WorkspaceDto> {
+  async createWorkspace(param: CreateWorkspaceDto, teamId: string, creatorId: string): Promise<WorkspaceDto> {
     const { name, description } = param;
     if (!name || !description) {
       throw new Error("Name and description are required");
@@ -35,7 +35,7 @@ export class WorkspaceService {
       teamId,
       name,
       description,
-      ownerId,
+      ownerId: creatorId,
     });
     if (!workspace) {
       throw new Error("Failed to create workspace");
@@ -43,7 +43,7 @@ export class WorkspaceService {
     const workspaceDto = new WorkspaceDto(workspace);
 
     // User 매핑
-    const user = await this.userService.getUserByUserId(ownerId);
+    const user = await this.userService.getUserByUserId(creatorId);
     if (user) {
       workspaceDto.owner = new PublicUserDto(user);
     }
@@ -51,7 +51,7 @@ export class WorkspaceService {
     return workspaceDto;
   }
 
-  async updateWorkspace(param: UpdateWorkspaceDto, workspaceId: string, ownerId: string): Promise<WorkspaceDto | null> {
+  async updateWorkspace(param: UpdateWorkspaceDto, workspaceId: string, updaterId: string): Promise<WorkspaceDto | null> {
     const { name, description } = param;
     if (!name || !description) {
       throw new Error("Name and description are required");
@@ -71,7 +71,7 @@ export class WorkspaceService {
     const workspaceDto = new WorkspaceDto(workspace);
 
     // User 매핑
-    const user = await this.userService.getUserByUserId(ownerId);
+    const user = await this.userService.getUserByUserId(updaterId);
     if (user) {
       workspaceDto.owner = new PublicUserDto(user);
     }
@@ -79,10 +79,10 @@ export class WorkspaceService {
     return workspaceDto;
   }
 
-  async deleteWorkspace(workspaceId: string, ownerId: string): Promise<void> {
+  async deleteWorkspace(workspaceId: string, deleterId: string): Promise<void> {
     // TODO: 권한처리
     const workspace = await this.workspaceRepository.findOne({
-      where: { workspaceId, ownerId },
+      where: { workspaceId, ownerId: deleterId },
     });
     if (!workspace) return;
 

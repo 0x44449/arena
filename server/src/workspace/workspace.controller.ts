@@ -9,6 +9,8 @@ import { plainToInstance } from "class-transformer";
 import { WorkspaceFeatureDto } from "@/dto/workspace-feature.dto";
 import { CreateWorkspaceFeatureDto } from "./dto/create-workspace-feature.dto";
 import { AuthGuard } from "@/auth/auth.guard";
+import { FromCredential } from "@/auth/credential.decorator";
+import ArenaCredential from "@/auth/arena-credential";
 
 @Controller('api/v1/workspaces')
 @UseGuards(AuthGuard)
@@ -21,8 +23,10 @@ export class WorkspaceController {
   @Put(':workspaceId')
   @ApiOkResponseWithResult(WorkspaceDto)
   @ApiBody({ type: UpdateWorkspaceDto })
-  async updateWorkspace(@Param('workspaceId') workspaceId: string, @Body() param: UpdateWorkspaceDto): Promise<ApiResult<WorkspaceDto | null>> {
-    const workspace = await this.workspaceService.updateWorkspace(param, workspaceId, 'admin');
+  async updateWorkspace(
+    @Param('workspaceId') workspaceId: string, @Body() param: UpdateWorkspaceDto, @FromCredential() credential: ArenaCredential
+  ): Promise<ApiResult<WorkspaceDto | null>> {
+    const workspace = await this.workspaceService.updateWorkspace(param, workspaceId, credential.userId);
 
     const result = new ApiResult<WorkspaceDto | null>({ data: workspace ? workspace : null });
     return plainToInstance(ApiResult<WorkspaceDto | null>, result);
@@ -30,8 +34,10 @@ export class WorkspaceController {
 
   @Delete(':workspaceId')
   @ApiOkResponseWithResult()
-  async deleteWorkspace(@Param('workspaceId') workspaceId: string): Promise<ApiResult<null>> {
-    await this.workspaceService.deleteWorkspace(workspaceId, 'admin');
+  async deleteWorkspace(
+    @Param('workspaceId') workspaceId: string, @FromCredential() credential: ArenaCredential
+  ): Promise<ApiResult<null>> {
+    await this.workspaceService.deleteWorkspace(workspaceId, credential.userId);
 
     const result = new ApiResult<null>({ data: null });
     return plainToInstance(ApiResult<null>, result);

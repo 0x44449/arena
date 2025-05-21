@@ -11,8 +11,8 @@ import { PublicUserDto } from "@/dto/public-user.dto";
 import { RefreshTokenResultDto } from "./dto/refresh-token-result.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
 import { AuthGuard } from "./auth.guard";
-import { User } from "./user.decorator";
-import { UserEntity } from "@/entity/user.entity";
+import { FromCredential } from "./credential.decorator";
+import ArenaCredential from "./arena-credential";
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -45,8 +45,10 @@ export class AuthController {
   @ApiBody({ type: RefreshTokenDto })
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
-  async refreshToken(@Body() param: RefreshTokenDto, @User() user: UserEntity): Promise<ApiResult<RefreshTokenResultDto>> {
-    const refreshResult = await this.authService.refreshToken(user.userId, param.refreshToken);
+  async refreshToken(
+    @Body() param: RefreshTokenDto, @FromCredential() credential: ArenaCredential
+  ): Promise<ApiResult<RefreshTokenResultDto>> {
+    const refreshResult = await this.authService.refreshToken(credential.userId, param.refreshToken);
 
     const result = new ApiResult<RefreshTokenResultDto>({ data: refreshResult });
     return plainToInstance(ApiResult<RefreshTokenResultDto>, result);

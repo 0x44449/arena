@@ -1,6 +1,6 @@
-import { UserEntity } from '@/entity/user.entity';
 import { Request } from 'express';
+import ArenaCredential from './arena-credential';
 
 export interface ArenaRequest extends Request {
-  user?: UserEntity;
+  credential?: ArenaCredential;
 }

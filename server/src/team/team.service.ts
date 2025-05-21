@@ -17,7 +17,7 @@ export class TeamService {
     private readonly userService: UserService
   ) {}
 
-  async createTeam(param: CreateTeamDto, ownerId: string): Promise<TeamDto> {
+  async createTeam(param: CreateTeamDto, creatorId: string): Promise<TeamDto> {
     const { name, description } = param;
     if (!name || !description) {
       throw new Error("Name and description are required");
@@ -29,7 +29,7 @@ export class TeamService {
       teamId: nanoid(12),
       name,
       description,
-      ownerId,
+      ownerId: creatorId,
     });
     const team = await this.teamRepository.save(teamEntity);
     if (!team) {
@@ -38,7 +38,7 @@ export class TeamService {
     const teamDto = new TeamDto(team);
 
     // User 매핑
-    const user = await this.userService.getUserByUserId(ownerId);
+    const user = await this.userService.getUserByUserId(creatorId);
     if (user) {
       teamDto.owner = new PublicUserDto(user);
     }
@@ -46,7 +46,7 @@ export class TeamService {
     return teamDto;
   }
 
-  async updateTeam(teamId: string, param: UpdateTeamDto, ownerId: string): Promise<TeamDto | null> {
+  async updateTeam(teamId: string, param: UpdateTeamDto, updaterId: string): Promise<TeamDto | null> {
     const { name, description } = param;
     if (!name || !description) {
       throw new Error("Name and description are required");
@@ -66,7 +66,7 @@ export class TeamService {
     const teamDto = new TeamDto(team);
 
     // User 매핑
-    const user = await this.userService.getUserByUserId(ownerId);
+    const user = await this.userService.getUserByUserId(updaterId);
     if (user) {
       teamDto.owner = new PublicUserDto(user);
     }
@@ -74,10 +74,10 @@ export class TeamService {
     return teamDto;
   }
 
-  async deleteTeam(teamId: string, ownerId: string): Promise<void> {
+  async deleteTeam(teamId: string, deleterId: string): Promise<void> {
     // TODO: 권한처리
     const team = await this.teamRepository.findOne({
-      where: { teamId, ownerId },
+      where: { teamId, ownerId: deleterId },
     });
     if (!team) return;
 

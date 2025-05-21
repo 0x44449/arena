@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { nanoid } from "nanoid";
 import { WellKnownError } from "@/common/exception-manage/well-known-error";
 import { RefreshTokenResultDto } from "./dto/refresh-token-result.dto";
+import AccessTokenPayload from "./access-token-payload";
 
 @Injectable()
 export class AuthService {
@@ -109,9 +110,10 @@ export class AuthService {
       });
     }
 
-    const accessToken = this.jwtService.sign({
+    const payload: AccessTokenPayload = {
       userId: user.userId,
-    });
+    };
+    const accessToken = this.jwtService.sign(payload);
     const refreshToken = randomUUID();
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
     const refreshTokenEntity = this.refreshTokenRepository.create({
@@ -166,9 +168,10 @@ export class AuthService {
     }
 
     // Access token 재발급
-    const accessToken = this.jwtService.sign({
+    const payload: AccessTokenPayload = {
       userId: foundEntity.userId,
-    });
+    };
+    const accessToken = this.jwtService.sign(payload);
 
     // Refresh token 재발급
     const newRefreshToken = randomUUID();
@@ -182,5 +185,14 @@ export class AuthService {
     refreshTokenResultDto.refreshToken = newRefreshToken;
 
     return refreshTokenResultDto;
+  }
+
+  getPayloadFromAccessToken(accessToken: string): AccessTokenPayload | null {
+    try {
+      const payload = this.jwtService.verify<AccessTokenPayload>(accessToken);
+      return payload;
+    } catch {
+      return null;
+    }
   }
 }

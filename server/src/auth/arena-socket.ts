@@ -1,6 +1,6 @@
-import { UserEntity } from '@/entity/user.entity';
 import { Socket } from 'socket.io';
+import ArenaCredential from './arena-credential';
 
 export interface ArenaSocket extends Socket {
-  user?: UserEntity;
+  credential?: ArenaCredential;
 }
