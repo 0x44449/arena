@@ -18,6 +18,9 @@ import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth/auth.controller';
 import { RefreshTokenEntity } from './entity/refresh-token.entity';
+import { FileEntity } from './entity/file.entity';
+import { FileService } from './file/file.service';
+import { FileController } from './file/file.controller';
 
 @Module({
   imports: [
@@ -46,6 +49,7 @@ import { RefreshTokenEntity } from './entity/refresh-token.entity';
       WorkspaceFeatureEntity,
       ChatMessageEntity,
       RefreshTokenEntity,
+      FileEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -59,7 +63,7 @@ import { RefreshTokenEntity } from './entity/refresh-token.entity';
       }),
     }),
   ],
-  controllers: [TeamController, WorkspaceController, ChatController, AuthController],
-  providers: [UserService, TeamService, WorkspaceService, ChatService, ChatGateway, AuthService],
+  controllers: [TeamController, WorkspaceController, ChatController, AuthController, FileController],
+  providers: [UserService, TeamService, WorkspaceService, ChatService, ChatGateway, AuthService, FileService],
 })
 export class AppModule {}
