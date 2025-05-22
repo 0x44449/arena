@@ -6,6 +6,8 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { GlobalExceptionFilter } from './common/exception-manage/global-exception-filter';
+import express from 'express';
+import { join } from 'path';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -15,6 +17,9 @@ async function bootstrap() {
 
   // Global error 핸들링
   app.useGlobalFilters(new GlobalExceptionFilter());
+
+  // Static 파일 제공
+  app.use('/public', express.static(join(process.cwd(), 'public')));
 
   // Swagger 설정
   const config = new DocumentBuilder()
