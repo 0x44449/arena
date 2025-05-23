@@ -1,3 +1,4 @@
+import { login } from "@/api/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -6,10 +7,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (id && password) {
-      localStorage.setItem("accessToken", "dummyAccessToken");
-      navigate("/arena");
+      try {
+        const result = await login(id, password);
+        if (result.success) {
+          localStorage.setItem("accessToken", result.data.accessToken);
+          localStorage.setItem("refreshToken", result.data.refreshToken);
+          navigate("/arena");
+        } else {
+          alert(result.errorCode);
+        }
+      } catch (error) {
+        console.error("Login failed:", error);
+        alert("로그인에 실패했습니다. 다시 시도해주세요.");
+      }
     }
   }
 
