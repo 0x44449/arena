@@ -8,8 +8,11 @@ export class RefreshTokenEntity {
   @Column({ name: 'UserId' })
   userId: string;
 
-  @Column({ name: 'Token' })
-  token: string;
+  @Column({ name: 'AccessToken' })
+  accessToken: string;
+
+  @Column({ name: 'RefreshToken' })
+  refreshToken: string;
 
   @Column({ name: 'IsRevoked', default: false })
   isRevoked: boolean;

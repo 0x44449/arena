@@ -49,7 +49,7 @@ export class ChatGateway {
       return client.disconnect();
     }
 
-    const tokenPayload = this.authService.getPayloadFromAccessToken(token);
+    const tokenPayload = this.authService.verifyToken(token);
     if (!tokenPayload) {
       console.log(`[${formatDate('HH:mm:ss.SSS')}] Client disconnected due to invalid token`);
       return client.disconnect();

@@ -8,7 +8,7 @@ import { PublicUserDto } from "@/dto/public-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { JwtService } from "@nestjs/jwt";
 import { LoginUserResultDto } from "./dto/login-user-result.dto";
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import { RefreshTokenEntity } from "@/entity/refresh-token.entity";
 import dayjs from "dayjs";
 import { nanoid } from "nanoid";
@@ -114,11 +114,14 @@ export class AuthService {
       userId: user.userId,
     };
     const accessToken = this.jwtService.sign(payload);
+    const accessTokenHash = createHash('sha256').update(accessToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
+
     const refreshToken = randomUUID();
-    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    const refreshTokenHash = createHash('sha256').update(refreshToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
     const refreshTokenEntity = this.refreshTokenRepository.create({
       userId: user.userId,
-      token: refreshTokenHash,
+      accessToken: accessTokenHash,
+      refreshToken: refreshTokenHash,
       isRevoked: false,
       expiredAt: dayjs().add(7, 'day').toDate(),
     });
@@ -135,32 +138,34 @@ export class AuthService {
     return loginUserResultDto;
   }
 
-  async refreshToken(userId: string, token: string): Promise<RefreshTokenResultDto> {
-    const refreshTokenEntities = await this.refreshTokenRepository.find({
-      where: { userId, isRevoked: false },
+  async logoutUser(accessToken: string, userId: string): Promise<void> {
+    const accessTokenHash = createHash('sha256').update(accessToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
+    await this.refreshTokenRepository.update({
+      userId,
+      accessToken: accessTokenHash,
+    }, {
+      isRevoked: true,
+    });
+  }
+
+  async refreshToken(userId: string, refreshToken: string): Promise<RefreshTokenResultDto> {
+    const refreshTokenHash = createHash('sha256').update(refreshToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
+    const refreshTokenEntity = await this.refreshTokenRepository.findOne({
+      where: {
+        userId,
+        refreshToken: refreshTokenHash,
+        isRevoked: false,
+      },
     });
 
-    if (!refreshTokenEntities) {
+    if (!refreshTokenEntity) {
       throw new WellKnownError({
         message: "Refresh token not found",
         errorCode: "REFRESH_TOKEN_NOT_FOUND",
       });
     }
 
-    const matched = await Promise.all(refreshTokenEntities.map(async (entity) => ({
-      entity,
-      isMatch: await bcrypt.compare(token, entity.token),
-    })));
-
-    const foundEntity = matched.find((x) => x.isMatch)?.entity;
-    if (!foundEntity) {
-      throw new WellKnownError({
-        message: "Refresh token not found",
-        errorCode: "REFRESH_TOKEN_NOT_FOUND",
-      });
-    }
-
-    if (dayjs(foundEntity.expiredAt).isBefore(dayjs())) {
+    if (dayjs(refreshTokenEntity.expiredAt).isBefore(dayjs())) {
       throw new WellKnownError({
         message: "Refresh token expired",
         errorCode: "REFRESH_TOKEN_EXPIRED",
@@ -169,16 +174,20 @@ export class AuthService {
 
     // Access token 재발급
     const payload: AccessTokenPayload = {
-      userId: foundEntity.userId,
+      userId: refreshTokenEntity.userId,
     };
     const accessToken = this.jwtService.sign(payload);
+    const accessTokenHash = createHash('sha256').update(accessToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
 
     // Refresh token 재발급
     const newRefreshToken = randomUUID();
-    const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
-    foundEntity.token = newRefreshTokenHash;
-    foundEntity.expiredAt = dayjs().add(7, 'day').toDate();
-    await this.refreshTokenRepository.save(foundEntity);
+    const newRefreshTokenHash = createHash('sha256').update(newRefreshToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
+
+    // Refresh token DB 업데이트
+    refreshTokenEntity.accessToken = accessTokenHash;
+    refreshTokenEntity.refreshToken = newRefreshTokenHash;
+    refreshTokenEntity.expiredAt = dayjs().add(7, 'day').toDate();
+    await this.refreshTokenRepository.save(refreshTokenEntity);
 
     const refreshTokenResultDto = new RefreshTokenResultDto();
     refreshTokenResultDto.accessToken = accessToken;
@@ -187,7 +196,7 @@ export class AuthService {
     return refreshTokenResultDto;
   }
 
-  getPayloadFromAccessToken(accessToken: string): AccessTokenPayload | null {
+  verifyToken(accessToken: string): AccessTokenPayload | null {
     try {
       const payload = this.jwtService.verify<AccessTokenPayload>(accessToken);
       return payload;
