@@ -11,6 +11,18 @@ import { JoinChatPayload } from "./payload/join-chat.payload";
 import { formatDate } from "@/common/util/time";
 import { FromWsCredential } from "@/auth/ws-credential.decorator";
 import ArenaCredential from "@/auth/arena-credential";
+import { AuthService } from "@/auth/auth.service";
+
+interface SocketAuthPayload {
+  token?: string;
+}
+
+interface ArenaSocket extends Socket {
+  handshake: Socket['handshake'] & { auth: SocketAuthPayload };
+  data: {
+    credential: ArenaCredential;
+  }
+}
 
 @WebSocketGateway({
   cors: {
@@ -19,18 +31,42 @@ import ArenaCredential from "@/auth/arena-credential";
   namespace: '/feature/chat',
 })
 @Injectable()
-@UseGuards(WsAuthGuard)
+// @UseGuards(WsAuthGuard)
 export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly authService: AuthService,
+  ) {}
+
+  // lifecycle hook: client 연결시 자동으로 호출됨
+  handleConnection(client: ArenaSocket) {
+    const token = client.handshake.auth['token'];
+    if (!token) {
+      console.log(`[${formatDate('HH:mm:ss.SSS')}] Client disconnected due to missing token`);
+      return client.disconnect();
+    }
+
+    const tokenPayload = this.authService.getPayloadFromAccessToken(token);
+    if (!tokenPayload) {
+      console.log(`[${formatDate('HH:mm:ss.SSS')}] Client disconnected due to invalid token`);
+      return client.disconnect();
+    }
+
+    const credential: ArenaCredential = {
+      userId: tokenPayload.userId,
+    };
+    client.data.credential = credential;
+  }
 
   @SubscribeMessage("chat:join")
   async handleJoin(
-    @ConnectedSocket() client: Socket, @MessageBody() payload: JoinChatPayload, @FromWsCredential() credential: ArenaCredential
+    @ConnectedSocket() client: ArenaSocket, @MessageBody() payload: JoinChatPayload
   ) {
     const { featureId } = payload;
+    const credential = client.data.credential;
     const userId = credential.userId;
 
     await client.join(featureId);
@@ -40,9 +76,10 @@ export class ChatGateway {
 
   @SubscribeMessage("chat:leave")
   async handleLeave(
-    @ConnectedSocket() client: Socket, @MessageBody() payload: LeaveChatPayload, @FromWsCredential() credential: ArenaCredential
+    @ConnectedSocket() client: ArenaSocket, @MessageBody() payload: LeaveChatPayload
   ) {
     const { featureId } = payload;
+    const credential = client.data.credential;
     const userId = credential.userId;
 
     await client.leave(featureId);
@@ -52,9 +89,10 @@ export class ChatGateway {
 
   @SubscribeMessage("chat:message")
   async handleMessage(
-    @ConnectedSocket() client: Socket, @MessageBody() payload: ChatMessagePayload, @FromWsCredential() credential: ArenaCredential
+    @ConnectedSocket() client: ArenaSocket, @MessageBody() payload: ChatMessagePayload
   ) {
     const { featureId, content } = payload;
+    const credential = client.data.credential;
     const userId = credential.userId;
 
     const message = await this.chatService.createMessage(payload, 'admin');
