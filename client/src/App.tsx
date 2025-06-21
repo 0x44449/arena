@@ -6,8 +6,11 @@ import LoginPage from './pages/Auth/LoginPage';
 import ProtectedRoute from './pages/Auth/ProtectedRoute';
 import RegisterPage from './pages/Auth/RegisterPage';
 import IndexPage from './pages/IndexPage';
+import useBootstrap from './bootstrap';
 
 export default function App() {
+  useBootstrap();
+
   return (
     <Routes>
       <Route path="/" element={<IndexPage />} />

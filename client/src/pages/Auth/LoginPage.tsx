@@ -1,5 +1,6 @@
 import { login } from "@/api/auth";
 import TokenManager from "@/lib/token-manager";
+import { useUserStore } from "@/stores/user-store";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +8,7 @@ export default function LoginPage() {
   const [id, setId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
+  const setUser = useUserStore((state) => state.setUser);
 
   const handleLogin = async () => {
     if (id && password) {
@@ -15,6 +17,8 @@ export default function LoginPage() {
         if (result.success) {
           TokenManager.setAccessToken(result.data.accessToken);
           TokenManager.setRefreshToken(result.data.refreshToken);
+          setUser(result.data.user);
+
           navigate("/arena");
         } else {
           alert(result.errorCode);

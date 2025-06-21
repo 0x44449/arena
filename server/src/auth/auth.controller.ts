@@ -10,9 +10,6 @@ import { LoginUserResultDto } from "./dto/login-user-result.dto";
 import { PublicUserDto } from "@/dto/public-user.dto";
 import { RefreshTokenResultDto } from "./dto/refresh-token-result.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
-import { AuthGuard } from "./auth.guard";
-import { FromCredential } from "./credential.decorator";
-import ArenaCredential from "./arena-credential";
 
 @Controller('api/v1/auth')
 export class AuthController {

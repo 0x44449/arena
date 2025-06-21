@@ -21,6 +21,7 @@ import { RefreshTokenEntity } from './entity/refresh-token.entity';
 import { FileEntity } from './entity/file.entity';
 import { FileService } from './file/file.service';
 import { FileController } from './file/file.controller';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [
@@ -63,7 +64,7 @@ import { FileController } from './file/file.controller';
       }),
     }),
   ],
-  controllers: [TeamController, WorkspaceController, ChatController, AuthController, FileController],
+  controllers: [UserController, TeamController, WorkspaceController, ChatController, AuthController, FileController],
   providers: [UserService, TeamService, WorkspaceService, ChatService, ChatGateway, AuthService, FileService],
 })
 export class AppModule {}

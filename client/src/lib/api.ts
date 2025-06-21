@@ -55,6 +55,8 @@ api.interceptors.response.use((res) => res, async (error) => {
         TokenManager.removeAccessToken();
         TokenManager.removeRefreshToken();
         pendingRequests = [];
+        //TODO: 추후 상태관리에서 login 처리가 완료되면 주석 해제
+        // useUserStore.getState().clearUser();
 
         return Promise.reject(error);
       } finally {

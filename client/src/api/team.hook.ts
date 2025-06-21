@@ -13,7 +13,7 @@ export function useTeamsQuery() {
 
       return response.data;
     },
-  })
+  });
 }
 
 export function useTeamQueryByTeamId(teamId: string | undefined) {
@@ -30,7 +30,7 @@ export function useTeamQueryByTeamId(teamId: string | undefined) {
       return response.data.find((team) => team.teamId === teamId) || null;
     },
     enabled: !!teamId,
-  })
+  });
 }
 
 export function useCachedTeam(teamId: string | undefined) {

@@ -1,11 +1,12 @@
+import { useUserStore } from "@/stores/user-store";
 import PublicUserDto from "@/types/public-user.dto"
 
-interface ProfileCardProps {
-  user: PublicUserDto;
-}
+export function ProfileCard() {
+  const user = useUserStore((state) => state.user);
 
-export function ProfileCard(props: ProfileCardProps) {
-  const user = props.user;
+  if (!user) {
+    return <div className="text-gray-500">No user data available</div>;
+  }
 
   return (
     <div className="flex items-center space-x-4 p-4 bg-white shadow rounded-lg">
