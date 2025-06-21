@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { ArenaRequest } from './arena-request';
 import { UserService } from '@/user/user.service';
 import { AuthService } from './auth.service';
+import { UnauthorizedError } from '@/common/exception-manage/unauthorized-error';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,7 +21,7 @@ export class AuthGuard implements CanActivate {
 
     const payload = this.authService.verifyToken(token);
     if (!payload) {
-      return false;
+      throw new UnauthorizedError('Invalid or expired token');
     }
 
     req.credential = {

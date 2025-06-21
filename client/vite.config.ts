@@ -12,5 +12,10 @@ export default defineConfig({
     alias: {
       '@': '/src',
     },
+  },
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: ['arena-dev.com'],
   }
 })

@@ -25,9 +25,6 @@ interface ArenaSocket extends Socket {
 }
 
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
   namespace: '/feature/chat',
 })
 @Injectable()

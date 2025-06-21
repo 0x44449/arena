@@ -39,11 +39,14 @@ async function bootstrap() {
   SwaggerModule.setup('swagger', app, document);
 
   // dev 구동을 위한 CORS 설정, 추후 삭제
-  app.enableCors({
-    origin: /http:\/\/localhost:5[0-9]{3}$/, // 5000~5999 허용
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  const allowedCors = process.env.CORS_ALLOWED_ORIGINS?.split(',') ?? [];
+  if (allowedCors.length > 0) {
+    app.enableCors({
+      origin: allowedCors,
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    });
+  }
 
   // DTO 생성을 위한 class-transformer 설정
   app.useGlobalPipes(new ValidationPipe());
@@ -59,7 +62,7 @@ async function bootstrap() {
   // );
 
   const port = process.env.PORT || 3001;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`🚀 Arena Nest 서버가 ${port}번 포트에서 실행 중입니다`);
 }
 bootstrap();

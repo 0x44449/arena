@@ -148,11 +148,10 @@ export class AuthService {
     });
   }
 
-  async refreshToken(userId: string, refreshToken: string): Promise<RefreshTokenResultDto> {
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResultDto> {
     const refreshTokenHash = createHash('sha256').update(refreshToken).digest('hex'); // DB에서 WHERE 조건으로 사용 가능해야함
     const refreshTokenEntity = await this.refreshTokenRepository.findOne({
       where: {
-        userId,
         refreshToken: refreshTokenHash,
         isRevoked: false,
       },

@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import * as authApi from '@/api/auth';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -28,12 +29,13 @@ api.interceptors.response.use((res) => res, async (error) => {
     originalRequest._retry = true;
 
     if (!isRefreshing) {
+      console.log('Access token expired, refreshing...');
       isRefreshing = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh`, { refreshToken });
+          const response = await authApi.refreshToken(refreshToken) // await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh`, { refreshToken });
           const newAccessToken = response.data.accessToken;
           localStorage.setItem('accessToken', newAccessToken);
 

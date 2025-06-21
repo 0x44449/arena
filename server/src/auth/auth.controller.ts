@@ -43,12 +43,10 @@ export class AuthController {
   @Post('refresh')
   @ApiOkResponseWithResult(RefreshTokenResultDto)
   @ApiBody({ type: RefreshTokenDto })
-  @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   async refreshToken(
-    @Body() param: RefreshTokenDto, @FromCredential() credential: ArenaCredential
-  ): Promise<ApiResult<RefreshTokenResultDto>> {
-    const refreshResult = await this.authService.refreshToken(credential.userId, param.refreshToken);
+    @Body() param: RefreshTokenDto): Promise<ApiResult<RefreshTokenResultDto>> {
+    const refreshResult = await this.authService.refreshToken(param.refreshToken);
 
     const result = new ApiResult<RefreshTokenResultDto>({ data: refreshResult });
     return plainToInstance(ApiResult<RefreshTokenResultDto>, result);

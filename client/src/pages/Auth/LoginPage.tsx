@@ -25,11 +25,15 @@ export default function LoginPage() {
     }
   }
 
+  const handleRegister = () => {
+    navigate("/register");
+  }
+
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md w-80">
         <h1 className="text-2xl font-bold mb-6 text-center">로그인</h1>
-        
+
         <input
           type="text"
           placeholder="아이디"
@@ -44,13 +48,21 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        
-        <button
-          onClick={handleLogin}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
-        >
-          로그인
-        </button>
+
+        <div className="flex flex-row gap-4">
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
+          >
+            로그인
+          </button>
+          <button
+            onClick={handleRegister}
+            className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 rounded-lg"
+          >
+            회원가입
+          </button>
+        </div>
       </div>
     </div>
   )

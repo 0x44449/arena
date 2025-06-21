@@ -1,3 +1,4 @@
+import { register } from "@/api/auth";
 import { useState } from "react";
 
 export default function RegisterPage() {
@@ -23,11 +24,25 @@ export default function RegisterPage() {
       return;
     }
 
-    // await axios.post('/auth/register', {
-    //   email: form.email,
-    //   loginId: form.loginId,
-    //   password: form.password,
-    // });
+    try {
+      const registerResult = await register({
+        loginId: form.loginId,
+        email: form.email,
+        displayName: form.name,
+        password: form.password,
+      });
+
+      if (registerResult.success) {
+        alert("회원가입이 완료되었습니다. 로그인해주세요.");
+        window.location.href = "/login"; // 회원가입 후 로그인 페이지로 이동
+      } else {
+        alert(registerResult.errorCode || "회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (error) {
+      console.error("회원가입 실패:", error);
+      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      return;
+    }
   };
 
   return (

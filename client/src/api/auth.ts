@@ -15,3 +15,20 @@ export async function login(id: string, password: string): Promise<ApiResult<Log
   });
   return response.data;
 }
+
+export async function register(params: {
+  loginId: string;
+  email: string;
+  displayName: string;
+  password: string;
+}): Promise<ApiResult<PublicUserDto>> {
+  const response = await api.post<ApiResult<PublicUserDto>>('/api/v1/auth/register', params);
+  return response.data;
+}
+
+export async function refreshToken(refreshToken: string): Promise<ApiResult<LoginUserResultDto>> {
+  const response = await api.post<ApiResult<LoginUserResultDto>>('/api/v1/auth/refresh', {
+    refreshToken,
+  });
+  return response.data;
+}

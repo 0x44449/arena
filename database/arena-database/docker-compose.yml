@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:15
+    image: postgres:latest
     container_name: arena-postgres
     restart: always
     ports:
