@@ -1,4 +1,5 @@
 import { login } from "@/api/auth";
+import TokenManager from "@/lib/token-manager";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,8 +13,8 @@ export default function LoginPage() {
       try {
         const result = await login(id, password);
         if (result.success) {
-          localStorage.setItem("accessToken", result.data.accessToken);
-          localStorage.setItem("refreshToken", result.data.refreshToken);
+          TokenManager.setAccessToken(result.data.accessToken);
+          TokenManager.setRefreshToken(result.data.refreshToken);
           navigate("/arena");
         } else {
           alert(result.errorCode);

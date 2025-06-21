@@ -1,12 +1,13 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import * as authApi from '@/api/auth';
+import TokenManager from './token-manager';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = TokenManager.getAccessToken();
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
@@ -33,11 +34,14 @@ api.interceptors.response.use((res) => res, async (error) => {
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = TokenManager.getRefreshToken();
         if (refreshToken) {
           const response = await authApi.refreshToken(refreshToken) // await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh`, { refreshToken });
           const newAccessToken = response.data.accessToken;
-          localStorage.setItem('accessToken', newAccessToken);
+          const newRefreshToken = response.data.refreshToken;
+
+          TokenManager.setAccessToken(newAccessToken);
+          TokenManager.setRefreshToken(newRefreshToken);
 
           processQueue(newAccessToken);
 
@@ -48,8 +52,8 @@ api.interceptors.response.use((res) => res, async (error) => {
         console.error('Failed to refresh token:', err);
 
         isRefreshing = false;
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        TokenManager.removeAccessToken();
+        TokenManager.removeRefreshToken();
         pendingRequests = [];
 
         return Promise.reject(error);

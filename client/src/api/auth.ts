@@ -8,6 +8,11 @@ export interface LoginUserResultDto {
   user: PublicUserDto;
 }
 
+export interface RefreshTokenResultDto {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export async function login(id: string, password: string): Promise<ApiResult<LoginUserResultDto>> {
   const response = await api.post<ApiResult<LoginUserResultDto>>('/api/v1/auth/login', {
     id,
@@ -26,8 +31,8 @@ export async function register(params: {
   return response.data;
 }
 
-export async function refreshToken(refreshToken: string): Promise<ApiResult<LoginUserResultDto>> {
-  const response = await api.post<ApiResult<LoginUserResultDto>>('/api/v1/auth/refresh', {
+export async function refreshToken(refreshToken: string): Promise<ApiResult<RefreshTokenResultDto>> {
+  const response = await api.post<ApiResult<RefreshTokenResultDto>>('/api/v1/auth/refresh', {
     refreshToken,
   });
   return response.data;
