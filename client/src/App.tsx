@@ -7,6 +7,7 @@ import ProtectedRoute from './pages/Auth/ProtectedRoute';
 import RegisterPage from './pages/Auth/RegisterPage';
 import IndexPage from './pages/IndexPage';
 import useBootstrap from './bootstrap';
+import ArenaView from './views/ArenaView';
 
 export default function App() {
   useBootstrap();
@@ -16,12 +17,7 @@ export default function App() {
       <Route path="/" element={<IndexPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/arena" element={<ProtectedRoute><ArenaLayout /></ProtectedRoute>}>
-        <Route path=":teamId" element={<TeamLayout />}>
-          <Route path=":workspaceId" element={<WorkspaceLayout />}>
-          </Route>
-        </Route>
-      </Route>
+      <Route path="/arena/*" element={<ProtectedRoute><ArenaView /></ProtectedRoute>} />
     </Routes>
   )
 }

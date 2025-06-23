@@ -16,7 +16,7 @@ function ArenaLayout() {
             <Outlet />
           </div>
         </div>
-        
+
         <ProfileCard />
       </div>
     </div>

@@ -1,9 +1,12 @@
 import TeamDto from "@/types/team.dto";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { createTeam, CreateTeamParam, getTeams } from "./team";
 
-export function useTeamsQuery() {
+export function useTeamsQuery(param?: {
+  options?: Partial<UseQueryOptions<TeamDto[]>>
+}) {
   return useQuery<TeamDto[], Error>({
+    ...param?.options,
     queryKey: ["teams"],
     queryFn: async () => {
       const response = await getTeams();
@@ -12,12 +15,18 @@ export function useTeamsQuery() {
       }
 
       return response.data;
-    },
+    }
   });
 }
 
-export function useTeamQueryByTeamId(teamId: string | undefined) {
+export function useTeamQueryByTeamId(param?: {
+  teamId: string | undefined,
+  options?: Partial<UseQueryOptions<TeamDto | null>>
+}) {
+  const teamId = param?.teamId;
+
   return useQuery<TeamDto | null, Error>({
+    ...param?.options,
     queryKey: ["teams", teamId],
     queryFn: async () => {
       if (!teamId) throw new Error("teamId is required");
@@ -29,21 +38,27 @@ export function useTeamQueryByTeamId(teamId: string | undefined) {
 
       return response.data.find((team) => team.teamId === teamId) || null;
     },
-    enabled: !!teamId,
+    enabled: !!teamId && (param?.options?.enabled ?? true)
   });
 }
 
-export function useCachedTeam(teamId: string | undefined) {
+export function useCachedTeam(param?: {
+  teamId: string | undefined
+}) {
+  const teamId = param?.teamId;
   const queryClient = useQueryClient();
 
   const allTeams = queryClient.getQueryData<TeamDto[]>(['teams']);
   return allTeams?.find((o) => o.teamId === teamId) || null;
 }
 
-export function useCreateTeamMutation() {
+export function useCreateTeamMutation(param?: {
+  options?: Partial<UseMutationOptions<TeamDto, Error, CreateTeamParam>>
+}) {
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...param?.options,
     mutationFn: async (param: CreateTeamParam) => {
       const response = await createTeam(param);
       if (!response.success) {
@@ -52,10 +67,12 @@ export function useCreateTeamMutation() {
 
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
         queryKey: ["teams"],
       });
-    },
+
+      param?.options?.onSuccess?.(data, variables, context);
+    }
   });
 }

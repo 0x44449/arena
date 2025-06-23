@@ -1,9 +1,15 @@
 import WorkspaceDto from "@/types/workspace.dto";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { createWorkspace, createWorkspaceFeature, CreateWorkspaceFeatureParam, CreateWorkspaceParam, getWorkspaceByWorkspaceId, getWorkspacesByTeamId } from "./workspace";
 
-export function useWorkspacesQueryByTeamId(teamId: string | undefined) {
+export function useWorkspacesQueryByTeamId(param?: {
+  teamId: string | undefined,
+  options?: Partial<UseQueryOptions<WorkspaceDto[]>>
+}) {
+  const teamId = param?.teamId;
+
   return useQuery<WorkspaceDto[], Error>({
+    ...param?.options,
     queryKey: ['teams', teamId, 'workspaces'],
     queryFn: async () => {
       if (!teamId) throw new Error("teamId is required");
@@ -14,13 +20,18 @@ export function useWorkspacesQueryByTeamId(teamId: string | undefined) {
       }
 
       return response.data;
-    },
-    enabled: !!teamId,
+    }
   });
 }
 
-export function useWorkspaceQueryByWorkspaceId(workspaceId: string | undefined) {
+export function useWorkspaceQueryByWorkspaceId(param?: {
+  workspaceId: string | undefined,
+  options?: Partial<UseQueryOptions<WorkspaceDto | null>>
+}) {
+  const workspaceId = param?.workspaceId;
+
   return useQuery<WorkspaceDto | null, Error>({
+    ...param?.options,
     queryKey: ['workspaces', workspaceId],
     queryFn: async () => {
       if (!workspaceId) throw new Error("workspaceId is required");
@@ -31,15 +42,19 @@ export function useWorkspaceQueryByWorkspaceId(workspaceId: string | undefined) 
       }
 
       return response.data;
-    },
-    enabled: !!workspaceId,
+    }
   });
 }
 
-export function useCreateWorkspaceWithFeatureMutation(teamId: string) {
+export function useCreateWorkspaceWithFeatureMutation(param: {
+  teamId: string,
+  options?: Partial<UseMutationOptions<WorkspaceDto, Error, { workspace: CreateWorkspaceParam; feature: CreateWorkspaceFeatureParam }>>
+}) {
+  const teamId = param?.teamId;
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...param?.options,
     mutationFn: async (
       { workspace, feature }: { workspace: CreateWorkspaceParam; feature: CreateWorkspaceFeatureParam }
     ) => {
@@ -59,12 +74,18 @@ export function useCreateWorkspaceWithFeatureMutation(teamId: string) {
         throw new Error("Failed to create workspace");
       }
 
+      if (!workspaceRefresh.data) {
+        throw new Error("Workspace data is null");
+      }
+
       return workspaceRefresh.data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
         queryKey: ['teams', teamId, 'workspaces'],
       });
-    },
-  })
+
+      param?.options?.onSuccess?.(data, variables, context);
+    }
+  });
 }
