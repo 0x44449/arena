@@ -17,7 +17,7 @@ import * as fs from "fs";
 import { Response } from "express";
 
 @Controller('api/v1/users')
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @ApiBearerAuth('access-token')
 export class UserController {
   constructor(
@@ -25,6 +25,7 @@ export class UserController {
     private readonly fileService: FileService,
   ) {}
 
+  @UseGuards(AuthGuard)
   @Get('me')
   @ApiOkResponseWithResult(PublicUserDto)
   async getMe(@FromCredential() credential: ArenaCredential): Promise<ApiResult<PublicUserDto | null>> {
@@ -34,6 +35,7 @@ export class UserController {
     return result;
   }
 
+  @UseGuards(AuthGuard)
   @Put('me')
   @ApiOkResponseWithResult(PublicUserDto)
   @ApiBody({ type: UpdateUserDto })
@@ -44,8 +46,9 @@ export class UserController {
     return result;
   }
 
+  @UseGuards(AuthGuard)
   @Post('me/avatar')
-  @UseInterceptors(FileInterceptor('avatar', {
+  @UseInterceptors(FileInterceptor('file', {
     storage: memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
@@ -69,7 +72,7 @@ export class UserController {
   async uploadAvatar(
     @UploadedFile() file: Express.Multer.File, @FromCredential() credential: ArenaCredential
   ): Promise<ApiResult<FileDto>> {
-    const fileDto = await this.fileService.saveUploadedFile(file, credential.userId);
+    const fileDto = await this.userService.saveUploadedAvatar(file, credential.userId);
 
     const result = new ApiResult<FileDto>({ data: fileDto });
     return result;
@@ -82,7 +85,7 @@ export class UserController {
       throw new Error("Avatar file not found");
     }
 
-    const filePath = join(process.cwd(), file.path, file.storedName);
+    const filePath = join(file.path, file.storedName);
     if (!fs.existsSync(filePath)) {
       throw new Error("Avatar file does not exist");
     }

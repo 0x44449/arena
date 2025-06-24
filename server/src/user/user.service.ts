@@ -10,8 +10,9 @@ import { FileEntity } from "@/entity/file.entity";
 import { nanoid } from "nanoid";
 import { ConfigService } from "@nestjs/config";
 import sharp from "sharp";
-import { extname, join } from "path";
+import { join } from "path";
 import { randomUUID } from "crypto";
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -69,6 +70,7 @@ export class UserService {
     const fileName = randomUUID();
     const fileDestinationDir = join(process.cwd(), UserService.getAvatarRelativePath());
     const fileFullPath = join(fileDestinationDir, fileName);
+    await fs.promises.mkdir(fileDestinationDir, { recursive: true });
     const savedFile = await sharp(file.buffer).png().toFile(fileFullPath);
 
     const fileEntity = this.fileRepository.create({
