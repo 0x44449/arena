@@ -1,12 +1,14 @@
 import { useTeamsQuery } from "@/api/team.hook";
-import { useNavigate, useParams } from "react-router-dom";
+import { matchPath, useLocation, useNavigate, useParams } from "react-router-dom";
 import TeamCreateButtonWithModal from "./TeamCreateButtonWithModal";
 import { useTeamStore } from "@/stores/team-store";
 import { useEffect } from "react";
 
 export default function TeamSidebar() {
   const navigate = useNavigate();
-  const { teamId } = useParams<{ teamId: string }>();
+  const location = useLocation();
+  const match  = matchPath("/arena/:teamId", location.pathname);
+  const teamId = match?.params.teamId;
 
   const teams = useTeamStore((state) => state.teams);
   const setTeams = useTeamStore((state) => state.setTeams);
@@ -18,8 +20,8 @@ export default function TeamSidebar() {
     }
   }, [fetchedTeams]);
 
-  const handleSelect = (teamId: string) => {
-    navigate(`/arena/${teamId}`);
+  const handleSelect = (selectedTeamId: string) => {
+    navigate(`/arena/${selectedTeamId}`);
   }
 
   return (

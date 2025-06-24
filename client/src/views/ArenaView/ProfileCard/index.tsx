@@ -2,6 +2,7 @@ import { useMeQuery } from "@/api/user.hook";
 import { useUserStore } from "@/stores/user-store";
 import { Settings } from "lucide-react";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 interface ProfileCardProps {
   className?: string;
@@ -37,9 +38,12 @@ export function ProfileCard(props: ProfileCardProps) {
         <h2 className="text-xl font-semibold">{user.displayName}</h2>
         {/* <p className="text-gray-600">{user.email}</p> */}
       </div>
-      <div className="cursor-pointer text-gray-500 hover:text-gray-700 transition p-1.5 rounded-full hover:bg-gray-400">
+      <Link
+        className="cursor-pointer text-gray-500 hover:text-gray-700 transition p-1.5 rounded-full hover:bg-gray-400"
+        to="/settings/profile"
+      >
         <Settings size={24} strokeWidth={1.5} />
-      </div>
+      </Link>
     </div>
   )
 }
