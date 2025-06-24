@@ -35,6 +35,9 @@ export class FileDto {
   @Expose()
   url: string;
 
+  @Exclude()
+  category: string;
+
   constructor(input: Partial<FileDto> | FileEntity) {
     Object.assign(this, input);
 

@@ -1,6 +1,7 @@
 import { WellKnownError } from "@/common/exception-manage/well-known-error";
 import { FileDto } from "@/dto/file.dto";
 import { FileEntity } from "@/entity/file.entity";
+import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { nanoid } from "nanoid";
 import { join } from "path";
@@ -10,6 +11,7 @@ export class FileService {
   constructor(
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>,
+    private readonly configService: ConfigService,
   ) {}
 
   static getServerRelativePath() {
@@ -29,7 +31,7 @@ export class FileService {
     }
 
     const fileDto = new FileDto(file);
-    fileDto.url = `/files/download/${fileDto.fileId}`;
+    fileDto.url = `${this.configService.get('SERVER_BASE_URL')}/api/v1/files/download/${fileDto.fileId}`;
     return fileDto;
   }
 
@@ -47,13 +49,14 @@ export class FileService {
       storedName: file.filename,
       mimeType: file.mimetype,
       size: file.size,
-      path: FileService.getServerRelativePath(),
+      path: file.destination,
       uploaderId: uploaderId,
+      category: 'file',
     });
     await this.fileRepository.save(fileEntity);
 
     const fileDto = new FileDto(fileEntity);
-    fileDto.url = `/files/download/${fileDto.fileId}`;
+    fileDto.url = `${this.configService.get('SERVER_BASE_URL')}/api/v1/files/download/${fileDto.fileId}`;
     return fileDto;
   }
 }

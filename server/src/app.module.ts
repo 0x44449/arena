@@ -64,7 +64,13 @@ import { UserController } from './user/user.controller';
       }),
     }),
   ],
-  controllers: [UserController, TeamController, WorkspaceController, ChatController, AuthController, FileController],
-  providers: [UserService, TeamService, WorkspaceService, ChatService, ChatGateway, AuthService, FileService],
+  controllers: [
+    UserController, TeamController, WorkspaceController, ChatController,
+    AuthController, FileController
+  ],
+  providers: [
+    UserService, TeamService, WorkspaceService, ChatService, ChatGateway,
+    AuthService, FileService, ConfigService,
+  ],
 })
 export class AppModule {}

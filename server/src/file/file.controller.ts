@@ -52,23 +52,23 @@ export class FileController {
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-  schema: {
-    type: 'object',
-    properties: {
-      file: {
-        type: 'string',
-        format: 'binary',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
       },
     },
-  },
-})
+  })
   @ApiOkResponseWithResult(FileDto)
   async uploadFile(
     @UploadedFile() file: Express.Multer.File, @FromCredential() credential: ArenaCredential
   ): Promise<ApiResult<FileDto>> {
     const fileDto = await this.fileService.saveUploadedFile(file, credential.userId);
 
-    const result = new ApiResult<FileDto>({ data: fileDto});
+    const result = new ApiResult<FileDto>({ data: fileDto });
     return plainToInstance(ApiResult<FileDto>, result);
   }
 }
