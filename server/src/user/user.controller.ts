@@ -9,11 +9,10 @@ import ArenaCredential from "@/auth/arena-credential";
 import { FromCredential } from "@/auth/credential.decorator";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { randomUUID } from "crypto";
+import { memoryStorage } from "multer";
 import { FileService } from "@/file/file.service";
 import { FileDto } from "@/dto/file.dto";
-import { extname, join } from "path";
+import { join } from "path";
 import * as fs from "fs";
 import { Response } from "express";
 
@@ -46,21 +45,14 @@ export class UserController {
   }
 
   @Post('me/avatar')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, callback) => {
-          const uploadPath = join(process.cwd(), FileService.getServerRelativePath());
-          callback(null, uploadPath);
-        },
-        filename: (req, file, callback) => {
-          const uniqueSuffix = randomUUID();
-          const fileExtension = extname(file.originalname);
-          callback(null, uniqueSuffix + fileExtension);
-        },
-      })
-    })
-  )
+  @UseInterceptors(FileInterceptor('avatar', {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+      if (!file.mimetype.startsWith('image/')) return cb(new Error('image only'), false);
+      cb(null, true);
+    },
+  }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
