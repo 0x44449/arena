@@ -24,10 +24,6 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
-  static getAvatarRelativePath() {
-    return 'stored/avatar';
-  }
-
   async getUserByUserId(userId: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { userId } });
   }
@@ -59,35 +55,54 @@ export class UserService {
     return new PublicUserDto(updatedUser);
   }
 
-  async saveUploadedAvatar(file: Express.Multer.File, userId: string): Promise<FileDto> {
+  /**
+   * 업로드된 사용자의 아바타를 서버에 저장하고 DB에 기록하며 사용자 프로필 정보를 업데이트 합니다.
+   */
+  async updateUserAvatar(file: Express.Multer.File, userId: string): Promise<PublicUserDto> {
     if (!file) {
       throw new WellKnownError({
         message: "Upload file not found",
         errorCode: "UPLOAD_FILE_NOT_FOUND",
       });
     }
+    const user = await this.getUserByUserId(userId);
+    if (!user) {
+      throw new WellKnownError({
+        message: "User not found",
+        errorCode: "USER_NOT_FOUND",
+      });
+    }
 
     const fileName = randomUUID();
-    const fileDestinationDir = join(process.cwd(), UserService.getAvatarRelativePath());
-    const fileFullPath = join(fileDestinationDir, fileName);
-    await fs.promises.mkdir(fileDestinationDir, { recursive: true });
+    const destinationDir = this.configService.get<string>('FILE_STORAGE_LOCATION')!;
+    const fileFullPath = join(destinationDir, fileName);
+    
+    // 파일 PNG 변환 및 저장
+    await fs.promises.mkdir(destinationDir, { recursive: true });
     const savedFile = await sharp(file.buffer).png().toFile(fileFullPath);
 
+    // 파일 정보를 저장
+    // 아바타 썸네일도 파일로 관리하고 카테고리만 분리
+    const fileId = nanoid(12);
     const fileEntity = this.fileRepository.create({
-      fileId: nanoid(12),
+      fileId: fileId,
       originalName: file.originalname,
       storedName: fileName,
       mimeType: 'image/png',
       size: savedFile.size,
-      path: fileDestinationDir,
+      path: destinationDir,
       uploaderId: userId,
       category: 'avatar',
     });
     await this.fileRepository.save(fileEntity);
 
-    const fileDto = new FileDto(fileEntity);
-    fileDto.url = `${this.configService.get('SERVER_BASE_URL')}/api/v1/users/${userId}/avatar/thumbnail`;
-    return fileDto;
+    // 사용자 정보를 업데이트
+    user.avatarKey = fileId;
+    user.avatarType = 'user';
+    const updatedUser = await this.userRepository.save(user);
+
+    const userDto = new PublicUserDto(updatedUser);
+    return userDto;
   }
 
   async getAvatarFileByUserId(userId: string): Promise<FileDto | null> {
@@ -106,7 +121,6 @@ export class UserService {
     }
 
     const fileDto = new FileDto(fileEntity);
-    fileDto.url = `${this.configService.get('SERVER_BASE_URL')}/api/v1/users/${userId}/avatar/thumbnail`;
     return fileDto;
   }
 }

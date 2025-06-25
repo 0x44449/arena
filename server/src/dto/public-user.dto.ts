@@ -46,7 +46,7 @@ export class PublicUserDto {
       this.avatarUrl = `/image/default-avatar/${this.avatarKey}`;
     }
     else {
-      this.avatarUrl = `/image/user/${this.userId}/avatar/${this.avatarKey}`;
+      this.avatarUrl = `${process.env.SERVER_BASE_URL}/api/v1/users/${this.userId}/avatar/thumbnail.png`;
     }
   }
 }

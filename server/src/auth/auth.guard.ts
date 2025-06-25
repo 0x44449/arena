@@ -4,6 +4,7 @@ import { ArenaRequest } from './arena-request';
 import { UserService } from '@/user/user.service';
 import { AuthService } from './auth.service';
 import { UnauthorizedError } from '@/common/exception-manage/unauthorized-error';
+import { IS_PUBLIC_KEY } from './allow-public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -14,6 +15,12 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) return true;
+    
     const req = context.switchToHttp().getRequest<ArenaRequest>();
     const token = req.headers.authorization?.split(' ')[1];
 

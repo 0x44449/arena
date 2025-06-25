@@ -44,5 +44,7 @@ export class FileDto {
     if (input instanceof FileEntity) {
       this.name = input.originalName;
     }
+
+    this.url = `${process.env.SERVER_BASE_URL}/api/v1/files/download/${this.fileId}`;
   }
 }
