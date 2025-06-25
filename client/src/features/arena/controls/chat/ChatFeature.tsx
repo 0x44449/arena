@@ -1,6 +1,6 @@
-import ChatArea from "./Chat/ChatArea";
-import ChatInputArea from "./Chat/ChatInputArea";
-import { useChatFeature, useChatFeatureConnectionSync } from "./Chat/chat.hook";
+import { useChatFeature, useChatFeatureConnectionSync } from "../../hooks/chat.hook";
+import ChatArea from "./ChatArea";
+import ChatInputArea from "./ChatInputArea";
 
 interface ChatFeatureProps {
   teamId: string;

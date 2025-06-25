@@ -92,7 +92,7 @@ export class ChatGateway {
     const credential = client.data.credential;
     const userId = credential.userId;
 
-    const message = await this.chatService.createMessage(payload, 'admin');
+    const message = await this.chatService.createMessage(payload, userId);
 
     client.to(featureId).emit("message", plainToInstance(ChatMessageDto, message));
     client.emit("chat:message", plainToInstance(ChatMessageDto, message));

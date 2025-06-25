@@ -4,7 +4,7 @@ import PublicUserDto from "@/types/public-user.dto";
 import { useState } from "react";
 import { useLocation, useNavigate, useNavigation } from "react-router-dom";
 
-export default function ProfileView() {
+export default function ProfileSettingPage() {
   // const location = useLocation();
   // const navigate = useNavigate();
   // const navigation = useNavigation();

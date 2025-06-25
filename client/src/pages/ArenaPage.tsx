@@ -1,8 +1,9 @@
-import { ProfileCard } from "@/views/ArenaView/ProfileCard";
-import TeamSidebar from "@/views/ArenaView/TeamSidebar";
-import WorkspaceView from "./WorkspaceView";
+import FeatureView from "@/features/arena/controls/FeatureView";
+import ProfileCard from "@/features/arena/controls/ProfileCard";
+import TeamSidebar from "@/features/arena/controls/TeamSidebar";
+import WorkspaceView from "@/features/arena/controls/WorkspaceView";
 
-export default function ArenaView() {
+export default function ArenaPage() {
   return (
     <div className="flex flex-row h-screen w-screen">
       <div className="flex flex-col w-100 bg-gray-100">
@@ -23,6 +24,7 @@ export default function ArenaView() {
 
       <div className="flex flex-1">
         {/* FeatureView */}
+        <FeatureView />
       </div>
     </div>
   )

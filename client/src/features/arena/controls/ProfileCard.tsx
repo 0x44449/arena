@@ -8,7 +8,7 @@ interface ProfileCardProps {
   className?: string;
 }
 
-export function ProfileCard(props: ProfileCardProps) {
+export default function ProfileCard(props: ProfileCardProps) {
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const { data: fetchedUser } = useMeQuery({

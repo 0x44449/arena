@@ -18,5 +18,6 @@ export const useTeamStore = create<TeamState>((set, get) => ({
       ? get().teams.map(t => t.teamId === team.teamId ? team : t)
       : [...get().teams, team]
   }),
-  clearTeams: () => set({ teams: [] })
+  clearTeams: () => set({ teams: [] }),
+  getTeamById: (teamId: string) => get().teams.find(team => team.teamId === teamId) || null,
 }));

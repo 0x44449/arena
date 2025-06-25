@@ -1,24 +1,24 @@
 import { Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/Auth/LoginPage';
-import ProtectedRoute from './pages/Auth/ProtectedRoute';
-import RegisterPage from './pages/Auth/RegisterPage';
-import IndexPage from './pages/IndexPage';
+import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './pages/ProtectedRoute';
+import RegisterPage from './pages/RegisterPage';
 import useBootstrap from './bootstrap';
-import ArenaView from './views/ArenaView';
-import ProfileView from './views/SettingView/ProfileView';
-import SettingView from './views/SettingView';
+import ArenaPage from './pages/ArenaPage';
+import SettingPage from './pages/SettingPage';
+import ProfileSettingPage from './pages/setting/ProfileSettingPage';
+import IndexRedirect from './pages/IndexRedirect';
 
 export default function App() {
   useBootstrap();
 
   return (
     <Routes>
-      <Route path="/" element={<IndexPage />} />
+      <Route path="/" element={<IndexRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/arena/*" element={<ProtectedRoute><ArenaView /></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><SettingView /></ProtectedRoute>}>
-        <Route path="profile" element={<ProfileView />} />
+      <Route path="/arena/*" element={<ProtectedRoute><ArenaPage /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>}>
+        <Route path="profile" element={<ProfileSettingPage />} />
       </Route>
     </Routes>
   )

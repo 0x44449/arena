@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
 
-export default function IndexPage() {
+export default function IndexRedirect() {
   return <Navigate to="/arena" replace />
 }

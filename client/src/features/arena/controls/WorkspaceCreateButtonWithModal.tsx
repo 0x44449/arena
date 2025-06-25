@@ -14,7 +14,7 @@ export default function WorkspaceCreateButtonWithModal(props: WorkspaceCreateBut
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const createWorkspaceWithFeatureMutation = useCreateWorkspaceWithFeatureMutation(teamId);
+  const createWorkspaceWithFeatureMutation = useCreateWorkspaceWithFeatureMutation({ teamId });
 
   const handleCreate = async () => {
     if (!teamId) return;

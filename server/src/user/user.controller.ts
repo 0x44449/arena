@@ -11,7 +11,6 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
 import { FileService } from "@/file/file.service";
-import { FileDto } from "@/dto/file.dto";
 import { join } from "path";
 import * as fs from "fs";
 import { Response } from "express";
