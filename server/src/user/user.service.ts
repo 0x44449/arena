@@ -120,7 +120,7 @@ export class UserService {
       return null;
     }
 
-    const fileDto = new FileDto(fileEntity);
+    const fileDto = FileDto.fromEntity(fileEntity);
     return fileDto;
   }
 }

@@ -4,7 +4,6 @@ import { FileEntity } from "@/entity/file.entity";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { nanoid } from "nanoid";
-import { join } from "path";
 import { Repository } from "typeorm";
 
 export class FileService {
@@ -19,19 +18,18 @@ export class FileService {
   }
 
   async getFileByFileId(fileId: string): Promise<FileDto> {
-    const file = await this.fileRepository.findOne({
+    const fileEntity = await this.fileRepository.findOne({
       where: { fileId },
     });
 
-    if (!file) {
+    if (!fileEntity) {
       throw new WellKnownError({
         message: "File not found",
         errorCode: "DOWNLOAD_FILE_NOT_FOUND",
       });
     }
 
-    const fileDto = new FileDto(file);
-    fileDto.url = `${this.configService.get('SERVER_BASE_URL')}/api/v1/files/download/${fileDto.fileId}`;
+    const fileDto = FileDto.fromEntity(fileEntity);
     return fileDto;
   }
 
@@ -55,8 +53,7 @@ export class FileService {
     });
     await this.fileRepository.save(fileEntity);
 
-    const fileDto = new FileDto(fileEntity);
-    fileDto.url = `${this.configService.get('SERVER_BASE_URL')}/api/v1/files/download/${fileDto.fileId}`;
+    const fileDto = FileDto.fromEntity(fileEntity);
     return fileDto;
   }
 }

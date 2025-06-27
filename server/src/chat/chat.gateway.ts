@@ -1,17 +1,13 @@
 import { Injectable, UseGuards } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { plainToInstance } from "class-transformer";
 import { Server, Socket } from 'socket.io';
 import { ChatService } from "./chat.service";
 import { LeaveChatPayload } from "./payload/leave-chat.payload";
-import { ChatMessagePayload } from "./payload/chat-message.payload";
-import { ChatMessageDto } from "@/dto/chat-message.dto";
-import { WsAuthGuard } from "@/auth/ws-auth.guard";
 import { JoinChatPayload } from "./payload/join-chat.payload";
 import { formatDate } from "@/common/util/time";
-import { FromWsCredential } from "@/auth/ws-credential.decorator";
 import ArenaCredential from "@/auth/arena-credential";
 import { AuthService } from "@/auth/auth.service";
+import { ChatMessageDto } from "@/dto/chat-message.dto";
 
 interface SocketAuthPayload {
   token?: string;
@@ -34,7 +30,6 @@ export class ChatGateway {
   server: Server;
 
   constructor(
-    private readonly chatService: ChatService,
     private readonly authService: AuthService,
   ) {}
 
@@ -84,18 +79,8 @@ export class ChatGateway {
     console.log(`[${formatDate('HH:mm:ss.SSS')}] User ${userId} left zone ${featureId}`);
   }
 
-  @SubscribeMessage("chat:message")
-  async handleMessage(
-    @ConnectedSocket() client: ArenaSocket, @MessageBody() payload: ChatMessagePayload
-  ) {
-    const { featureId, content } = payload;
-    const credential = client.data.credential;
-    const userId = credential.userId;
-
-    const message = await this.chatService.createMessage(payload, userId);
-
-    client.to(featureId).emit("message", plainToInstance(ChatMessageDto, message));
-    client.emit("chat:message", plainToInstance(ChatMessageDto, message));
-    console.log(`[${formatDate('HH:mm:ss.SSS')}] Message from ${userId} in ${featureId}: ${content}`);
+  notifyChatMessage(featureId: string, message: ChatMessageDto) {
+    this.server.to(featureId).emit("message", message);
+    console.log(`[${formatDate('HH:mm:ss.SSS')}] Broadcast message in ${featureId}: ${message.content}`);
   }
 }

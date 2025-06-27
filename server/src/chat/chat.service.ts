@@ -16,6 +16,7 @@ import { join } from "path";
 import * as fs from 'fs';
 import sharp from "sharp";
 import { FileEntity } from "@/entity/file.entity";
+import { ChatGateway } from "./chat.gateway";
 
 @Injectable()
 export class ChatService {
@@ -25,6 +26,7 @@ export class ChatService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly fileRepository: Repository<FileEntity>,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   async getMessages(featureId: string): Promise<ChatMessageDto[]> {
@@ -74,6 +76,9 @@ export class ChatService {
 
     const messageDto = ChatMessageDto.fromEntity(savedMessage);
     messageDto.sender = user;
+
+    // 메세지 전송 알림
+    this.chatGateway.notifyChatMessage(featureId, messageDto);
 
     return messageDto;
   }
@@ -156,6 +161,9 @@ export class ChatService {
     // 메시지 DTO 변환
     const messageDto = ChatMessageDto.fromEntity(savedMessage);
     messageDto.sender = user;
+
+    // 메세지 전송 알림
+    this.chatGateway.notifyChatMessage(featureId, messageDto);
 
     return messageDto;
   }
