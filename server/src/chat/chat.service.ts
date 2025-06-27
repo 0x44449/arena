@@ -1,11 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { UserService } from "@/user/user.service";
 import { ChatMessageDto } from "@/dto/chat-message.dto";
-import { PublicUserDto } from "@/dto/public-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ChatMessageEntity } from "@/entity/chat-message.entity";
-import { Repository } from "typeorm";
-import { ChatMessagePayload } from "./payload/chat-message.payload";
+import { In, Repository } from "typeorm";
 import { CreateTextChatMessageDto } from "./dto/create-text-chat-message.dto";
 import { WellKnownError } from "@/common/exception-manage/well-known-error";
 import { ImageChatMessageContent, TextChatMessageContent } from "@/entity/chat-message-content.type";
@@ -23,9 +21,10 @@ export class ChatService {
   constructor(
     @InjectRepository(ChatMessageEntity)
     private readonly messageRepository: Repository<ChatMessageEntity>,
+    @InjectRepository(FileEntity)
+    private readonly fileRepository: Repository<FileEntity>,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
-    private readonly fileRepository: Repository<FileEntity>,
     private readonly chatGateway: ChatGateway,
   ) {}
 
