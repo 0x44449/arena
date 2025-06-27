@@ -38,13 +38,13 @@ export class FileDto {
   @Exclude()
   category: string;
 
-  constructor(input: Partial<FileDto> | FileEntity) {
-    Object.assign(this, input);
+  private constructor() {}
 
-    if (input instanceof FileEntity) {
-      this.name = input.originalName;
-    }
-
-    this.url = `${process.env.SERVER_BASE_URL}/api/v1/files/download/${this.fileId}`;
+  static fromEntity(entity: FileEntity): FileDto {
+    const instance = new FileDto();
+    Object.assign(instance, entity);
+    instance.name = entity.originalName;
+    instance.url = `${process.env.SERVER_BASE_URL}/api/v1/files/download/${instance.fileId}`;
+    return instance;
   }
 }
