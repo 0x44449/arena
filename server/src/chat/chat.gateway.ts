@@ -1,7 +1,6 @@
-import { Injectable, UseGuards } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
-import { ChatService } from "./chat.service";
 import { LeaveChatPayload } from "./payload/leave-chat.payload";
 import { JoinChatPayload } from "./payload/join-chat.payload";
 import { formatDate } from "@/common/util/time";
@@ -81,6 +80,6 @@ export class ChatGateway {
 
   notifyChatMessage(featureId: string, message: ChatMessageDto) {
     this.server.to(featureId).emit("message", message);
-    console.log(`[${formatDate('HH:mm:ss.SSS')}] Broadcast message in ${featureId}: ${message.content}`);
+    console.log(`[${formatDate('HH:mm:ss.SSS')}] Broadcast message in ${featureId}: ${message.text}`);
   }
 }

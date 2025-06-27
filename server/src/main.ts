@@ -8,6 +8,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { GlobalExceptionFilter } from './common/exception-manage/global-exception-filter';
 import express from 'express';
 import { join } from 'path';
+import metadata from './metadata';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -35,6 +36,7 @@ async function bootstrap() {
       in: 'header',
     }, 'access-token')
     .build();
+  await SwaggerModule.loadPluginMetadata(metadata);
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 

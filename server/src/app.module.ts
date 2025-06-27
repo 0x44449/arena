@@ -22,6 +22,7 @@ import { FileEntity } from './entity/file.entity';
 import { FileService } from './file/file.service';
 import { FileController } from './file/file.controller';
 import { UserController } from './user/user.controller';
+import { ChatAttachmentEntity } from './entity/chat-attachment.entity';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { UserController } from './user/user.controller';
       WorkspaceEntity,
       WorkspaceFeatureEntity,
       ChatMessageEntity,
+      ChatAttachmentEntity,
       RefreshTokenEntity,
       FileEntity,
     ]),

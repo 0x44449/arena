@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ChatMessageContent } from "./chat-message-content.type";
 
 @Entity('ChatMessage')
 export class ChatMessageEntity {
@@ -14,15 +13,8 @@ export class ChatMessageEntity {
   @Index()
   senderId: string;
 
-  @Column('json', { name: 'Content' })
-  content: ChatMessageContent;
-
-  @Column({
-    name: 'ContentType',
-    type: 'enum',
-    enum: ['text', 'image']
-  })
-  contentType: 'text' | 'image';
+  @Column({ name: 'Text' })
+  text: string;
 
   @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
   @Index()

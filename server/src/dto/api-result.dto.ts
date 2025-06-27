@@ -1,20 +1,15 @@
-import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 
 export class ApiResult<T> {
-  @ApiProperty()
   @Expose()
   success: boolean;
 
-  @ApiProperty()
   @Expose()
   data?: T;
 
-  @ApiProperty()
   @Expose()
   errorMessage?: string;
 
-  @ApiProperty()
   @Expose()
   errorCode?: string;
 

@@ -1,23 +1,24 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { plainToInstance } from "class-transformer";
 import { ChatService } from "./chat.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
 import { ApiResult } from "@/dto/api-result.dto";
 import { ChatMessageDto } from "@/dto/chat-message.dto";
 import { AuthGuard } from "@/auth/auth.guard";
-import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiConsumes, ApiBody } from "@nestjs/swagger";
 import { FromCredential } from "@/auth/credential.decorator";
 import ArenaCredential from "@/auth/arena-credential";
-import { CreateTextChatMessageDto } from "./dto/create-text-chat-message.dto";
-import { CreateImageChatMessageDto } from "./dto/create-image-chat-message.dto";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { memoryStorage } from "multer";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { CreateChatMessageDto } from "./dto/create-chat-message.dto";
+import { randomUUID } from "crypto";
+import { ChatAttachmentDto } from "@/dto/chat-attachment.dto";
 
 @Controller('api/v1/chat')
 @UseGuards(AuthGuard)
 @ApiBearerAuth('access-token')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) { }
+  constructor(private readonly chatService: ChatService) {}
 
   @Get('/:featureId/messages')
   @ApiOkResponseWithResult(ChatMessageDto, { isArray: true })
@@ -28,36 +29,51 @@ export class ChatController {
     return plainToInstance(ApiResult<ChatMessageDto[]>, result);
   }
 
-  @Post('/:featureId/messages/text')
+  @Post('/:featureId/messages')
   @ApiOkResponseWithResult(ChatMessageDto)
-  @ApiBody({ type: CreateTextChatMessageDto })
-  async createTextMessage(
-    @Param('featureId') featureId: string,
-    @Body() param: CreateTextChatMessageDto,
-    @FromCredential() credential: ArenaCredential
-  ): Promise<ApiResult<ChatMessageDto>> {
-    const message = await this.chatService.createTextMessage(featureId, param, credential.userId);
+  async createMessage(@Param('featureId') featureId: string, @Body() param: CreateChatMessageDto, @FromCredential() credential: ArenaCredential): Promise<ApiResult<ChatMessageDto>> {
+    const message = await this.chatService.createMessage(featureId, param, credential.userId);
     return plainToInstance(ApiResult<ChatMessageDto>, { data: message });
   }
 
-  @Post('/:featureId/messages/image')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: memoryStorage(),
-    limits: { fileSize: 100 * 1024 * 1024 },
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.startsWith('image/')) return cb(new Error('image only'), false);
-      cb(null, true);
+  @Post('/:featureId/messages/attachments')
+  @ApiOkResponseWithResult(ChatAttachmentDto, { isArray: true })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary'
+          }
+        }
+      }
+    }
+  })
+  @UseInterceptors(FilesInterceptor('files', 10, {
+    limits: {
+      fileSize: 100 * 1024 * 1024, // 최대 100MB 파일 크기
     },
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const destinationDir = `${process.env.FILE_STORAGE_LOCATION}`;
+        cb(null, destinationDir); // 업로드 디렉토리 설정
+      },
+      filename: (req, file, cb) => {
+        const fileName = randomUUID();
+        cb(null, `${fileName}`);
+      }
+    })
   }))
-  @ApiOkResponseWithResult(ChatMessageDto)
-  @ApiBody({ type: CreateImageChatMessageDto })
-  async createImageMessage(
+  async uploadAttachments(
     @Param('featureId') featureId: string,
-    @Body() param: CreateImageChatMessageDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @FromCredential() credential: ArenaCredential
-  ): Promise<ApiResult<ChatMessageDto>> {
-    const message = await this.chatService.createImageMessage(featureId, param, file, credential.userId);
-    return plainToInstance(ApiResult<ChatMessageDto>, { data: message });
+  ): Promise<ApiResult<ChatAttachmentDto[]>> {
+    const attachmentUrls = await this.chatService.uploadAttachments(featureId, files, credential.userId);
+    return plainToInstance(ApiResult<ChatAttachmentDto[]>, { data: attachmentUrls });
   }
 }
