@@ -17,6 +17,9 @@ export class ChatMessageEntity {
   @Column('json', { name: 'Content' })
   content: ChatMessageContent;
 
+  @Column({ name: 'ContentType', type: 'string' })
+  contentType: 'text' | 'image';
+
   @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
   @Index()
   createdAt: Date;

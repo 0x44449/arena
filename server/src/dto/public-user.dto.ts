@@ -49,4 +49,9 @@ export class PublicUserDto {
       this.avatarUrl = `${process.env.SERVER_BASE_URL}/api/v1/users/${this.userId}/avatar/thumbnail.png`;
     }
   }
+
+  static fromEntity(entity: UserEntity): PublicUserDto {
+    const instance = new PublicUserDto(entity);
+    return instance;
+  }
 }

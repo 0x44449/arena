@@ -38,8 +38,6 @@ export class FileDto {
   @Exclude()
   category: string;
 
-  private constructor() {}
-
   static fromEntity(entity: FileEntity): FileDto {
     const instance = new FileDto();
     Object.assign(instance, entity);

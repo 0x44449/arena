@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
 import { PublicUserDto } from "./public-user.dto";
 import { ChatMessageEntity } from "@/entity/chat-message.entity";
+import { ChatMessageContentDto } from "./chat-message-content.dto";
 
 export class ChatMessageDto {
   @ApiProperty()
@@ -17,7 +18,7 @@ export class ChatMessageDto {
 
   @ApiProperty()
   @Expose()
-  content: string;
+  content: ChatMessageContentDto;
 
   @ApiProperty()
   @Expose()
@@ -30,11 +31,17 @@ export class ChatMessageDto {
   @Exclude()
   senderId: string;
 
+  @ApiProperty()
+  @Expose()
+  contentType: 'text' | 'image';
+
   @ApiProperty({ type: PublicUserDto })
   @Expose()
   sender: PublicUserDto;
 
-  constructor(input: Partial<ChatMessageDto> | ChatMessageEntity) {
-    Object.assign(this, input);
+  static fromEntity(entity: ChatMessageEntity): ChatMessageDto {
+    const instance = new ChatMessageDto();
+    Object.assign(instance, entity);
+    return instance;
   }
 }
