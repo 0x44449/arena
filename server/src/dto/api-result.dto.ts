@@ -3,13 +3,10 @@ import { Expose } from "class-transformer";
 export class ApiResult<T> {
   @Expose()
   success: boolean;
-
   @Expose()
   data?: T;
-
   @Expose()
   errorMessage?: string;
-
   @Expose()
   errorCode?: string;
 

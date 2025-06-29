@@ -1,16 +1,9 @@
 import { ImageChatMessageContent, TextChatMessageContent } from "@/entity/chat-message-content.type";
-import { ApiProperty } from "@nestjs/swagger";
-import { Expose } from "class-transformer";
 import { FileDto } from "./file.dto";
 import { FileEntity } from "@/entity/file.entity";
 
 export class TextChatMessageContentDto {
-  @ApiProperty()
-  @Expose()
   type: 'text';
-
-  @ApiProperty()
-  @Expose()
   text: string;
 
   private constructor() {}
@@ -23,28 +16,11 @@ export class TextChatMessageContentDto {
 }
 
 export class ImageChatMessageContentDto {
-  @ApiProperty()
-  @Expose()
   type: 'image';
-
-  @ApiProperty()
-  @Expose()
   text: string;
-
-  @ApiProperty()
-  @Expose()
   fileId: string;
-
-  @ApiProperty()
-  @Expose()
   width: number;
-
-  @ApiProperty()
-  @Expose()
   height: number;
-
-  @ApiProperty({ type: FileDto })
-  @Expose()
   file: FileDto;
 
   private constructor() {}
