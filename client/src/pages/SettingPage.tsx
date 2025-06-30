@@ -1,4 +1,4 @@
-import SettingMenu from "@/features/setting/controls/SettingMenu";
+import SettingMenu from "@/views/setting/controls/SettingMenu";
 import { Outlet } from "react-router-dom";
 
 export default function SettingPage() {

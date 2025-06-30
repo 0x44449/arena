@@ -6,3 +6,8 @@ export async function getMe(): Promise<ApiResult<PublicUserDto | null>> {
   const response = await api.get<ApiResult<PublicUserDto | null>>(`/api/v1/users/me`);
   return response.data;
 }
+
+const userApi = {
+  getMe,
+};
+export default userApi;

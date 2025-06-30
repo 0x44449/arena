@@ -37,3 +37,10 @@ export async function refreshToken(refreshToken: string): Promise<ApiResult<Refr
   });
   return response.data;
 }
+
+const authApi = {
+  login,
+  register,
+  refreshToken,
+};
+export default authApi;

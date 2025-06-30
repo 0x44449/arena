@@ -21,3 +21,10 @@ export async function createTeam(param: CreateTeamParam): Promise<ApiResult<Team
   const response = await api.post<ApiResult<TeamDto>>(`/api/v1/teams`, param);
   return response.data;
 }
+
+const teamApi = {
+  getTeams,
+  getTeamByTeamId,
+  createTeam,
+};
+export default teamApi;

@@ -35,3 +35,11 @@ export async function createWorkspaceFeature(
   const response = await api.post<ApiResult<WorkspaceFeatureDto>>(`/api/v1/workspaces/${workspaceId}/features`, param);
   return response.data;
 }
+
+const workspaceApi = {
+  getWorkspacesByTeamId,
+  getWorkspaceByWorkspaceId,
+  createWorkspace,
+  createWorkspaceFeature,
+};
+export default workspaceApi;
