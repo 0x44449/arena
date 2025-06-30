@@ -79,7 +79,7 @@ export class ChatGateway {
   }
 
   notifyChatMessage(featureId: string, message: ChatMessageDto) {
-    this.server.to(featureId).emit("message", message);
+    this.server.to(featureId).emit("chat:message", message);
     console.log(`[${formatDate('HH:mm:ss.SSS')}] Broadcast message in ${featureId}: ${message.text}`);
   }
 }
