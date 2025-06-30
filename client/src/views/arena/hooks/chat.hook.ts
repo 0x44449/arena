@@ -1,4 +1,4 @@
-import { getMessages } from "@/api/chat";
+import chatApi, { getMessages } from "@/api/chat";
 import { socket } from "@/lib/socket";
 import ChatMessageDto from "@/types/chat-message.dto";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -80,10 +80,7 @@ export function useChatFeature(props: ChatFeatureProps) {
   const sendMessage = useCallback((message: string) => {
     if (!featureId) return;
 
-    socket.emit('chat:message', {
-      featureId,
-      content: message
-    });
+    chatApi.sendMessage(featureId, { text: message });
   }, [featureId]);
 
   return { messages, sendMessage };

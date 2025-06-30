@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useChatFeature, useChatFeatureConnectionSync } from "../../hooks/chat.hook";
+import { useChatStore } from "../../stores/chat-store";
 import ChatArea from "./ChatArea";
 import ChatInputArea from "./ChatInputArea";
 
@@ -11,17 +13,19 @@ interface ChatFeatureProps {
 export default function ChatFeature(props: ChatFeatureProps) {
   const { teamId, workspaceId, featureId } = props;
   useChatFeatureConnectionSync({ featureId });
-  const { messages, sendMessage } = useChatFeature({ featureId });
+  const { joinChat, exitChat } = useChatStore();
 
-  const handleSend = (input: string) => {
-    console.log("Sending message:", input);
-    sendMessage(input);
-  };
+  useEffect(() => {
+    joinChat(featureId);
+    return () => exitChat();
+  }, []);
 
   return (
-    <div className="flex flex-col flex-1">
-      <ChatArea messages={messages} />
-      <ChatInputArea onSend={handleSend} />
+    <div className="flex flex-col h-full">
+      <div className="flex flex-1 min-h-0 max-h-full overflow-hidden">
+        <ChatArea />
+      </div>
+      <ChatInputArea />
     </div>
   )
 }

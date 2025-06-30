@@ -16,7 +16,7 @@ export default function FeatureView(props: FeatureViewProps) {
         <button className="text-gray-500 hover:text-gray-700 text-xl">⋯</button>
       </div>
 
-      <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col">
         {workspace && (
           <ChatFeature teamId={workspace.teamId} workspaceId={workspace.workspaceId} featureId={workspace.defaultFeatureId} />
         )}
