@@ -33,7 +33,9 @@ export class ChatController {
   @ApiOkResponseWithResult(ChatMessageDto)
   async createMessage(@Param('featureId') featureId: string, @Body() param: CreateChatMessageDto, @FromCredential() credential: ArenaCredential): Promise<ApiResult<ChatMessageDto>> {
     const message = await this.chatService.createMessage(featureId, param, credential.userId);
-    return plainToInstance(ApiResult<ChatMessageDto>, { data: message });
+
+    const result = new ApiResult<ChatMessageDto>({ data: message });
+    return plainToInstance(ApiResult<ChatMessageDto>, result);
   }
 
   @Post('/:featureId/messages/attachments')
@@ -68,12 +70,10 @@ export class ChatController {
       }
     })
   }))
-  async uploadAttachments(
-    @Param('featureId') featureId: string,
-    @UploadedFiles() files: Express.Multer.File[],
-    @FromCredential() credential: ArenaCredential
-  ): Promise<ApiResult<ChatAttachmentDto[]>> {
+  async uploadAttachments(@Param('featureId') featureId: string, @UploadedFiles() files: Express.Multer.File[], @FromCredential() credential: ArenaCredential): Promise<ApiResult<ChatAttachmentDto[]>> {
     const attachmentUrls = await this.chatService.uploadAttachments(featureId, files, credential.userId);
-    return plainToInstance(ApiResult<ChatAttachmentDto[]>, { data: attachmentUrls });
+
+    const result = new ApiResult<ChatAttachmentDto[]>({ data: attachmentUrls });
+    return plainToInstance(ApiResult<ChatAttachmentDto[]>, result);
   }
 }
