@@ -26,7 +26,9 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     set({ featureId, messages: [] });
 
     // * 메세지 로드
-    const messagesResponse = await chatApi.getMessages(featureId);
+    const messagesResponse = await chatApi.getMessages(featureId, {
+      take: 10
+    });
     if (messagesResponse.success) {
       set({ messages: messagesResponse.data || [] });
     } else {

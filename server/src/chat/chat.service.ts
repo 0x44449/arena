@@ -31,12 +31,13 @@ export class ChatService {
     private readonly chatGateway: ChatGateway,
   ) {}
 
-  async getMessages(featureId: string): Promise<ChatMessageDto[]> {
+  async getMessages(featureId: string, take: number): Promise<ChatMessageDto[]> {
     const messages = await this.messageRepository.find({
       where: { featureId },
-      order: { createdAt: "ASC" },
-      take: 50,
+      order: { createdAt: "DESC" },
+      take: take,
     });
+    messages.reverse();
 
     // User 매핑
     const messageDtoList = await Promise.all(

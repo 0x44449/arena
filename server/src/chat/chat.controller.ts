@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { plainToInstance } from "class-transformer";
 import { ChatService } from "./chat.service";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
@@ -22,8 +22,8 @@ export class ChatController {
 
   @Get('/:featureId/messages')
   @ApiOkResponseWithResult(ChatMessageDto, { isArray: true })
-  async getMessages(@Param('featureId') featureId: string): Promise<ApiResult<ChatMessageDto[]>> {
-    const messages = await this.chatService.getMessages(featureId);
+  async getMessages(@Param('featureId') featureId: string, @Query('take') take?: number): Promise<ApiResult<ChatMessageDto[]>> {
+    const messages = await this.chatService.getMessages(featureId, take || 20);
 
     const result = new ApiResult<ChatMessageDto[]>({ data: messages });
     return plainToInstance(ApiResult<ChatMessageDto[]>, result);

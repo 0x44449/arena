@@ -4,8 +4,10 @@ import ChatAttachmentDto from "@/types/chat-attachment.dto";
 import ChatMessageDto from "@/types/chat-message.dto";
 import { AxiosProgressEvent } from "axios";
 
-export async function getMessages(featureId: string): Promise<ApiResult<ChatMessageDto[]>> {
-  const response = await api.get<ApiResult<ChatMessageDto[]>>(`/api/v1/chat/${featureId}/messages`);
+export async function getMessages(featureId: string, param?: { take?: number }): Promise<ApiResult<ChatMessageDto[]>> {
+  const response = await api.get<ApiResult<ChatMessageDto[]>>(`/api/v1/chat/${featureId}/messages`, {
+    params: param,
+  });
   return response.data;
 }
 
