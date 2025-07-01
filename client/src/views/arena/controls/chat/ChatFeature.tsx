@@ -21,8 +21,8 @@ export default function ChatFeature(props: ChatFeatureProps) {
   }, []);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex flex-1 min-h-0 max-h-full overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0">
         <ChatArea />
       </div>
       <ChatInputArea />
