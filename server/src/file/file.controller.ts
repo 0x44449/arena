@@ -14,6 +14,8 @@ import { ApiResult } from "@/dto/api-result.dto";
 import { FileDto } from "@/dto/file.dto";
 import { plainToInstance } from "class-transformer";
 import { ApiOkResponseWithResult } from "@/common/decorator/api-ok-response-with-result";
+import { AllowPublic } from "@/auth/allow-public.decorator";
+import * as fs from "fs";
 
 @Controller('api/v1/files')
 @UseGuards(AuthGuard)
@@ -23,12 +25,20 @@ export class FileController {
     private readonly fileService: FileService,
   ) {}
 
+  @AllowPublic()
   @Get('download/:fileId')
   async downloadFile(@Param('fileId') fileId: string, @Res() response: Response): Promise<Response> {
     const file = await this.fileService.getFileByFileId(fileId);
-    const pysicalPath = join(process.cwd(), file.path, file.storedName);
-    const stream = createReadStream(pysicalPath);
+    if (!file) {
+      throw new Error('File not found');
+    }
 
+    const filePath = join(file.path, file.storedName);
+    if (!fs.existsSync(filePath)) {
+      throw new Error('File does not exist on server');
+    }
+
+    const stream = createReadStream(filePath);
     response.setHeader('Content-Type', file.mimeType);
     response.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.originalName)}"`);
     return stream.pipe(response);
