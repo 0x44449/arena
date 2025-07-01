@@ -13,13 +13,24 @@ export default function ChatAttachment(props: ChatAttachmentProps) {
   switch (attachment.type) {
     case "image":
       const imageMetadata = attachment.metadata as ImageChatAttachmentMetadataType;
+
+      // 가로, 세로중에 더 긴 쪽을 기준으로 크기를 맞추기
+      // 200px 기준으로 맞추기
+      const maxSize = 200;
+      const width = imageMetadata.width || 200;
+      const height = imageMetadata.height || 200;
+      const aspectRatio = width / height;
+      const adjustedWidth = aspectRatio > 1 ? maxSize : maxSize * aspectRatio;
+      const adjustedHeight = aspectRatio > 1 ? maxSize / aspectRatio : maxSize
+
       return (
-        <div className="flex items-center gap-2">
+        <div
+          className="flex item-center justify-center bg-gray-200 rounded-md"
+          style={{ height: adjustedHeight, width: adjustedWidth }}
+        >
           <img
             src={attachment.file.url}
-            width={imageMetadata.width}
-            height={imageMetadata.height}
-            className="max-w-full max-h-60 object-contain rounded"
+            className="object-contain rounded-md"
           />
         </div>
       );
