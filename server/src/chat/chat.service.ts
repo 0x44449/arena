@@ -42,11 +42,32 @@ export class ChatService {
     // User 매핑
     const messageDtoList = await Promise.all(
       messages.map(async (message) => {
+        // User 매핑
         const user = await this.userService.getUserDtoByUserId(message.senderId);
         const messageDto = ChatMessageDto.fromEntity(message);
         if (user) {
           messageDto.sender = user;
         }
+
+        // 첨부파일 매핑
+        const attachments = await this.attachmentRepository.find({
+          where: { messageId: message.messageId },
+        });
+        
+        const attachmentDtoList: ChatAttachmentDto[] = [];
+
+        for (const attachment of attachments) {
+          const file = await this.fileRepository.findOne({
+            where: { fileId: attachment.fileId },
+          });
+          if (file) {
+            const attachmentDto = ChatAttachmentDto.fromEntity(attachment);
+            attachmentDto.file = FileDto.fromEntity(file);
+            attachmentDtoList.push(attachmentDto);
+          }
+        }
+        messageDto.attachments = attachmentDtoList;
+
         return messageDto;
       })
     );
