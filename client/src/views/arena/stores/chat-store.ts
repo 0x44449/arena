@@ -6,14 +6,18 @@ import { create } from "zustand";
 interface ChatState {
   featureId: string | null;
   messages: ChatMessageDto[];
-  joinChat: (featureId: string) => Promise<void>;
+  joinChat: (featureId: string, options?: {
+    onComplete?: () => void;
+  }) => Promise<void>;
   exitChat: () => void;
 }
 
 export const useChatStore = create<ChatState>()((set, get) => ({
   featureId: null,
   messages: [],
-  joinChat: async (featureId: string) => {
+  joinChat: async (featureId: string, options?: {
+    onComplete?: () => void;
+  }) => {
     const state = get();
 
     // 이미 해당 채팅에 들어가 있는 경우
@@ -27,7 +31,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
     // * 메세지 로드
     const messagesResponse = await chatApi.getMessages(featureId, {
-      take: 10
+      take: 50
     });
     if (messagesResponse.success) {
       set({ messages: messagesResponse.data || [] });
@@ -49,6 +53,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     }
     socket.off('chat:message');
     socket.on('chat:message', handleMessage);
+
+    options?.onComplete?.();
   },
   exitChat: () => {
     const state = get();
