@@ -5,6 +5,51 @@ interface ChatMessageProps {
   message: ChatMessageDto;
 }
 
+function renderTextWithLinks(text: string) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (urlRegex.test(part) && isValidUrl(part)) {
+      urlRegex.lastIndex = 0; // 정규식 상태 리셋
+      
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline break-all"
+        >
+          {part}
+        </a>
+      )
+    }
+    return part;
+  });
+}
+
+function isValidUrl(string: string): boolean {
+  try {
+    const url = new URL(string);
+
+    // 프로토콜 검증
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return false;
+    }
+
+    // 호스트명 검증 (최소한 점이 하나는 있어야 함)
+    if (!url.hostname.includes('.')) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function ChatMessage(props: ChatMessageProps) {
   const { message } = props;
 
@@ -37,7 +82,7 @@ export default function ChatMessage(props: ChatMessageProps) {
 
           {/* 메시지 내용 */}
           <div className="text-sm text-gray-700 whitespace-pre-wrap">
-            {message.text}
+            {renderTextWithLinks(message.text)}
           </div>
         </div>
       </div>
