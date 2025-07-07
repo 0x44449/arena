@@ -15,13 +15,13 @@ export default function ChatAttachment(props: ChatAttachmentProps) {
       const imageMetadata = attachment.metadata as ImageChatAttachmentMetadataType;
 
       // 가로, 세로중에 더 긴 쪽을 기준으로 크기를 맞추기
-      // 200px 기준으로 맞추기
-      const maxSize = 200;
-      const width = imageMetadata.width || 200;
-      const height = imageMetadata.height || 200;
+      // 300px 기준으로 맞추기
+      const maxSize = 300;
+      const width = imageMetadata.width || 300;
+      const height = imageMetadata.height || 300;
       const aspectRatio = width / height;
       const adjustedWidth = aspectRatio > 1 ? maxSize : maxSize * aspectRatio;
-      const adjustedHeight = aspectRatio > 1 ? maxSize / aspectRatio : maxSize
+      const adjustedHeight = aspectRatio > 1 ? maxSize / aspectRatio : maxSize;
 
       return (
         <div
