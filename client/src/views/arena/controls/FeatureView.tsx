@@ -1,5 +1,5 @@
 import useSelectedWorkspaceStore from "../stores/selected-workspace-store";
-import ChatFeature from "./chat/ChatFeature";
+import ChatFeature from "@/views/chat/controls/ChatFeature";
 
 interface FeatureViewProps {
   children?: React.ReactNode;

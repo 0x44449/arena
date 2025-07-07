@@ -2,7 +2,7 @@ import chatApi from '@/api/chat';
 import { Button } from '@/components/ui/button';
 import { FilePlus, X } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { useChatStore } from '../../stores/chat-store';
+import { useChatStore } from '../stores/chat-store';
 
 interface ChatInputAreaProps {
   // onSend: (message: string) => void;

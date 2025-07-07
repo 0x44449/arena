@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useChatFeature, useChatFeatureConnectionSync } from "../../hooks/chat.hook";
-import { useChatStore } from "../../stores/chat-store";
+import { useChatFeatureConnectionSync } from "../hooks/chat.hook";
+import { useChatStore } from "../stores/chat-store";
 import ChatArea from "./ChatArea";
 import ChatInputArea from "./ChatInputArea";
 

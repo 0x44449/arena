@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { useChatStore } from "../../stores/chat-store";
-import ChatMessage from "./ChatMessage";
+import { useChatStore } from "../stores/chat-store";
 import { useVirtualizer } from '@tanstack/react-virtual';
+import ChatMessage from "./ChatMessage";
 
 interface ChatAreaProps {
 }
