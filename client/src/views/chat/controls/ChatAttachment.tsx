@@ -1,6 +1,7 @@
 import { ImageChatAttachmentMetadataType } from "@/types/chat-attachment-metadata.type";
 import ChatAttachmentDto from "@/types/chat-attachment.dto";
 import ChatMessageDto from "@/types/chat-message.dto";
+import { useChatImageViewer } from "../hooks/image-view.hook";
 
 interface ChatAttachmentProps {
   message: ChatMessageDto;
@@ -9,6 +10,7 @@ interface ChatAttachmentProps {
 
 export default function ChatAttachment(props: ChatAttachmentProps) {
   const { message, attachment } = props;
+  const { openViewer: openImageViewer } = useChatImageViewer();
 
   switch (attachment.type) {
     case "image":
@@ -31,6 +33,7 @@ export default function ChatAttachment(props: ChatAttachmentProps) {
           <img
             src={attachment.file.url}
             className="object-contain rounded-md"
+            onClick={() => openImageViewer(attachment)}
           />
         </div>
       );

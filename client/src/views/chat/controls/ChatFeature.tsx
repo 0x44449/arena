@@ -3,6 +3,7 @@ import { useChatFeatureConnectionSync } from "../hooks/chat.hook";
 import { useChatStore } from "../stores/chat-store";
 import ChatArea from "./ChatArea";
 import ChatInputArea from "./ChatInputArea";
+import ChatImageViewer from "./ChatImageViewer";
 
 interface ChatFeatureProps {
   teamId: string;
@@ -26,6 +27,7 @@ export default function ChatFeature(props: ChatFeatureProps) {
         <ChatArea />
       </div>
       <ChatInputArea />
+      <ChatImageViewer />
     </div>
   )
 }
