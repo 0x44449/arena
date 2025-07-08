@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { ImageChatAttachmentMetadataType } from '@/types/chat-attachment-metadata.type';
 import { useImageViewerStore } from '../stores/image-viewer-store';
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 // ref 로 메서드만 노출, 상태는 내부 useState 로 관리
 const ChatImageViewer = () => {
@@ -12,25 +12,30 @@ const ChatImageViewer = () => {
   return (
     <Dialog.Root open={open} onOpenChange={val => !val && closeViewer()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/70" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/80" />
         <Dialog.Content className="fixed inset-0 flex items-center justify-center">
+          {attachment && (
+            <div className="w-full h-full flex flex-col">
+
+              {/* 이미지 영역 */}
+              <div className="flex-1 flex items-center justify-center cursor-grab active:cursor-grabbing">
+                <TransformWrapper>
+                  <TransformComponent
+                    wrapperStyle={{ width: '100%', height: '100%' }}
+                  >
+                    <img
+                      src={attachment.file.url}
+                      alt={attachment.file.name}
+                      className="max-w-none select-none"
+                    />
+                  </TransformComponent>
+                </TransformWrapper>
+              </div>
+            </div>
+          )}
           <Dialog.Close className="absolute top-4 right-4 text-white text-2xl">
             ✕
           </Dialog.Close>
-          {attachment && (
-            <>
-              <img
-                src={attachment.file.url}
-                alt={attachment.file.name}
-                className="object-contain max-h-full max-w-full"
-              />
-              <footer className="mt-4 text-sm text-white/80">
-                <div>{attachment.file.name}</div>
-                {/* <div>{new Date(attachment.file.).toLocaleString()}</div> */}
-                <div>{(attachment.metadata as ImageChatAttachmentMetadataType).width}×{(attachment.metadata as ImageChatAttachmentMetadataType).height}</div>
-              </footer>
-            </>
-          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root >
