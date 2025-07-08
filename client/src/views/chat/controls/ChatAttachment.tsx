@@ -33,7 +33,7 @@ export default function ChatAttachment(props: ChatAttachmentProps) {
           <img
             src={attachment.file.url}
             className="object-contain rounded-md"
-            onClick={() => openImageViewer(attachment)}
+            onClick={() => openImageViewer(message, attachment)}
           />
         </div>
       );
