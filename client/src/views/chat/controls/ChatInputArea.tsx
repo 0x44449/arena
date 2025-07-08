@@ -28,7 +28,7 @@ export default function ChatInputArea(props: ChatInputAreaProps) {
 
     const trimmedInput = input.trim();
     if (attachments.length === 0 && trimmedInput === '') return;
-    
+
     setInput('');
 
     // 첨부파일 존재시 첨부파일 전송
@@ -110,7 +110,22 @@ export default function ChatInputArea(props: ChatInputAreaProps) {
           </div>
         );
       case 'video':
-        return null;
+        return (
+          <div className="relative">
+            <video
+              src={attachment.url}
+              className="w-20 h-20 object-cover rounded-lg border border-gray-300"
+              muted
+              preload="metadata"
+            />
+            <button
+              onClick={() => removeAttachment(index)}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        );
       case 'file':
         return null;
       default:
