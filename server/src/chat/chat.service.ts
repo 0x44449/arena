@@ -215,6 +215,8 @@ export class ChatService {
           break;
         // 비디오에서 메타데이터 추출
         case 'video':
+          // ffprobe 바이너리 경로 지정
+          ffmpeg.setFfprobePath(ffprobeStatic.path);
           const probe = await new Promise<ffmpeg.FfprobeData>((resolve, reject) => {
             ffmpeg.ffprobe(fileFullPath, (err, data) => err ? reject(err) : resolve(data));
           });
