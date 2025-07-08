@@ -16,6 +16,8 @@ import { ChatAttachmentDto } from "@/dto/chat-attachment.dto";
 import { FileDto } from "@/dto/file.dto";
 import { nanoid } from "nanoid";
 import { ChatAttachmentMetadataType, FileChatAttachmentMetadataType, ImageChatAttachmentMetadataType, VideoChatAttachmentMetadataType } from "@/types/chat-attachment-metadata.type";
+import ffmpeg from 'fluent-ffmpeg';
+import ffprobeStatic from 'ffprobe-static';
 
 @Injectable()
 export class ChatService {
@@ -53,7 +55,7 @@ export class ChatService {
         const attachments = await this.attachmentRepository.find({
           where: { messageId: message.messageId },
         });
-        
+
         const attachmentDtoList: ChatAttachmentDto[] = [];
 
         for (const attachment of attachments) {
@@ -213,11 +215,21 @@ export class ChatService {
           break;
         // 비디오에서 메타데이터 추출
         case 'video':
+          const probe = await new Promise<ffmpeg.FfprobeData>((resolve, reject) => {
+            ffmpeg.ffprobe(fileFullPath, (err, data) => err ? reject(err) : resolve(data));
+          });
+          const videoStream = probe.streams.find(stream => stream.codec_type === 'video');
+          if (!probe.format.duration || !videoStream?.width || !videoStream?.height) {
+            throw new WellKnownError({
+              message: "Invalid video file format",
+              errorCode: "INVALID_VIDEO_FORMAT",
+            });
+          }
           metadata = {
             type: 'video',
-            duration: 10000, // 비디오의 경우, 실제 메타데이터에서 추출할 수 있음
-            height: 100, // 비디오의 경우, 실제 메타데이터에서 추출할 수 있음
-            width: 100, // 비디오의 경우, 실제 메타데이터에서 추출할 수 있음
+            duration: Math.floor(probe.format.duration * 1000),
+            height: videoStream.height,
+            width: videoStream.width,
           } satisfies VideoChatAttachmentMetadataType;
           break;
         // 일반 파일에서 메타데이터 추출
