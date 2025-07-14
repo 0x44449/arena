@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import metadata from './metadata'; // 빌드시 자동 생성
+import { WellKnownExceptionFilter } from './commons/well-known-exception-filter';
+import { UnauthorizedExceptionFilter } from './commons/unauthorized-exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -33,6 +35,9 @@ async function bootstrap() {
       credentials: true,
     });
   }
+
+  // ExceptionFilter 설치
+  app.useGlobalFilters(new WellKnownExceptionFilter(), new UnauthorizedExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
 }

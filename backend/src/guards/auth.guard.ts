@@ -1,39 +1,54 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
-import admin from './firebase.plugin';
+import firebaseAdmin from '../libs/firebase.plugin';
 import { ArenaRequest } from '@/commons/arena-requset';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from '@/entities/user.entity';
+import { Repository } from 'typeorm';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '@/decorators/allow-public.decorator';
+import { UnauthorizedError } from '@/commons/unauthorized-error';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) return true;
+
     const request = context.switchToHttp().getRequest<ArenaRequest>();
 
     const authHeader = request.headers.authorization || '';
     const [, idToken] = authHeader.split('Bearer ');
 
     if (!idToken) {
-      return false; // No token provided
+      throw new UnauthorizedError('No ID token provided');
     }
 
     let decoded: DecodedIdToken | null = null;
     try {
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        })
-      });
-      decoded = await admin.auth().verifyIdToken(idToken);
+      decoded = await firebaseAdmin.auth().verifyIdToken(idToken);
     } catch {
-      return false; // Invalid token
+      throw new UnauthorizedError('Invalid ID token');
     }
 
     if (!decoded) {
-      return false; // Token verification failed
+      throw new UnauthorizedError('Token verification failed');
     }
 
-    request.credential = { uid: decoded.uid };
+    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+    if (!userEntity) {
+      throw new UnauthorizedError('User not found');
+    }
+
+    request.credential = { user: userEntity };
     return true;
   }
 }

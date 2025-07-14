@@ -1,5 +1,7 @@
 {
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  // "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  // "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true
 }
