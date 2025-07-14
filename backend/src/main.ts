@@ -1,12 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import metadata from './metadata'; // 빌드시 자동 생성
 import { WellKnownExceptionFilter } from './commons/well-known-exception-filter';
 import { UnauthorizedExceptionFilter } from './commons/unauthorized-exception-filter';
+import { ConfigModule } from '@nestjs/config';
+import firebaseAdmin from './libs/firebase.plugin';
+import metadata from './metadata'; // 빌드시 자동 생성
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // env 환경변수 로드 대기
+  await ConfigModule.envVariablesLoaded;
+
+  // Firebase Admin SDK 초기화
+  firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert({
+      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
 
   // Swagger 설정
   const config = new DocumentBuilder()

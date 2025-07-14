@@ -8,9 +8,11 @@ import { AuthGuard } from "@/guards/auth.guard";
 import { ApiResult } from "@/dtos/api-result.dto";
 import { AllowPublic } from "@/decorators/allow-public.decorator";
 import { RegisterUserDto } from "./dto/register-user.dto";
+import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 
 @Controller('api/v1/users')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('access-token')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -19,6 +21,7 @@ export class UsersController {
   @Post('')
   @AllowPublic()
   @ApiOkResponseWith(UserDto)
+  @ApiBody({ type: RegisterUserDto })
   async register(@Body() dto: RegisterUserDto): Promise<ApiResult<UserDto>> {
     const user = await this.usersService.registerUser(dto);
     return new ApiResult<UserDto>({ data: UserDto.fromEntity(user) });

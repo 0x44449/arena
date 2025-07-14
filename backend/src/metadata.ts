@@ -1,5 +1,5 @@
 /* eslint-disable */
 export default async () => {
     const t = {};
-    return { "@nestjs/swagger": { "models": [], "controllers": [] } };
+    return { "@nestjs/swagger": { "models": [[import("./entities/user.entity"), { "UserEntity": { userId: { required: true, type: () => String }, email: { required: true, type: () => String }, uid: { required: true, type: () => String }, provider: { required: true, type: () => String }, displayName: { required: true, type: () => String }, avatarType: { required: true, type: () => String }, avatarKey: { required: true, type: () => String }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } } }], [import("./modules/users/dto/register-user.dto"), { "RegisterUserDto": { email: { required: true, type: () => String }, displayName: { required: true, type: () => String }, token: { required: true, type: () => String }, provider: { required: true, type: () => String } } }], [import("./dtos/user.dto"), { "UserDto": { avatarUrl: { required: true, type: () => String } } }], [import("./dtos/api-result.dto"), { "ApiResult": { success: { required: true, type: () => Boolean }, data: { required: false }, errorCode: { required: false, type: () => String } } }]], "controllers": [[import("./modules/users/users.controller"), { "UsersController": { "register": {}, "getMe": {} } }]] } };
 };

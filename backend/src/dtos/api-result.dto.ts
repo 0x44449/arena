@@ -1,8 +1,9 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class ApiResult<T> {
-  success: boolean;
-  data?: T;
-  errorMessage?: string;
-  errorCode?: string;
+  @ApiProperty() success: boolean;
+  @ApiProperty() data?: T;
+  @ApiProperty() errorCode?: string;
 
   constructor(param?: { success?: boolean; data?: T; errorMessage?: string; errorCode?: string }) {
     this.success = true;
@@ -18,7 +19,6 @@ export class ApiResult<T> {
     }
 
     if (param && !this.success) {
-      this.errorMessage = param.errorMessage;
       this.errorCode = param.errorCode;
     }
   }
