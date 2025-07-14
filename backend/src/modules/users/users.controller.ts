@@ -18,12 +18,13 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  @Post('')
   @AllowPublic()
+  @Post('')
   @ApiOkResponseWith(UserDto)
   @ApiBody({ type: RegisterUserDto })
   async register(@Body() dto: RegisterUserDto): Promise<ApiResult<UserDto>> {
     const user = await this.usersService.registerUser(dto);
+
     return new ApiResult<UserDto>({ data: UserDto.fromEntity(user) });
   }
 
@@ -31,6 +32,7 @@ export class UsersController {
   @ApiOkResponseWith(UserDto)
   async getMe(@ReqCred() credential: ArenaCredential): Promise<ApiResult<UserDto | null>> {
     const user = await this.usersService.findUserByUid(credential.user.uid);
+
     const result = new ApiResult<UserDto | null>({ data: user ? UserDto.fromEntity(user) : null });
     return result;
   }

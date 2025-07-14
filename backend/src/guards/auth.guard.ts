@@ -7,7 +7,7 @@ import { UserEntity } from '@/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '@/decorators/allow-public.decorator';
-import { UnauthorizedError } from '@/commons/unauthorized-error';
+import { UnauthorizedError } from '@/commons/exceptions/unauthorized-error';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

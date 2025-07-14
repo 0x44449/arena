@@ -5,6 +5,7 @@ import { Repository } from "typeorm";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import fireabseAdmin from "@/libs/firebase.plugin";
 import { idgen } from "@/libs/id-generator";
+import { WellKnownError } from "@/commons/exceptions/well-known-error";
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,10 @@ export class UsersService {
         const decoded = await fireabseAdmin.auth().verifyIdToken(dto.token);
         uid = decoded.uid;
       } catch {
-
+        throw new WellKnownError({
+          message: 'Invalid Google token',
+          errorCode: 'INVALID_GOOGLE_TOKEN',
+        });
       }
     }
 
