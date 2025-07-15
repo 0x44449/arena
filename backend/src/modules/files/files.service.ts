@@ -1,7 +1,7 @@
 import { WellKnownError } from "@/commons/exceptions/well-known-error";
 import { FileEntity } from "@/entities/file.entity";
 import { UserEntity } from "@/entities/user.entity";
-import { idgen } from "@/libs/id-generator";
+import { idgen } from "@/commons/id-generator";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";

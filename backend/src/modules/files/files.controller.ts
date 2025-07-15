@@ -2,7 +2,7 @@ import { AuthGuard } from "@/guards/auth.guard";
 import { Controller, Get, Param, Post, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { FilesService } from "./files.service";
-import { ArenaFileInterceptor } from "@/commons/upload/arena-file-interceptor";
+import { ArenaFileInterceptor } from "@/commons/file-uploader/arena-file-interceptor";
 import { ApiMultipartBody } from "@/decorators/api-multipart-body.decorator";
 import { ApiOkResponseWith } from "@/decorators/api-ok-response-with.decorator";
 import { ApiResult } from "@/dtos/api-result.dto";
@@ -13,6 +13,7 @@ import { AllowPublic } from "@/decorators/allow-public.decorator";
 import { join } from "path";
 import * as fs from "fs";
 import { Response } from "express";
+import { ApiOkResponseBinary } from "@/decorators/api-ok-response-binary.decorator";
 
 @Controller('api/v1/files')
 @UseGuards(AuthGuard)
@@ -24,6 +25,7 @@ export class FilesController {
 
   @AllowPublic()
   @Get('download/:fileId')
+  @ApiOkResponseBinary()
   async downloadFile(@Param('fileId') fileId: string, @Res() response: Response): Promise<Response> {
     const file = await this.filesService.findFileByFileId(fileId);
     if (!file) {
@@ -41,7 +43,6 @@ export class FilesController {
     return stream.pipe(response);
   }
   
-
   @Post()
   @UseInterceptors(ArenaFileInterceptor())
   @ApiMultipartBody()

@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigModule } from '@nestjs/config';
-import firebaseAdmin from './libs/firebase.plugin';
+import firebaseAdmin from './commons/firebase.plugin';
 import metadata from './metadata'; // 빌드시 자동 생성
 import { WellKnownExceptionFilter } from './commons/exceptions/well-known-exception-filter';
 import { UnauthorizedExceptionFilter } from './commons/exceptions/unauthorized-exception-filter';

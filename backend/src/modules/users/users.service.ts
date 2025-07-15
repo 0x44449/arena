@@ -3,8 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { RegisterUserDto } from "./dto/register-user.dto";
-import fireabseAdmin from "@/libs/firebase.plugin";
-import { idgen } from "@/libs/id-generator";
+import fireabseAdmin from "@/commons/firebase.plugin";
+import { idgen } from "@/commons/id-generator";
 import { WellKnownError } from "@/commons/exceptions/well-known-error";
 
 @Injectable()
@@ -13,8 +13,8 @@ export class UsersService {
     @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async findUserByUid(uid: string): Promise<UserEntity | null> {
-    return this.userRepository.findOne({ where: { uid } });
+  async findUserByUserId(userId: string): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { userId } });
   }
 
   async registerUser(dto: RegisterUserDto): Promise<UserEntity> {
@@ -29,6 +29,11 @@ export class UsersService {
           errorCode: 'INVALID_GOOGLE_TOKEN',
         });
       }
+    } else {
+      throw new WellKnownError({
+        message: 'Unsupported authentication provider',
+        errorCode: 'UNSUPPORTED_AUTH_PROVIDER',
+      });
     }
 
     const user = this.userRepository.create({
@@ -41,5 +46,18 @@ export class UsersService {
       avatarKey: '1',
     });
     return this.userRepository.save(user);
+  }
+
+  async updateUserByUserId(user: UserEntity, param: Partial<UserEntity>): Promise<UserEntity> {
+    const existingUser = await this.findUserByUserId(user.userId);
+    if (!existingUser) {
+      throw new WellKnownError({
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
+      });
+    }
+
+    Object.assign(existingUser, param);
+    return this.userRepository.save(existingUser);
   }
 }
