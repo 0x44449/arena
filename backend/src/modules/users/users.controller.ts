@@ -42,7 +42,7 @@ export class UsersController {
   @ApiOkResponseWith(UserDto)
   @ApiBody({ type: UpdateUserDto })
   async updateMe(@Body() param: UpdateUserDto, @ReqCred() credential: ArenaCredential): Promise<ApiResult<UserDto | null>> {
-    const user = await this.usersService.updateUserByUserId(param, credential.user);
+    const user = await this.usersService.updateUserByUserId(param, credential.user.userId);
 
     const result = new ApiResult<UserDto | null>({ data: UserDto.fromEntity(user) });
     return result;

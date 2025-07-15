@@ -1,6 +1,5 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
-import { WorkspaceEntity } from "./workspace.entity";
 
 @Entity('Team')
 export class TeamEntity {
@@ -19,9 +18,6 @@ export class TeamEntity {
 
   @Column({ name: 'OwnerId' })
   ownerId: string;
-
-  @OneToMany(() => WorkspaceEntity, (workspace) => workspace.team)
-  workspaces: WorkspaceEntity[];
 
   @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
   createdAt: Date;

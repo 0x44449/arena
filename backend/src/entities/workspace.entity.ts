@@ -20,7 +20,7 @@ export class WorkspaceEntity {
   @Column({ name: 'OwnerId' })
   ownerId: string;
 
-  @ManyToOne(() => TeamEntity, (team) => team.workspaces)
+  @ManyToOne(() => TeamEntity)
   @JoinColumn({ name: 'TeamId' })
   team: TeamEntity;
 

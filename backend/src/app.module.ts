@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { FilesModule } from './modules/files/files.module';
 import { TeamsModule } from './modules/teams/teams.module';
 import { ArenaOrmModule } from './arena-orm.module';
+import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ArenaOrmModule } from './arena-orm.module';
     UsersModule,
     FilesModule,
     TeamsModule,
+    WorkspacesModule
   ],
 })
 export class AppModule {}

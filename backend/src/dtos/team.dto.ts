@@ -8,7 +8,6 @@ export class TeamDto extends OmitType(
   [
     'owner',
     'ownerId',
-    'workspaces',
   ] as const
 ) {
   owner: UserDto;
