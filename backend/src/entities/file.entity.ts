@@ -21,8 +21,12 @@ export class FileEntity {
   @Column({ name: 'Path' })
   path: string;
 
-  @OneToOne(() => UserEntity, { eager: true })
+  @OneToOne(() => UserEntity)
+  @JoinColumn({ name: 'UploaderId' })
   uploader: UserEntity;
+
+  @Column({ name: 'UploaderId' })
+  uploaderId: string;
 
   @Column({ name: 'Category' })
   category: string;

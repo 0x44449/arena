@@ -11,6 +11,7 @@ export class FileDto extends OmitType(
     'path',
     'category',
     'uploader',
+    'uploaderId',
   ] as const
 ) {
   name: string;

@@ -6,6 +6,7 @@ import { RegisterUserDto } from "./dto/register-user.dto";
 import fireabseAdmin from "@/commons/firebase.plugin";
 import { idgen } from "@/commons/id-generator";
 import { WellKnownError } from "@/commons/exceptions/well-known-error";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -17,11 +18,11 @@ export class UsersService {
     return this.userRepository.findOne({ where: { userId } });
   }
 
-  async registerUser(dto: RegisterUserDto): Promise<UserEntity> {
+  async registerUser(param: RegisterUserDto): Promise<UserEntity> {
     let uid = '';
-    if (dto.provider === 'google') {
+    if (param.provider === 'google') {
       try {
-        const decoded = await fireabseAdmin.auth().verifyIdToken(dto.token);
+        const decoded = await fireabseAdmin.auth().verifyIdToken(param.token);
         uid = decoded.uid;
       } catch {
         throw new WellKnownError({
@@ -38,26 +39,28 @@ export class UsersService {
 
     const user = this.userRepository.create({
       userId: idgen.shortId(),
-      email: dto.email,
-      displayName: dto.displayName,
+      email: param.email,
+      displayName: param.displayName,
       uid: uid,
-      provider: dto.provider,
+      provider: param.provider,
       avatarType: 'default',
       avatarKey: '1',
     });
     return this.userRepository.save(user);
   }
 
-  async updateUserByUserId(user: UserEntity, param: Partial<UserEntity>): Promise<UserEntity> {
-    const existingUser = await this.findUserByUserId(user.userId);
-    if (!existingUser) {
+  async updateUserByUserId(param: UpdateUserDto, userId: string): Promise<UserEntity> {
+    const user = await this.findUserByUserId(userId);
+    if (!user) {
       throw new WellKnownError({
         message: 'User not found',
         errorCode: 'USER_NOT_FOUND',
       });
     }
 
-    Object.assign(existingUser, param);
-    return this.userRepository.save(existingUser);
+    if (param.displayName) {
+      user.displayName = param.displayName;
+    }
+    return this.userRepository.save(user);
   }
 }
