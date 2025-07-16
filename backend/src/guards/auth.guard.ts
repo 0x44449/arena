@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '@/decorators/allow-public.decorator';
 import { UnauthorizedError } from '@/commons/exceptions/unauthorized-error';
+import { WellKnownError } from '@/commons/exceptions/well-known-error';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -45,7 +46,11 @@ export class AuthGuard implements CanActivate {
 
     const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
     if (!userEntity) {
-      throw new UnauthorizedError('User not found');
+      // throw new UnauthorizedError('User not found');
+      throw new WellKnownError({
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
+      });
     }
 
     request.credential = { user: userEntity };

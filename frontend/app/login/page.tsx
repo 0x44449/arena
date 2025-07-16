@@ -1,9 +1,7 @@
-import LoginControl from "./login-control";
+import LoginForm from "./login-form";
 
 export default function Index() {
   return (
-    <div>
-      <LoginControl />
-    </div>
+    <LoginForm />
   )
 }

@@ -40,7 +40,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  // dev 구동을 위한 CORS 설정, 추후 삭제
+  // CORS 설정
   const allowedCors = process.env.CORS_ALLOWED_ORIGINS?.split(',') ?? [];
   if (allowedCors.length > 0) {
     app.enableCors({

@@ -20,14 +20,14 @@ export class UsersService {
 
   async registerUser(param: RegisterUserDto): Promise<UserEntity> {
     let uid = '';
-    if (param.provider === 'google') {
+    if (param.provider === 'firebase') {
       try {
         const decoded = await fireabseAdmin.auth().verifyIdToken(param.token);
         uid = decoded.uid;
       } catch {
         throw new WellKnownError({
-          message: 'Invalid Google token',
-          errorCode: 'INVALID_GOOGLE_TOKEN',
+          message: 'Invalid Firebase token',
+          errorCode: 'INVALID_FIREBASE_TOKEN',
         });
       }
     } else {
