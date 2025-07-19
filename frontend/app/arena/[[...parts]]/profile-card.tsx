@@ -1,6 +1,6 @@
 'use client';
 
-import userApi from "@/api/user";
+import userApi from "@/api/user-api";
 import { useQuery } from "@tanstack/react-query";
 import { Settings } from "lucide-react";
 import Link from "next/link";

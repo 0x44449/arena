@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Separator } from "@/components/ui/separator";
 import useGoogleLogin from "./google-login.hook";
 import { useEffect, useState } from "react";
-import userApi from "@/api/user";
+import userApi from "@/api/user-api";
 import { useRouter } from "next/navigation";
 import { auth } from "@/plugins/firebase.plugin";
 
