@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { TeamEntity } from "./team.entity";
 
@@ -13,7 +13,7 @@ export class WorkspaceEntity {
   @Column({ name: 'Description' })
   description: string;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'OwnerId' })
   owner: UserEntity;
 

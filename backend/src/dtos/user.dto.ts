@@ -1,6 +1,5 @@
 import { UserEntity } from "@/entities/user.entity";
 import { OmitType } from "@nestjs/swagger";
-import { plainToInstance } from "class-transformer";
 
 export class UserDto extends OmitType(
   UserEntity,
@@ -14,17 +13,15 @@ export class UserDto extends OmitType(
   avatarUrl: string;
 
   public static fromEntity(entity: UserEntity): UserDto {
-    const dto = plainToInstance(UserDto, entity, {
-      excludeExtraneousValues: true,
-    });
-
-    if (entity.avatarType === 'default') {
-      dto.avatarUrl = `/image/default-avatar/${entity.avatarKey}`;
+    return {
+      userId: entity.userId,
+      email: entity.email,
+      displayName: entity.displayName,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      avatarUrl: entity.avatarType === 'default'
+        ? `/image/default-avatar/${entity.avatarKey}`
+        : `${process.env.SERVER_BASE_URL}/api/v1/users/${entity.userId}/avatar/thumbnail.png`,
     }
-    else {
-      dto.avatarUrl = `${process.env.SERVER_BASE_URL}/api/v1/users/${entity.userId}/avatar/thumbnail.png`;
-    }
-
-    return dto;
   }
 }

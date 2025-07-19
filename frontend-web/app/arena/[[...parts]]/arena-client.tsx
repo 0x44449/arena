@@ -9,13 +9,11 @@ export default function ArenaClient() {
 
   return (
     <div className="flex flex-row h-screen w-screen overflow-hidden">
-      <div className="flex flex-col bg-gray-100 w-100">
+      <div className="flex flex-col bg-[#F5F3FF] w-100">
         <div className="flex flex-1 flex-row">
           {/* TeamSidebar */}
           <TeamSidebar />
-          <div className="flex flex-col w-20 overflow-y-auto border-r border-gray-300 items-center py-4">
-            {/* <TeamSidebar /> */}
-          </div>
+          
           {/* WorkspaceView */}
           <div className="flex flex-col flex-1">
             {/* <WorkspaceView /> */}

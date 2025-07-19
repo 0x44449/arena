@@ -1,6 +1,5 @@
 import { TeamEntity } from "@/entities/team.entity";
 import { OmitType } from "@nestjs/swagger";
-import { plainToInstance } from "class-transformer";
 import { UserDto } from "./user.dto";
 
 export class TeamDto extends OmitType(
@@ -13,12 +12,13 @@ export class TeamDto extends OmitType(
   owner: UserDto;
 
   public static fromEntity(entity: TeamEntity): TeamDto {
-    const dto = plainToInstance(TeamDto, entity, {
-      excludeExtraneousValues: true,
-    });
-
-    dto.owner = UserDto.fromEntity(entity.owner);
-
-    return dto;
+    return {
+      teamId: entity.teamId,
+      name: entity.name,
+      description: entity.description,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      owner: UserDto.fromEntity(entity.owner),
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 
 @Entity('File')
@@ -21,7 +21,7 @@ export class FileEntity {
   @Column({ name: 'Path' })
   path: string;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'UploaderId' })
   uploader: UserEntity;
 
