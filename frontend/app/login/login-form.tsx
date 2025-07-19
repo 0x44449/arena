@@ -18,34 +18,36 @@ interface SocialProvider {
 }
 
 export default function LoginForm() {
-  const [ isLoading, setIsLoading ] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { loginWithGoogle } = useGoogleLogin();
   const router = useRouter();
 
   useEffect(() => {
+    handleAuthStateChange();
+  }, [auth]);
+
+  const handleAuthStateChange = async () => {
     const user = auth.currentUser;
+    console.log('Current user:', user);
+
     if (user) {
-      // 이미 로그인된 상태라면 사용자 정보 확인 후 처리
-      handleAfterLogin();
-    }
-  }, []);
+      // 사용자 정보 획득
+      const userResult = await userApi.getMe();
 
-  const handleAfterLogin = async () => {
-    // 사용자 정보 획득
-    const userResult = await userApi.getMe();
-    if (!userResult.success) {
-      if (userResult.errorCode === 'USER_NOT_FOUND') {
-        // 사용자 정보가 없으면 새로 등록 페이지로 이동
-        router.push('/register');
-      } else {
-        // 다른 에러 처리
-        console.error('Failed to fetch user info:', userResult.errorCode);
+      if (!userResult.success) {
+        if (userResult.errorCode === 'USER_NOT_FOUND') {
+          // 사용자 정보가 없으면 새로 등록 페이지로 이동
+          router.push('/register');
+        } else {
+          // 다른 에러 처리
+          console.error('Failed to fetch user info:', userResult.errorCode);
+        }
+        return;
       }
-      return;
-    }
 
-    // 사용자 정보가 있으면 메인 페이지로 이동
-    router.push('/arena');
+      // 사용자 정보가 있으면 메인 페이지로 이동
+      router.push('/arena');
+    }
   }
 
   const socialProviders: SocialProvider[] = [
@@ -58,7 +60,6 @@ export default function LoginForm() {
         setIsLoading(true);
         try {
           await loginWithGoogle();
-          handleAfterLogin();
         } finally {
           setIsLoading(false);
         }
