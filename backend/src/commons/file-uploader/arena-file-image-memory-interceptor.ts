@@ -1,7 +1,7 @@
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
 
-export function ArenaImageMemoryInterceptor() {
+export function ArenaFileImageMemoryInterceptor() {
   return FileInterceptor('file', {
     storage: memoryStorage(),
     limits: { fileSize: 100 * 1024 * 1024 },

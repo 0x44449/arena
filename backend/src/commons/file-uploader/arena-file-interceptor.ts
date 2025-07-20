@@ -1,17 +1,16 @@
 import { FileInterceptor } from "@nestjs/platform-express";
-import { randomUUID } from "crypto";
 import { diskStorage } from "multer";
-import { join } from "path";
+import ArenaFile from "./arena-file-util";
 
 export function ArenaFileInterceptor() {
   return FileInterceptor('file', {
     storage: diskStorage({
       destination: (req, file, callback) => {
-        const uploadPath = process.env.FILE_STORAGE_LOCATION || join(__dirname, '../../uploads');
+        const uploadPath = ArenaFile.getDestPath();
         callback(null, uploadPath);
       },
       filename: (req, file, callback) => {
-        const fileName = randomUUID();
+        const fileName = ArenaFile.genFileName();
         callback(null, `${fileName}`);
       },
     })

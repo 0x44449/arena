@@ -1,5 +1,5 @@
 export type ApiResult<T> = {
   success: boolean;
-  data?: T;
+  data: T;
   errorCode?: string;
 }

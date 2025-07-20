@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('User')
 export class UserEntity {
@@ -22,6 +22,9 @@ export class UserEntity {
 
   @Column({ name: 'AvatarKey', nullable: true })
   avatarKey: string;
+
+  @Column({ name: 'Message' })
+  message: string;
 
   @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
   createdAt: Date;

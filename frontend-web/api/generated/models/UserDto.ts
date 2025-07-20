@@ -7,6 +7,7 @@ export type UserDto = {
     userId: string;
     email: string;
     displayName: string;
+    message: string;
     createdAt: string;
     updatedAt: string;
 };

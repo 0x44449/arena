@@ -1,7 +1,6 @@
 import { FilesInterceptor } from "@nestjs/platform-express";
-import { randomUUID } from "crypto";
 import { diskStorage } from "multer";
-import { join } from "path";
+import ArenaFile from "./arena-file-util";
 
 export function ArenaFilesInterceptor() {
   return FilesInterceptor('files', 10, {
@@ -10,11 +9,11 @@ export function ArenaFilesInterceptor() {
     },
     storage: diskStorage({
       destination: (req, file, cb) => {
-        const destinationDir = process.env.FILE_STORAGE_LOCATION || join(__dirname, '../../uploads');
+        const destinationDir = ArenaFile.getDestPath();
         cb(null, destinationDir); // 업로드 디렉토리 설정
       },
       filename: (req, file, cb) => {
-        const fileName = randomUUID();
+        const fileName = ArenaFile.genFileName();
         cb(null, `${fileName}`);
       }
     })

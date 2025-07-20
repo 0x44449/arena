@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
 import { User, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,6 +39,9 @@ export default function Layout({
         {/* <DialogContent className="h-screen w-screen flex flex-col rounded-none bg-white overflow-hidden"> */}
         {/* <DialogHeader className="flex flex-row items-center justify-between px-4 py-6"> */}
         <DialogTitle className="text-base font-semibold sr-only">설정</DialogTitle>
+        <DialogDescription className="sr-only">
+          프로필 설정 페이지입니다.
+        </DialogDescription>
         {/* <button
             onClick={() => close(false)}
             className="text-xs px-2 py-1 rounded hover:bg-neutral-100"
@@ -53,7 +57,7 @@ export default function Layout({
               <h2 className="text-gray-800 font-semibold">설정</h2>
             </div> */}
 
-            <div className="flex-1 p-2 pl-10">
+            <div className="flex-1 p-2 pl-10 pr-8">
               <div className="space-y-1">
                 <button
                   // onClick={() => setActiveSection(category.id)}
