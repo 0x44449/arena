@@ -23,12 +23,15 @@ export default function TeamSidebar() {
   });
 
   return (
-    <div className="w-[72px] flex flex-col items-center py-3 space-y-2 border-r border-[#E5E7EB]">
-      {teams?.map(team => (
-        <TeamSidebarButton key={team.teamId} team={team} active={team.teamId === teamId} />
-      ))}
-
-      <TeamAddButton />
+    <div>
+      <div className="w-[72px] flex flex-col items-center py-3 space-y-2 border-r border-[#E5E7EB] space-y-6">
+        {teams?.map(team => (
+          <TeamSidebarButton key={team.teamId} team={team} active={team.teamId === teamId} />
+        ))}
+      </div>
+      <div className="w-[72px] flex flex-col items-center py-3 space-y-2 border-r border-[#E5E7EB]">
+        <TeamAddButton />
+      </div>
     </div>
   )
 }
