@@ -250,8 +250,8 @@ export default function ProfileSetting() {
         <div>
           <Label className="text-gray-700 font-medium mb-3 block">미리보기</Label>
           <div className="bg-[#F5F3FF] rounded-lg p-4 border border-[#E5E7EB]">
-            <div className="flex items-start space-x-3">
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+            <div className="flex items-start space-x-2">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-[#8B5CF6] flex items-center justify-center flex-shrink-0">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
@@ -259,15 +259,15 @@ export default function ProfileSetting() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-5 h-5 text-white" />
+                  <User className="w-4 h-4 text-white" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-gray-800 font-medium">
+                <div className="text-gray-800 text-sm font-medium truncate">
                   {name || '이름'}
                 </div>
                 {message && (
-                  <div className="text-[#6B7280] text-sm mt-0.5">
+                  <div className="text-[#6B7280] text-xs truncate">
                     {message}
                   </div>
                 )}

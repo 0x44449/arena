@@ -3,7 +3,7 @@
 import { CreateTeamDto } from "@/api/generated";
 import teamApi from "@/api/team-api";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -60,19 +60,20 @@ export default function TeamAddButton() {
 
       <DialogContent className="max-w-md bg-white border border-[#E5E7EB] shadow-xl">
         <DialogHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#8B5CF6] to-[#A855F7] rounded-full flex items-center justify-center mb-3">
+          {/* <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#8B5CF6] to-[#A855F7] rounded-full flex items-center justify-center mb-3">
             <Server className="w-6 h-6 text-white" />
-          </div>
+          </div> */}
           <DialogTitle className="text-xl text-gray-800">새 팀 만들기</DialogTitle>
-          <p className="text-[#6B7280] text-sm mt-1">
+          <DialogDescription className="sr-only">새로운 팀을 만들어 친구들과 함께 대화해보세요.</DialogDescription>
+          {/* <p className="text-[#6B7280] text-sm mt-1">
             새로운 팀을 만들어 친구들과 함께 대화해보세요.
-          </p>
+          </p> */}
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
           <div className="space-y-2">
             <Label htmlFor="serverName" className="text-gray-700 font-medium">
-              팀 이름 <span className="text-red-500">*</span>
+              이름 <span className="text-red-500">*</span>
             </Label>
             <Input
               id="serverName"
@@ -91,7 +92,7 @@ export default function TeamAddButton() {
 
           <div className="space-y-2">
             <Label htmlFor="description" className="text-gray-700 font-medium">
-              팀 설명
+              설명
             </Label>
             <textarea
               id="description"
@@ -104,24 +105,6 @@ export default function TeamAddButton() {
             />
             <div className="text-xs text-[#6B7280] text-right">
               {description.length}/200
-            </div>
-          </div>
-
-          <div className="bg-[#F5F3FF] rounded-lg p-3 border border-[#E5E7EB]">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-[#8B5CF6] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white text-xs font-semibold">
-                  {name ? name.charAt(0).toUpperCase() : '?'}
-                </span>
-              </div>
-              <div>
-                <h4 className="text-gray-800 font-medium">
-                  {name || '팀 이름'}
-                </h4>
-                <p className="text-[#6B7280] text-sm mt-0.5">
-                  {description || '팀 설명이 여기에 표시됩니다.'}
-                </p>
-              </div>
             </div>
           </div>
 

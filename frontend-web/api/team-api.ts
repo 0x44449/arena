@@ -12,8 +12,14 @@ async function createTeam(data: CreateTeamDto) {
   return response.data;
 }
 
+async function getTeamByTeamId(teamId: string) {
+  const response = await api.get<ApiResult<TeamDto>>(`/api/v1/teams/${teamId}`);
+  return response.data;
+}
+
 const teamApi = {
   getTeams,
   createTeam,
+  getTeamByTeamId,
 };
 export default teamApi;

@@ -3,10 +3,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useArenaPath } from "./arena-path.hook";
 import teamApi from "@/api/team-api";
-import TeamSidebarButton from "./team-sidebar-button";
+import TeamButton from "./team-button";
 import TeamAddButton from "./team-add-button";
 
-export default function TeamSidebar() {
+export default function TeamView() {
   const { teamId } = useArenaPath();
   const { data: teams } = useQuery({
     queryKey: ['teams'],
@@ -24,12 +24,12 @@ export default function TeamSidebar() {
 
   return (
     <div>
-      <div className="w-[72px] flex flex-col items-center py-3 space-y-2 border-r border-[#E5E7EB] space-y-6">
+      <div className="w-[72px] flex flex-col items-center py-3 space-y-2 space-y-6">
         {teams?.map(team => (
-          <TeamSidebarButton key={team.teamId} team={team} active={team.teamId === teamId} />
+          <TeamButton key={team.teamId} team={team} active={team.teamId === teamId} />
         ))}
       </div>
-      <div className="w-[72px] flex flex-col items-center py-3 space-y-2 border-r border-[#E5E7EB]">
+      <div className="w-[72px] flex flex-col items-center py-3 space-y-2">
         <TeamAddButton />
       </div>
     </div>

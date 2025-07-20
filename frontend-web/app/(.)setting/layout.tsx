@@ -1,9 +1,8 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { User, X } from "lucide-react";
+import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -15,7 +14,6 @@ export default function Layout({
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(true);
-  const [hasChanges, setHasChanges] = useState(false);
 
   const handleOpenChange = (next: boolean) => {
     setIsOpen(next);

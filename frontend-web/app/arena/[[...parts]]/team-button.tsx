@@ -4,13 +4,13 @@ import { TeamDto } from "@/api/generated";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-interface TeamSidebarButtonProps {
+interface TeamButtonProps {
   team: TeamDto;
   active?: boolean;
   hovered?: boolean;
 }
 
-export default function TeamSidebarButton(props: TeamSidebarButtonProps) {
+export default function TeamButton(props: TeamButtonProps) {
   const { team, active, hovered } = props;
 
   return (
