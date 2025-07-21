@@ -12,8 +12,14 @@ async function createWorkspace(param: CreateWorkspaceDto) {
   return response.data;
 }
 
+async function getWorkspaceByWorkspaceId(workspaceId: string) {
+  const response = await api.get<ApiResult<WorkspaceDto>>(`/api/v1/workspaces/${workspaceId}`);
+  return response.data;
+}
+
 const workspaceApi = {
   getWorkspacesByTeamId,
   createWorkspace,
+  getWorkspaceByWorkspaceId,
 }
 export default workspaceApi;
