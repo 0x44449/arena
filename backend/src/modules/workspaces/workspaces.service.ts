@@ -21,7 +21,17 @@ export class WorkspacesService {
       ownerId: owner.userId,
     });
 
-    return await this.workspacesRepository.save(workspace);
+    await this.workspacesRepository.save(workspace);
+    const savedWorkspace = await this.workspacesRepository.findOne({
+      where: { workspaceId: workspace.workspaceId },
+      relations: ['owner', 'team'],
+    });
+
+    if (!savedWorkspace) {
+      throw new Error(`Workspace with ID ${workspace.workspaceId} not found`);
+    }
+
+    return savedWorkspace;
   }
 
   async findWorkspaceByWorkspaceId(workspaceId: string): Promise<WorkspaceEntity> {
