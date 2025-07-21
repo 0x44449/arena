@@ -27,7 +27,7 @@ export class WorkspacesService {
   async findWorkspaceByWorkspaceId(workspaceId: string): Promise<WorkspaceEntity> {
     const workspace = await this.workspacesRepository.findOne({
       where: { workspaceId },
-      relations: ['owner'],
+      relations: ['owner', 'team'],
     });
 
     if (!workspace) {
@@ -40,7 +40,7 @@ export class WorkspacesService {
   async findWorkspacesByTeamId(teamId: string): Promise<WorkspaceEntity[]> {
     return this.workspacesRepository.find({
       where: { teamId },
-      relations: ['owner'],
+      relations: ['owner', 'team'],
     });
   }
 }

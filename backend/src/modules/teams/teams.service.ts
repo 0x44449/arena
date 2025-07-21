@@ -39,16 +39,16 @@ export class TeamsService {
   }
 
   async findTeamsByUserId(userId: string): Promise<TeamEntity[]> {
-    return this.teamsRepository.find({
+    return await this.teamsRepository.find({
       where: { owner: { userId } },
       relations: ['owner'],
     });
   }
 
   async findWorkspacesByTeamId(teamId: string): Promise<WorkspaceEntity[]> {
-    return this.workspaceRepository.find({
+    return await this.workspaceRepository.find({
       where: { teamId },
-      relations: ['team'],
+      relations: ['team', 'owner'],
     });
   }
 }

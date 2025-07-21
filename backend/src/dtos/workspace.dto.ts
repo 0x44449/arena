@@ -1,7 +1,7 @@
 import { WorkspaceEntity } from "@/entities/workspace.entity";
-import { plainToInstance } from "class-transformer";
 import { UserDto } from "./user.dto";
 import { OmitType } from "@nestjs/swagger";
+import { TeamDto } from "./team.dto";
 
 export class WorkspaceDto extends OmitType(
   WorkspaceEntity,
@@ -15,12 +15,13 @@ export class WorkspaceDto extends OmitType(
   owner: UserDto;
 
   public static fromEntity(entity: WorkspaceEntity): WorkspaceDto {
-    const dto = plainToInstance(WorkspaceDto, entity, {
-      excludeExtraneousValues: true,
-    });
-
-    dto.owner = UserDto.fromEntity(entity.owner);
-
-    return dto;
+    return {
+      workspaceId: entity.workspaceId,
+      name: entity.name,
+      description: entity.description,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      owner: UserDto.fromEntity(entity.owner),
+    }
   }
 }
