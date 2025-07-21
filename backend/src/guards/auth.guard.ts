@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import firebaseAdmin from '../commons/firebase.plugin';
-import { ArenaRequest } from '@/commons/arena-requset';
+import { ArenaRequest } from '@/commons/arena-request';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '@/entities/user.entity';
 import { Repository } from 'typeorm';

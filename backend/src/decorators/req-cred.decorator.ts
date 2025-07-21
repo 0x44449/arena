@@ -1,4 +1,4 @@
-import { ArenaRequest } from "@/commons/arena-requset";
+import { ArenaRequest } from "@/commons/arena-request";
 import { createParamDecorator } from "@nestjs/common"
 
 const ReqCred = createParamDecorator(
