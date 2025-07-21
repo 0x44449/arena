@@ -7,7 +7,6 @@ export class WorkspaceDto extends OmitType(
   WorkspaceEntity,
   [
     'team',
-    'teamId',
     'owner',
     'ownerId',
   ] as const
@@ -19,6 +18,7 @@ export class WorkspaceDto extends OmitType(
       workspaceId: entity.workspaceId,
       name: entity.name,
       description: entity.description,
+      teamId: entity.teamId,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       owner: UserDto.fromEntity(entity.owner),
