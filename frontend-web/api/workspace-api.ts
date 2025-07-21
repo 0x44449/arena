@@ -1,5 +1,5 @@
 import api from "./api.axios";
-import { WorkspaceDto } from "./generated";
+import { CreateWorkspaceDto, WorkspaceDto } from "./generated";
 import { ApiResult } from "./models/api-result";
 
 async function getWorkspacesByTeamId(teamId: string) {
@@ -7,7 +7,13 @@ async function getWorkspacesByTeamId(teamId: string) {
   return response.data;
 }
 
+async function createWorkspace(param: CreateWorkspaceDto) {
+  const response = await api.post<ApiResult<WorkspaceDto>>(`/api/v1/workspaces`, param);
+  return response.data;
+}
+
 const workspaceApi = {
   getWorkspacesByTeamId,
+  createWorkspace,
 }
 export default workspaceApi;
