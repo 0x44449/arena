@@ -8,6 +8,7 @@ export type WorkspaceDto = {
     workspaceId: string;
     name: string;
     description: string;
+    teamId: string;
     createdAt: string;
     updatedAt: string;
 };
