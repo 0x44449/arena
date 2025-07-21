@@ -46,7 +46,7 @@ export default function LoginForm() {
       }
 
       // 사용자 정보가 있으면 메인 페이지로 이동
-      router.push('/arena');
+      router.push('/gate');
     }
   }
 
