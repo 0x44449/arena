@@ -2,7 +2,7 @@ import { WorkspaceEntity } from "@/entities/workspace.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateWorkspaceDto } from "./dto/create-workspace.dto";
+import { CreateWorkspaceDto } from "./dtos/create-workspace.dto";
 import { UserEntity } from "@/entities/user.entity";
 import { idgen } from "@/commons/id-generator";
 

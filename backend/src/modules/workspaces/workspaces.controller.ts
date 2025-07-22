@@ -3,7 +3,7 @@ import { WorkspacesService } from "./workspaces.service";
 import { AuthGuard } from "@/guards/auth.guard";
 import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { ApiOkResponseWith } from "@/decorators/api-ok-response-with.decorator";
-import { CreateWorkspaceDto } from "./dto/create-workspace.dto";
+import { CreateWorkspaceDto } from "./dtos/create-workspace.dto";
 import { WorkspaceDto } from "@/dtos/workspace.dto";
 import ReqCred from "@/decorators/req-cred.decorator";
 import ArenaCredential from "@/commons/arena-credential";

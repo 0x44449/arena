@@ -6,7 +6,7 @@ import { TeamDto } from "@/dtos/team.dto";
 import { AuthGuard } from "@/guards/auth.guard";
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
-import { CreateTeamDto } from "./dto/create-team.dto";
+import { CreateTeamDto } from "./dtos/create-team.dto";
 import { TeamsService } from "./teams.service";
 import { WorkspaceDto } from "@/dtos/workspace.dto";
 

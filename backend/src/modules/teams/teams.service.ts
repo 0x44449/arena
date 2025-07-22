@@ -3,7 +3,7 @@ import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateTeamDto } from "./dto/create-team.dto";
+import { CreateTeamDto } from "./dtos/create-team.dto";
 import { idgen } from "@/commons/id-generator";
 import { WorkspaceEntity } from "@/entities/workspace.entity";
 
