@@ -4,9 +4,12 @@
 /* eslint-disable */
 
 export type { ApiResult } from './models/ApiResult';
+export type { ChatMessageDto } from './models/ChatMessageDto';
+export type { CreateChatMessageDto } from './models/CreateChatMessageDto';
 export type { CreateTeamDto } from './models/CreateTeamDto';
 export type { CreateWorkspaceDto } from './models/CreateWorkspaceDto';
 export type { FileDto } from './models/FileDto';
+export type { InfinityPagedDto } from './models/InfinityPagedDto';
 export type { RegisterUserDto } from './models/RegisterUserDto';
 export type { TeamDto } from './models/TeamDto';
 export type { UpdateUserDto } from './models/UpdateUserDto';

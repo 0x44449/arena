@@ -5,8 +5,8 @@ import { WsAuthGuard } from "@/guards/ws-auth.guard";
 import { Injectable, UseGuards } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
-import { JoinChatPayload } from "./payload/join-chat.payload";
-import { LeaveChatPayload } from "./payload/leave-chat.payload";
+import { JoinChatPayload } from "./payloads/join-chat.payload";
+import { LeaveChatPayload } from "./payloads/leave-chat.payload";
 
 @WebSocketGateway({
   namespace: '/feature/chat'
