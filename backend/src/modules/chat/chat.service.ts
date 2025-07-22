@@ -8,13 +8,15 @@ import { CreateChatMessageDto } from "./dtos/create-chat-message.dto";
 import { UserEntity } from "@/entities/user.entity";
 import { FileEntity } from "@/entities/file.entity";
 import { InfinityPagedDto } from "@/dtos/infinity-paged.dto";
+import { ChatGateway } from "./chat.gateway";
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(ChatMessageEntity) private readonly chatMessageRepository: Repository<ChatMessageEntity>,
     @InjectRepository(FileEntity) private readonly fileRepository: Repository<FileEntity>,
-    @InjectRedis() private readonly redis: Redis
+    @InjectRedis() private readonly redis: Redis,
+    private readonly chatGateway: ChatGateway
   ) {}
 
   async getPagedMessagesByWorkspaceId(workspaceId: string, baseSeq: number, limit: number, direction: 'prev' | 'next'): Promise<InfinityPagedDto<ChatMessageEntity>> {
@@ -23,7 +25,9 @@ export class ChatService {
 
     const whereCondition: FindOptionsWhere<ChatMessageEntity> =
       direction === 'prev'
-        ? { workspaceId, seq: LessThan(baseSeq) }
+        ? baseSeq === -1
+          ? { workspaceId }
+          : { workspaceId, seq: LessThan(baseSeq) }
         : { workspaceId, seq: MoreThan(baseSeq) };
 
     // 정렬 순서 분기
@@ -43,29 +47,29 @@ export class ChatService {
     if (messages.length === 0) {
       hasPrev = false;
       hasNext = false;
+    } else {
+      const seqs = messages.map(m => m.seq);
+      const minSeq = Math.min(...seqs);
+      const maxSeq = Math.max(...seqs);
+
+      // Next/Prev 여부 확인 쿼리
+      const [hasPrevResult, hasNextResult] = await Promise.all([
+        this.chatMessageRepository.exists({
+          where: { workspaceId, seq: LessThan(minSeq) },
+        }),
+        this.chatMessageRepository.exists({
+          where: { workspaceId, seq: MoreThan(maxSeq) },
+        }),
+      ]);
+      hasPrev = hasPrevResult;
+      hasNext = hasNextResult;
     }
-
-    const seqs = messages.map(m => m.seq);
-    const minSeq = Math.min(...seqs);
-    const maxSeq = Math.max(...seqs);
-
-    // Next/Prev 여부 확인 쿼리
-    const [hasPrevResult, hasNextResult] = await Promise.all([
-      this.chatMessageRepository.exists({
-        where: { workspaceId, seq: LessThan(minSeq) },
-      }),
-      this.chatMessageRepository.exists({
-        where: { workspaceId, seq: MoreThan(maxSeq) },
-      }),
-    ]);
-    hasPrev = hasPrevResult;
-    hasNext = hasNextResult;
 
     // 메시지 순서 보정
     if (direction === 'prev') {
       messages.reverse(); // prev는 오래된 순으로 정렬되어야 하므로 역순으로
     }
-    
+
     return {
       items: messages,
       hasNext,
@@ -98,6 +102,19 @@ export class ChatService {
       attachments,
     });
 
-    return await this.chatMessageRepository.save(message);
+    await this.chatMessageRepository.save(message);
+    const saved = await this.chatMessageRepository.findOne({
+      where: { messageId: message.messageId },
+      relations: ['sender', 'attachments'],
+    });
+
+    if (!saved) {
+      throw new Error("Failed to save chat message");
+    }
+
+    // 메세지 생성 알림
+    this.chatGateway.notifyMessage(workspaceId, saved);
+
+    return saved;
   }
 }

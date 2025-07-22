@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  allowedDevOrigins: [],
+  allowedDevOrigins: ["arena-dev.com"],
   async rewrites() {
     return {
       beforeFiles: [
