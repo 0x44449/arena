@@ -3,7 +3,7 @@ import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/co
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { ChatService } from "./chat.service";
 import { ChatMessageDto } from "@/dtos/chat-message.dto";
-import { ApiResult } from "@/dtos/api-result.dto";
+import { ApiResultDto } from "@/dtos/api-result.dto";
 import { InfinityPagedDto } from "@/dtos/infinity-paged.dto";
 import { CreateChatMessageDto } from "./dtos/create-chat-message.dto";
 import ReqCred from "@/decorators/req-cred.decorator";
@@ -26,7 +26,7 @@ export class ChatController {
     @Param('workspaceId') workspaceId: string,
     @ReqCred() credential: ArenaCredential,
     @Query() query: GetChatMessagesQuery,
-  ): Promise<ApiResult<InfinityPagedDto<ChatMessageDto>>> {
+  ): Promise<ApiResultDto<InfinityPagedDto<ChatMessageDto>>> {
     let { seq, limit, direction } = query;
 
     if (typeof seq !== 'number') {
@@ -41,7 +41,7 @@ export class ChatController {
 
     const paged = await this.chatService.getPagedMessagesByWorkspaceId(workspaceId, seq, limit, direction);
 
-    const result = new ApiResult<InfinityPagedDto<ChatMessageDto>>({
+    const result = new ApiResultDto<InfinityPagedDto<ChatMessageDto>>({
       data: new InfinityPagedDto<ChatMessageDto>({
         items: paged.items.map(message => ChatMessageDto.fromEntity(message)),
         hasNext: paged.hasNext,
@@ -57,11 +57,11 @@ export class ChatController {
     @Param('workspaceId') workspaceId: string,
     @Body() param: CreateChatMessageDto,
     @ReqCred() credential: ArenaCredential
-  ): Promise<ApiResult<ChatMessageDto>> {
+  ): Promise<ApiResultDto<ChatMessageDto>> {
     const messageEntity = await this.chatService.createMessage(workspaceId, param, credential.user);
     const messageDto = ChatMessageDto.fromEntity(messageEntity);
 
-    const result = new ApiResult<ChatMessageDto>({ data: messageDto });
+    const result = new ApiResultDto<ChatMessageDto>({ data: messageDto });
     return result;
   }
 }

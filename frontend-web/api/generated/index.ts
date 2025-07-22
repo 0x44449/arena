@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type { ApiResult } from './models/ApiResult';
+export type { ApiResultDto } from './models/ApiResultDto';
 export type { ChatMessageDto } from './models/ChatMessageDto';
 export type { CreateChatMessageDto } from './models/CreateChatMessageDto';
 export type { CreateTeamDto } from './models/CreateTeamDto';

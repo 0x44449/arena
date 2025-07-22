@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
 import { Response } from 'express';
 import { UnauthorizedError } from "./unauthorized-error";
-import { ApiResult } from "@/dtos/api-result.dto";
+import { ApiResultDto } from "@/dtos/api-result.dto";
 
 @Catch(UnauthorizedError)
 export class UnauthorizedExceptionFilter implements ExceptionFilter {
@@ -9,7 +9,7 @@ export class UnauthorizedExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    response.status(401).json(new ApiResult({
+    response.status(401).json(new ApiResultDto({
       success: false,
       errorMessage: 'Unauthorized',
       errorCode: '401',

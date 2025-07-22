@@ -1,4 +1,4 @@
-import { ApiResult } from "@/dtos/api-result.dto";
+import { ApiResultDto } from "@/dtos/api-result.dto";
 import { applyDecorators, Type } from "@nestjs/common";
 import { ApiExtraModels, ApiOkResponse, ApiResponseNoStatusOptions, getSchemaPath } from "@nestjs/swagger";
 
@@ -10,11 +10,11 @@ interface ApiOkResponseWithResultOptions {
 export function ApiOkResponseWith<T>(model?: Type<T>, resultOptions?: ApiOkResponseWithResultOptions, options?: ApiResponseNoStatusOptions): MethodDecorator {
   if (model === undefined) {
     return applyDecorators(
-      ApiExtraModels(ApiResult),
+      ApiExtraModels(ApiResultDto),
       ApiOkResponse({
         schema: {
           allOf: [
-            { $ref: getSchemaPath(ApiResult) },
+            { $ref: getSchemaPath(ApiResultDto) },
             {
               properties: {
                 data: { type: 'null', nullable: true },
@@ -37,11 +37,11 @@ export function ApiOkResponseWith<T>(model?: Type<T>, resultOptions?: ApiOkRespo
       $ref: getSchemaPath(model),
     };
   return applyDecorators(
-    ApiExtraModels(ApiResult, model),
+    ApiExtraModels(ApiResultDto, model),
     ApiOkResponse({
       schema: {
         allOf: [
-          { $ref: getSchemaPath(ApiResult) },
+          { $ref: getSchemaPath(ApiResultDto) },
           {
             properties: {
               data: dataSchema,

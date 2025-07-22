@@ -5,7 +5,7 @@ import { FilesService } from "./files.service";
 import { ArenaFileInterceptor } from "@/commons/file-uploader/arena-file-interceptor";
 import { ApiMultipartBody } from "@/decorators/api-multipart-body.decorator";
 import { ApiOkResponseWith } from "@/decorators/api-ok-response-with.decorator";
-import { ApiResult } from "@/dtos/api-result.dto";
+import { ApiResultDto } from "@/dtos/api-result.dto";
 import { FileDto } from "@/dtos/file.dto";
 import ReqCred from "@/decorators/req-cred.decorator";
 import ArenaCredential from "@/commons/arena-credential";
@@ -47,10 +47,10 @@ export class FilesController {
   @UseInterceptors(ArenaFileInterceptor())
   @ApiMultipartBody()
   @ApiOkResponseWith(FileDto)
-  async uploadFile(@UploadedFile() file: Express.Multer.File, @ReqCred() credential: ArenaCredential): Promise<ApiResult<FileDto>> {
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @ReqCred() credential: ArenaCredential): Promise<ApiResultDto<FileDto>> {
     const savedFile = await this.filesService.uploadFile(file, credential.user);
 
-    const result = new ApiResult<FileDto>({ data: FileDto.fromEntity(savedFile) });
+    const result = new ApiResultDto<FileDto>({ data: FileDto.fromEntity(savedFile) });
     return result;
   }
 }

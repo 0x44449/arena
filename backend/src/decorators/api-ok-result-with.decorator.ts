@@ -1,4 +1,4 @@
-import { ApiResult } from '@/dtos/api-result.dto';
+import { ApiResultDto } from '@/dtos/api-result.dto';
 import { applyDecorators, Type } from '@nestjs/common';
 import {
   ApiExtraModels,
@@ -20,11 +20,11 @@ export function ApiOkResultWith(
 ): MethodDecorator {
   const extraModels = factory.models ?? [];
   return applyDecorators(
-    ApiExtraModels(ApiResult, ...extraModels),
+    ApiExtraModels(ApiResultDto, ...extraModels),
     ApiOkResponse({
       schema: {
         allOf: [
-          refOf(ApiResult),
+          refOf(ApiResultDto),
           {
             properties: {
               data: factory(refOf),

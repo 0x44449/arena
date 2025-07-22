@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ApiResult = {
+export type ApiResultDto = {
     success: boolean;
     data?: Record<string, any>;
     errorCode?: string;

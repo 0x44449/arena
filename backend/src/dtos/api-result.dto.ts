@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class ApiResult<T> {
+export class ApiResultDto<T> {
   @ApiProperty() success: boolean;
   @ApiProperty() data?: T;
   @ApiProperty() errorCode?: string;

@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
 import { WellKnownError } from "./well-known-error";
 import { Response } from 'express';
-import { ApiResult } from "@/dtos/api-result.dto";
+import { ApiResultDto } from "@/dtos/api-result.dto";
 
 @Catch(WellKnownError)
 export class WellKnownExceptionFilter implements ExceptionFilter {
@@ -10,7 +10,7 @@ export class WellKnownExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     const { message, errorCode, statusCode } = exception;
-    response.status(statusCode ?? 200).json(new ApiResult({
+    response.status(statusCode ?? 200).json(new ApiResultDto({
       success: false,
       errorMessage: message,
       errorCode: errorCode,
