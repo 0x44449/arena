@@ -1,19 +1,19 @@
 import api from "./api.axios";
 import { CreateTeamDto, TeamDto } from "./generated";
-import { ApiResult } from "./models/api-result";
+import { ApiResultDto } from "./models/api-result";
 
 async function getTeams() {
-  const response = await api.get<ApiResult<TeamDto[]>>('/api/v1/teams');
+  const response = await api.get<ApiResultDto<TeamDto[]>>('/api/v1/teams');
   return response.data;
 }
 
 async function createTeam(data: CreateTeamDto) {
-  const response = await api.post<ApiResult<TeamDto>>('/api/v1/teams', data);
+  const response = await api.post<ApiResultDto<TeamDto>>('/api/v1/teams', data);
   return response.data;
 }
 
 async function getTeamByTeamId(teamId: string) {
-  const response = await api.get<ApiResult<TeamDto>>(`/api/v1/teams/${teamId}`);
+  const response = await api.get<ApiResultDto<TeamDto>>(`/api/v1/teams/${teamId}`);
   return response.data;
 }
 

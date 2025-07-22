@@ -1,20 +1,20 @@
 import { AxiosProgressEvent } from "axios";
 import api from "./api.axios";
 import { RegisterUserDto, UpdateUserProfileDto, UserDto } from "./generated";
-import { ApiResult } from "./models/api-result";
+import { ApiResultDto } from "./models/api-result";
 
 async function getMe() {
-  const response = await api.get<ApiResult<UserDto>>('/api/v1/users/me');
+  const response = await api.get<ApiResultDto<UserDto>>('/api/v1/users/me');
   return response.data;
 }
 
 async function registerUser(user: RegisterUserDto) {
-  const response = await api.post<ApiResult<UserDto>>('/api/v1/users', user);
+  const response = await api.post<ApiResultDto<UserDto>>('/api/v1/users', user);
   return response.data;
 }
 
 async function updateProfile(profile: UpdateUserProfileDto) {
-  const response = await api.patch<ApiResult<UserDto>>('/api/v1/users/me/profile', profile);
+  const response = await api.patch<ApiResultDto<UserDto>>('/api/v1/users/me/profile', profile);
   return response.data;
 }
 
@@ -26,7 +26,7 @@ async function uploadAvatar(file: File, options?: {
   onError?: (error: unknown) => void;
   timeout?: number;
   signal?: AbortSignal;
-}): Promise<ApiResult<UserDto>> {
+}): Promise<ApiResultDto<UserDto>> {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -55,7 +55,7 @@ async function uploadAvatar(file: File, options?: {
   options?.onStart?.();
 
   try {
-    const response = await api.patch<ApiResult<UserDto>>('/api/v1/users/me/profile/avatar', formData, config);
+    const response = await api.patch<ApiResultDto<UserDto>>('/api/v1/users/me/profile/avatar', formData, config);
     options?.onComplete?.();
     return response.data;
   } catch (error) {

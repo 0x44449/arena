@@ -1,5 +1,5 @@
 import { AxiosProgressEvent } from "axios";
-import { ApiResult } from "./models/api-result";
+import { ApiResultDto } from "./models/api-result";
 import { FileDto } from "./generated";
 import api from "./api.axios";
 
@@ -11,7 +11,7 @@ async function uploadFile(file: File, options?: {
   onError?: (error: unknown) => void;
   timeout?: number;
   signal?: AbortSignal;
-}): Promise<ApiResult<FileDto>> {
+}): Promise<ApiResultDto<FileDto>> {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -40,7 +40,7 @@ async function uploadFile(file: File, options?: {
   options?.onStart?.();
 
   try {
-    const response = await api.post<ApiResult<FileDto>>('/api/v1/files', formData, config);
+    const response = await api.post<ApiResultDto<FileDto>>('/api/v1/files', formData, config);
     options?.onComplete?.();
     return response.data;
   } catch (error) {
