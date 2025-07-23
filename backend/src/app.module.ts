@@ -8,11 +8,15 @@ import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { RedisModule } from './redis.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ArenaJwtModule } from './arena-jwt.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ArenaOrmModule.forTypeOrm(),
+    ArenaJwtModule.register(),
     RedisModule,
     UsersModule,
     FilesModule,
@@ -20,6 +24,6 @@ import { AuthModule } from './modules/auth/auth.module';
     WorkspacesModule,
     ChatModule,
     AuthModule,
-  ],
+  ]
 })
 export class AppModule {}

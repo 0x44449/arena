@@ -1,6 +1,4 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
-import firebaseAdmin from '../commons/firebase.plugin';
 import { ArenaRequest } from '@/commons/arena-request';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '@/entities/user.entity';
@@ -9,18 +7,21 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '@/decorators/allow-public.decorator';
 import { UnauthorizedError } from '@/commons/exceptions/unauthorized-error';
 import { WellKnownError } from '@/commons/exceptions/well-known-error';
+import { AuthService } from '@/modules/auth/auth.service';
+import { ArenaAuthTokenPayloadDto } from '@/dtos/arena-auth-token-payload';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
+    private readonly authService: AuthService,
     @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async verifyByToken(request: ArenaRequest, token: string): Promise<boolean> {
-    let decoded: DecodedIdToken | null = null;
+    let decoded: ArenaAuthTokenPayloadDto | null = null;
     try {
-      decoded = await firebaseAdmin.auth().verifyIdToken(token);
+      decoded = await this.authService.verifyArenaToken(token);
     } catch {
       throw new UnauthorizedError('Invalid ID token');
     }
@@ -29,7 +30,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedError('Token verification failed');
     }
 
-    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.userId } });
     if (!userEntity) {
       throw new WellKnownError({
         message: 'User not found',
@@ -42,9 +43,9 @@ export class AuthGuard implements CanActivate {
   }
 
   async verifyByCookie(request: ArenaRequest, cookie: string): Promise<boolean> {
-    let decoded: DecodedIdToken | null = null;
+    let decoded: ArenaAuthTokenPayloadDto | null = null;
     try {
-      decoded = await firebaseAdmin.auth().verifySessionCookie(cookie);
+      decoded = await this.authService.verifyArenaToken(cookie);
     } catch {
       throw new UnauthorizedError('Invalid session cookie');
     }
@@ -53,7 +54,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedError('Session cookie verification failed');
     }
 
-    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.userId } });
     if (!userEntity) {
       throw new WellKnownError({
         message: 'User not found',
