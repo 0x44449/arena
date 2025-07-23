@@ -7,6 +7,8 @@ import ChatMessage from "./chat-message";
 import { ChatMessageDto } from "@/api/generated";
 import chatApi from "@/api/chat-api";
 import ws from "@/api/ws.socket";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ChatMainProps {
   teamId: string;
@@ -56,7 +58,17 @@ export default function ChatMain(props: ChatMainProps) {
     }
   }, []);
 
-  const handleKeyPress = async (e: React.KeyboardEvent) => {
+  const handleMessageInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log('Message input changed:', e.target.value);
+    setMessageInput(e.target.value);
+
+    const target = e.target as HTMLTextAreaElement;
+    target.style.height = 'auto';
+    target.style.height = `${target.scrollHeight}px`;
+  }
+
+  const handleMessageInputKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    console.log('Key pressed:', e.key);
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
 
@@ -68,7 +80,7 @@ export default function ChatMain(props: ChatMainProps) {
       });
       setMessageInput("");
     }
-  };
+  }
 
   return (
     <div className="flex flex-col flex-1">
@@ -95,7 +107,43 @@ export default function ChatMain(props: ChatMainProps) {
       </ScrollArea>
 
       {/* Message Input */}
-      <div className="p-2 bg-white border-t border-[#F3F4F6]">
+      <div className="flex w-full p-2 bg-white border-t border-[#F3F4F6]">
+        <div className="flex flex-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg">
+          <div className="flex flex-1 flex-row space-x-2 p-2 items-center">
+            <button className="p-0.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150 flex-shrink-0">
+              <Plus className="w-5 h-5 text-[#6B7280]" />
+            </button>
+
+            <div className="flex flex-1 flex-col">
+              <textarea
+                value={messageInput}
+                onChange={handleMessageInputChange}
+                onKeyDown={handleMessageInputKeyDown}
+                className="w-full min-w-0 box-border bg-transparent max-h-32 focus:outline-none text-gray-800 placeholder-[#9CA3AF] resize-none"
+                rows={1}
+                placeholder={`#에 메시지 보내기`}
+              />
+            </div>
+
+            <div className="flex flex-row items-center space-x-1 flex-shrink-0">
+              <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150">
+                <Gift className="w-5 h-5 text-[#6B7280]" />
+              </button>
+              <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150">
+                <Smile className="w-5 h-5 text-[#6B7280]" />
+              </button>
+              <Button
+                disabled={true}
+                className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-3 py-1.5 text-sm h-auto"
+              >
+                전송
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* <div className="p-2 bg-white border-t border-[#F3F4F6]">
         <div className="relative">
           <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg overflow-hidden hover:border-[#8B5CF6] transition-colors duration-200">
             <div className="flex items-end space-x-2 p-2">
@@ -121,14 +169,14 @@ export default function ChatMain(props: ChatMainProps) {
                   }}
                 />
               </div>
-              {/* <div className="flex items-center space-x-1 flex-shrink-0">
+              <div className="flex items-center space-x-1 flex-shrink-0">
                 <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150">
                   <Gift className="w-5 h-5 text-[#6B7280]" />
                 </button>
                 <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150">
                   <Smile className="w-5 h-5 text-[#6B7280]" />
                 </button>
-              </div> */}
+              </div>
               {messageInput.trim() && (
                 <Button
                   // onClick={handleSendMessage}
@@ -141,7 +189,7 @@ export default function ChatMain(props: ChatMainProps) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }
