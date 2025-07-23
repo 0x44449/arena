@@ -17,6 +17,54 @@ export class AuthGuard implements CanActivate {
     @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  async verifyByToken(request: ArenaRequest, token: string): Promise<boolean> {
+    let decoded: DecodedIdToken | null = null;
+    try {
+      decoded = await firebaseAdmin.auth().verifyIdToken(token);
+    } catch {
+      throw new UnauthorizedError('Invalid ID token');
+    }
+
+    if (!decoded) {
+      throw new UnauthorizedError('Token verification failed');
+    }
+
+    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+    if (!userEntity) {
+      throw new WellKnownError({
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
+      });
+    }
+
+    request.credential = { user: userEntity };
+    return true;
+  }
+
+  async verifyByCookie(request: ArenaRequest, cookie: string): Promise<boolean> {
+    let decoded: DecodedIdToken | null = null;
+    try {
+      decoded = await firebaseAdmin.auth().verifySessionCookie(cookie);
+    } catch {
+      throw new UnauthorizedError('Invalid session cookie');
+    }
+
+    if (!decoded) {
+      throw new UnauthorizedError('Session cookie verification failed');
+    }
+
+    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+    if (!userEntity) {
+      throw new WellKnownError({
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
+      });
+    }
+
+    request.credential = { user: userEntity };
+    return true;
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
@@ -28,32 +76,41 @@ export class AuthGuard implements CanActivate {
 
     const authHeader = request.headers.authorization || '';
     const [, idToken] = authHeader.split('Bearer ');
+    const sessionCookie = request.cookies.session || '';
 
-    if (!idToken) {
-      throw new UnauthorizedError('No ID token provided');
+    if (idToken) {
+      return await this.verifyByToken(request, idToken);
+    } else if (sessionCookie) {
+      return await this.verifyByCookie(request, sessionCookie);
+    } else {
+      throw new UnauthorizedError('No authentication token or session cookie provided');
     }
 
-    let decoded: DecodedIdToken | null = null;
-    try {
-      decoded = await firebaseAdmin.auth().verifyIdToken(idToken);
-    } catch {
-      throw new UnauthorizedError('Invalid ID token');
-    }
+    // if (!idToken) {
+    //   throw new UnauthorizedError('No ID token provided');
+    // }
 
-    if (!decoded) {
-      throw new UnauthorizedError('Token verification failed');
-    }
+    // let decoded: DecodedIdToken | null = null;
+    // try {
+    //   decoded = await firebaseAdmin.auth().verifyIdToken(idToken);
+    // } catch {
+    //   throw new UnauthorizedError('Invalid ID token');
+    // }
 
-    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
-    if (!userEntity) {
-      // throw new UnauthorizedError('User not found');
-      throw new WellKnownError({
-        message: 'User not found',
-        errorCode: 'USER_NOT_FOUND',
-      });
-    }
+    // if (!decoded) {
+    //   throw new UnauthorizedError('Token verification failed');
+    // }
 
-    request.credential = { user: userEntity };
-    return true;
+    // const userEntity = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+    // if (!userEntity) {
+    //   // throw new UnauthorizedError('User not found');
+    //   throw new WellKnownError({
+    //     message: 'User not found',
+    //     errorCode: 'USER_NOT_FOUND',
+    //   });
+    // }
+
+    // request.credential = { user: userEntity };
+    // return true;
   }
 }

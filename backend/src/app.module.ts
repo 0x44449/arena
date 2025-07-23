@@ -7,6 +7,7 @@ import { ArenaOrmModule } from './arena-orm.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { RedisModule } from './redis.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RedisModule } from './redis.module';
     TeamsModule,
     WorkspacesModule,
     ChatModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
