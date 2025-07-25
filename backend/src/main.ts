@@ -6,6 +6,7 @@ import firebaseAdmin from './commons/firebase.plugin';
 import metadata from './metadata'; // 빌드시 자동 생성
 import { WellKnownExceptionFilter } from './commons/exceptions/well-known-exception-filter';
 import { UnauthorizedExceptionFilter } from './commons/exceptions/unauthorized-exception-filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -52,6 +53,9 @@ async function bootstrap() {
 
   // ExceptionFilter 설치
   app.useGlobalFilters(new WellKnownExceptionFilter(), new UnauthorizedExceptionFilter());
+
+  // 쿠키 파서 사용 - 세션 쿠키 인증
+  app.use(cookieParser());
 
   await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
 }

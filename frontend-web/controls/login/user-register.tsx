@@ -1,6 +1,4 @@
-'use client';
-
-import userApi from "@/api/user-api";
+import authApi from "@/api/auth-api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,13 +31,13 @@ export default function UserRegister() {
   }, []);
 
   const handleRegisterClick = async () => {
-    console.log('Register button clicked');
     if (isLoading) return;
     setIsLoading(true);
     setErrors({});
 
     try {
       const user = auth.currentUser;
+
       if (!user) {
         //TODO: 사용자 정보가 없습니다. 다시 로그인해주세요.
         console.error('No user is currently logged in.');
@@ -47,23 +45,31 @@ export default function UserRegister() {
       }
 
       const token = await user.getIdToken(false);
-      const provider = user.providerId;
 
-      const result = await userApi.registerUser({
-        email: user.email || '',
+      const registed = await authApi.register({
         displayName: displayName,
-        provider: provider,
         token: token,
+        provider: 'firebase'
       });
 
-      if (!result.success) {
-        //TODO: 사용자 등록에 실패했습니다. 다시 시도해주세요.
-        console.error('User registration failed:', result);
+      if (!registed.success) {
+        // TODO: 사용자 등록에 실패했습니다. 다시 시도해주세요.
+        console.error('User registration failed:', registed);
         return;
       }
 
-      // 등록 성공 시 처리
-      router.push("/arena");
+      const exchanged = await authApi.exchangeAuth({
+        token: token,
+        provider: 'firebase'
+      });
+
+      if (!exchanged.success) {
+        // TODO: 로그인 실패?
+        console.error('User exchange failed:', exchanged);
+        return;
+      }
+
+      router.push('/gate');
     } finally {
       setIsLoading(false);
     }

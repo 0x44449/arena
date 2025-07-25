@@ -1,6 +1,6 @@
 import { AxiosProgressEvent } from "axios";
 import api from "./api.axios";
-import { RegisterUserDto, UpdateUserProfileDto, UserDto } from "./generated";
+import { UpdateUserProfileDto, UserDto } from "./generated";
 import { ApiResultDto } from "./models/api-result";
 
 async function getMe() {
@@ -8,10 +8,10 @@ async function getMe() {
   return response.data;
 }
 
-async function registerUser(user: RegisterUserDto) {
-  const response = await api.post<ApiResultDto<UserDto>>('/api/v1/users', user);
-  return response.data;
-}
+// async function registerUser(user: RegisterUserDto) {
+//   const response = await api.post<ApiResultDto<UserDto>>('/api/v1/users', user);
+//   return response.data;
+// }
 
 async function updateProfile(profile: UpdateUserProfileDto) {
   const response = await api.patch<ApiResultDto<UserDto>>('/api/v1/users/me/profile', profile);
@@ -73,7 +73,7 @@ async function uploadAvatar(file: File, options?: {
 
 const userApi = {
   getMe,
-  registerUser,
+  // registerUser,
   updateProfile,
   uploadAvatar,
 };

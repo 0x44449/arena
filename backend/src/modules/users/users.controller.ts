@@ -7,7 +7,6 @@ import { ApiOkResponseWith } from "@/decorators/api-ok-response-with.decorator";
 import { AuthGuard } from "@/guards/auth.guard";
 import { ApiResultDto } from "@/dtos/api-result.dto";
 import { AllowPublic } from "@/decorators/allow-public.decorator";
-import { RegisterUserDto } from "./dtos/register-user.dto";
 import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { UpdateUserDto } from "./dtos/update-user.dto";
 import { UpdateUserProfileDto } from "./dtos/update-user-profile.dto";
@@ -26,15 +25,15 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  @AllowPublic()
-  @Post('')
-  @ApiOkResponseWith(UserDto)
-  @ApiBody({ type: RegisterUserDto })
-  async register(@Body() dto: RegisterUserDto): Promise<ApiResultDto<UserDto>> {
-    const user = await this.usersService.registerUser(dto);
+  // @AllowPublic()
+  // @Post('')
+  // @ApiOkResponseWith(UserDto)
+  // @ApiBody({ type: RegisterUserDto })
+  // async register(@Body() dto: RegisterUserDto): Promise<ApiResultDto<UserDto>> {
+  //   const user = await this.usersService.registerUser(dto);
 
-    return new ApiResultDto<UserDto>({ data: UserDto.fromEntity(user) });
-  }
+  //   return new ApiResultDto<UserDto>({ data: UserDto.fromEntity(user) });
+  // }
 
   @Get('me')
   @ApiOkResponseWith(UserDto)

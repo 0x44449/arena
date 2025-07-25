@@ -30,7 +30,8 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedError('Token verification failed');
     }
 
-    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.userId } });
+    console.log(`Decoded userId: ${decoded.userId}`);
+    const userEntity = await this.userRepository.findOne({ where: { userId: decoded.userId } });
     if (!userEntity) {
       throw new WellKnownError({
         message: 'User not found',
@@ -54,7 +55,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedError('Session cookie verification failed');
     }
 
-    const userEntity = await this.userRepository.findOne({ where: { uid: decoded.userId } });
+    const userEntity = await this.userRepository.findOne({ where: { userId: decoded.userId } });
     if (!userEntity) {
       throw new WellKnownError({
         message: 'User not found',
@@ -75,17 +76,39 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<ArenaRequest>();
 
-    const authHeader = request.headers.authorization || '';
-    const [, idToken] = authHeader.split('Bearer ');
-    const sessionCookie = request.cookies.arena_session || '';
+    if (!request.headers.authorization) {
+      const cookieToken = request.cookies['arena_session'];
 
-    if (idToken) {
-      return await this.verifyByToken(request, idToken);
-    } else if (sessionCookie) {
-      return await this.verifyByCookie(request, sessionCookie);
+      if (cookieToken) {
+        return await this.verifyByCookie(request, cookieToken);
+      } else {
+        throw new UnauthorizedError('No authentication token or session cookie provided');
+      }
     } else {
-      throw new UnauthorizedError('No authentication token or session cookie provided');
+      const authHeader = request.headers.authorization;
+      const [, token] = authHeader.split('Bearer ');
+
+      if (token) {
+        return await this.verifyByToken(request, token);
+      } else {
+        throw new UnauthorizedError('No ID token provided in authorization header');
+      }
     }
+
+    // const authHeader = request.headers.authorization || '';
+    // const [, idToken] = authHeader.split('Bearer ');
+    // const sessionCookie = request.cookies?.arena_session || '';
+
+    // console.log(`idToken: ${idToken}`);
+    // console.log(`sessionCookie: ${sessionCookie}`);
+
+    // if (idToken) {
+    //   return await this.verifyByToken(request, idToken);
+    // } else if (sessionCookie) {
+    //   return await this.verifyByCookie(request, sessionCookie);
+    // } else {
+    //   throw new UnauthorizedError('No authentication token or session cookie provided');
+    // }
 
     // if (!idToken) {
     //   throw new UnauthorizedError('No ID token provided');

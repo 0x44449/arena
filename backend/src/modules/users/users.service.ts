@@ -2,8 +2,6 @@ import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { RegisterUserDto } from "./dtos/register-user.dto";
-import fireabseAdmin from "@/commons/firebase.plugin";
 import { idgen } from "@/commons/id-generator";
 import { WellKnownError } from "@/commons/exceptions/well-known-error";
 import { UpdateUserDto } from "./dtos/update-user.dto";
@@ -25,37 +23,37 @@ export class UsersService {
     return this.userRepository.findOne({ where: { userId } });
   }
 
-  async registerUser(param: RegisterUserDto): Promise<UserEntity> {
-    let uid = '';
-    if (param.provider === 'firebase') {
-      try {
-        const decoded = await fireabseAdmin.auth().verifyIdToken(param.token);
-        uid = decoded.uid;
-      } catch {
-        throw new WellKnownError({
-          message: 'Invalid Firebase token',
-          errorCode: 'INVALID_FIREBASE_TOKEN',
-        });
-      }
-    } else {
-      throw new WellKnownError({
-        message: 'Unsupported authentication provider',
-        errorCode: 'UNSUPPORTED_AUTH_PROVIDER',
-      });
-    }
+  // async registerUser(param: RegisterUserDto): Promise<UserEntity> {
+  //   let uid = '';
+  //   if (param.provider === 'firebase') {
+  //     try {
+  //       const decoded = await fireabseAdmin.auth().verifyIdToken(param.token);
+  //       uid = decoded.uid;
+  //     } catch {
+  //       throw new WellKnownError({
+  //         message: 'Invalid Firebase token',
+  //         errorCode: 'INVALID_FIREBASE_TOKEN',
+  //       });
+  //     }
+  //   } else {
+  //     throw new WellKnownError({
+  //       message: 'Unsupported authentication provider',
+  //       errorCode: 'UNSUPPORTED_AUTH_PROVIDER',
+  //     });
+  //   }
 
-    const user = this.userRepository.create({
-      userId: idgen.shortId(),
-      email: param.email,
-      displayName: param.displayName,
-      uid: uid,
-      provider: param.provider,
-      avatarType: 'default',
-      avatarKey: '1',
-      message: '',
-    });
-    return this.userRepository.save(user);
-  }
+  //   const user = this.userRepository.create({
+  //     userId: idgen.shortId(),
+  //     email: param.email,
+  //     displayName: param.displayName,
+  //     uid: uid,
+  //     provider: param.provider,
+  //     avatarType: 'default',
+  //     avatarKey: '1',
+  //     message: '',
+  //   });
+  //   return this.userRepository.save(user);
+  // }
 
   async updateUserByUserId(param: UpdateUserDto, userId: string): Promise<UserEntity> {
     const user = await this.findUserByUserId(userId);

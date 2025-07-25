@@ -1,5 +1,4 @@
-export class RegisterUserDto {
-  email: string;
+export class RegisterUserWithProviderDto {
   displayName: string;
   token: string;
   provider: string;

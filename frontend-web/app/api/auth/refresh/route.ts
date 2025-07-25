@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }));
   }
 
-  const response = await fetch(`/api/v1/auth/token/refresh`, {
+  const response = await fetch(`${process.env.API_BASE_URL}/api/v1/auth/token/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -35,11 +35,22 @@ export async function POST(request: NextRequest) {
   const result = await response.json() as ApiResultDto<ArenaAuthTokenDto>;
 
   if (!result.success) {
+    // 세션 쿠키 제거
+    const headers = new Headers();
+    headers.append('Set-Cookie', `arena_session=; Domain=${process.env.SESSION_COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`);
+    headers.append('Set-Cookie', `arena_session_refresh=; Domain=${process.env.SESSION_REFRESH_COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
+
     return new Response(JSON.stringify({
       success: false,
       errorCode: result.errorCode || 'TOKEN_REFRESH_FAILED',
       data: null,
-    }));
+    }), {
+      status: response.status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers,
+      },
+    });
   }
 
   const headers = new Headers(response.headers);

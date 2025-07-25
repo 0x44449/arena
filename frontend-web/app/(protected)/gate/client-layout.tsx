@@ -5,11 +5,7 @@ import TeamView from "@/controls/gate/team-view/team-view";
 import UserProfileCard from "@/controls/gate/user-profile-card";
 import { useParams } from "next/navigation";
 
-export default function Layout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const { teamId, workspaceId } = useParams<{
     teamId?: string;
     workspaceId?: string;

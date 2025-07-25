@@ -14,7 +14,7 @@ export type { FileDto } from './models/FileDto';
 export type { InfinityPagedDto } from './models/InfinityPagedDto';
 export type { IssueArenaTokenDto } from './models/IssueArenaTokenDto';
 export type { RefreshArenaTokenDto } from './models/RefreshArenaTokenDto';
-export type { RegisterUserDto } from './models/RegisterUserDto';
+export type { RegisterUserWithProviderDto } from './models/RegisterUserWithProviderDto';
 export type { TeamDto } from './models/TeamDto';
 export type { UpdateUserDto } from './models/UpdateUserDto';
 export type { UpdateUserProfileDto } from './models/UpdateUserProfileDto';

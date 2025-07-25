@@ -1,13 +1,12 @@
-'use client';
-
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import useGoogleLogin from "./google-login.hook";
-import { useEffect, useState } from "react";
-import userApi from "@/api/user-api";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/plugins/firebase.plugin";
+import { auth as firebaseAuth } from "@/plugins/firebase.plugin";
+import { LoginPageContext } from "./login-page";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import authApi from "@/api/auth-api";
 
 interface SocialProvider {
   id: string;
@@ -18,36 +17,40 @@ interface SocialProvider {
 }
 
 export default function LoginForm() {
+  const { setMode } = useContext(LoginPageContext);
+
   const [isLoading, setIsLoading] = useState(false);
-  const { loginWithGoogle } = useGoogleLogin();
   const router = useRouter();
 
-  useEffect(() => {
-    handleAuthStateChange();
-  }, [auth]);
-
-  const handleAuthStateChange = async () => {
-    const user = auth.currentUser;
-    console.log('Current user:', user);
-
-    if (user) {
-      // 사용자 정보 획득
-      const userResult = await userApi.getMe();
-
-      if (!userResult.success) {
-        if (userResult.errorCode === 'USER_NOT_FOUND') {
-          // 사용자 정보가 없으면 새로 등록 페이지로 이동
-          router.push('/register');
-        } else {
-          // 다른 에러 처리
-          console.error('Failed to fetch user info:', userResult.errorCode);
-        }
-        return;
-      }
-
-      // 사용자 정보가 있으면 메인 페이지로 이동
-      router.push('/gate');
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    const credential = await signInWithPopup(firebaseAuth, provider);
+    
+    if (!credential.user) {
+      // TODO: 사용자에게 알림
+      console.error('Google login failed: No user returned');
+      return;
     }
+
+    const token = await credential.user.getIdToken(false);
+
+    const exchanged = await authApi.exchangeAuth({
+      token: token,
+      provider: 'firebase'
+    });
+
+    if (!exchanged.success) {
+      if (exchanged.errorCode === 'USER_NOT_FOUND') {
+        // 사용자 정보가 없으면 새로 등록 페이지로 이동
+        setMode('register');
+      } else {
+        // TODO: 다른 에러 처리
+        console.error('Failed to exchange auth:', exchanged.errorCode);
+      }
+      return;
+    }
+
+    router.push('/gate');
   }
 
   const socialProviders: SocialProvider[] = [

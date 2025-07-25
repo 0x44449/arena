@@ -4,5 +4,6 @@
 /* eslint-disable */
 export type IssueArenaTokenDto = {
     token: string;
+    provider: string;
 };
 

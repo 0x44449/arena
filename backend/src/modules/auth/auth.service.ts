@@ -7,14 +7,20 @@ import { AuthTokenEntity } from "@/entities/auth-token.entity";
 import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from "@nestjs/jwt";
-import { JwtService } from "@nestjs/jwt/dist/jwt.service";
+import { JsonWebTokenError, JwtService, NotBeforeError, TokenExpiredError } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { createHash, randomUUID } from "crypto";
 import dayjs from "dayjs";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import ms, { StringValue } from "ms";
 import { Repository } from "typeorm";
+import { IssueArenaTokenDto } from "./dtos/issue-arena-token.dto";
+import { RegisterUserWithProviderDto } from "./dtos/register-user-with-provider.dto";
+import { idgen } from "@/commons/id-generator";
+
+interface ArenaAuthTokenPayloadTypes {
+  userId: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -48,51 +54,64 @@ export class AuthService {
   //   return sessionCookie;
   // }
 
-  async issueArenaTokensByFirebase(fbtoken: string): Promise<ArenaAuthTokenDto> {
-    // token 및 사용자 검증
-    let decoded: DecodedIdToken | null = null;
-    try {
-      decoded = await firebaseAdmin.auth().verifyIdToken(fbtoken);
-    } catch {
-      throw new UnauthorizedError('Invalid ID token');
-    }
+  async issueArenaTokens(param: IssueArenaTokenDto): Promise<ArenaAuthTokenDto> {
+    const { provider, token } = param;
 
-    if (!decoded) {
-      throw new UnauthorizedError('Token verification failed');
-    }
+    if (provider === 'firebase') {
+      // token 및 사용자 검증
+      let decoded: DecodedIdToken | null = null;
+      try {
+        decoded = await firebaseAdmin.auth().verifyIdToken(token);
+      } catch {
+        throw new UnauthorizedError('Invalid ID token');
+      }
 
-    const user = await this.userRepository.findOne({ where: { uid: decoded.uid } });
-    if (!user) {
+      if (!decoded) {
+        throw new UnauthorizedError('Token verification failed');
+      }
+
+      const user = await this.userRepository.findOne({ where: { uid: decoded.uid } });
+      if (!user) {
+        throw new WellKnownError({
+          message: 'User not found',
+          errorCode: 'USER_NOT_FOUND',
+        });
+      }
+
+      // access token 발급
+      const payload: ArenaAuthTokenPayloadTypes = { userId: user.userId };
+      const accessToken = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: this.configService.get<StringValue>('JWT_ACCESS_EXPIRES_IN') || '15m',
+        algorithm: 'HS256',
+      });
+
+      // refresh token 발급
+      const refreshToken = randomUUID();
+
+      // 발급한 내용 기록, 각 토큰은 해시값으로 저장
+      const refreshTtl = this.configService.get<StringValue>('JWT_REFRESH_EXPIRES_IN') || '7d';
+      const absoluteTtl = this.configService.get<StringValue>('JWT_ABSOLUTE_EXPIRES_IN') || '60d';
+      const authToken = this.authTokenRepository.create({
+        userId: user.userId,
+        accessToken: createHash('sha256').update(accessToken).digest('hex'),
+        refreshToken: createHash('sha256').update(refreshToken).digest('hex'),
+        issuedAt: new Date(),
+        expiredAt: new Date(Date.now() + ms(refreshTtl)),
+        absoluteExpiresAt: new Date(Date.now() + ms(absoluteTtl)),
+      });
+      await this.authTokenRepository.save(authToken);
+
+      return new ArenaAuthTokenDto({
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+    } else {
       throw new WellKnownError({
-        message: 'User not found',
-        errorCode: 'USER_NOT_FOUND',
+        message: 'Unsupported provider',
+        errorCode: 'UNSUPPORTED_PROVIDER',
       });
     }
-
-    // access token 발급
-    const payload = new ArenaAuthTokenPayloadDto({ userId: user.userId });
-    const accessToken = this.jwtService.sign(payload);
-
-    // refresh token 발급
-    const refreshToken = randomUUID();
-
-    // 발급한 내용 기록, 각 토큰은 해시값으로 저장
-    const refreshTtl = this.configService.get<StringValue>('JWT_REFRESH_EXPIRES_IN') || '7d';
-    const absoluteTtl = this.configService.get<StringValue>('JWT_ABSOLUTE_EXPIRES_IN') || '60d';
-    const authToken = this.authTokenRepository.create({
-      userId: user.userId,
-      accessToken: createHash('sha256').update(accessToken).digest('hex'),
-      refreshToken: createHash('sha256').update(refreshToken).digest('hex'),
-      issuedAt: new Date(),
-      expiredAt: new Date(Date.now() + ms(refreshTtl)),
-      absoluteExpiresAt: new Date(Date.now() + ms(absoluteTtl)),
-    });
-    await this.authTokenRepository.save(authToken);
-
-    return new ArenaAuthTokenDto({
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
   }
 
   async refreshArenaTokens(refreshToken: string): Promise<ArenaAuthTokenDto> {
@@ -131,8 +150,12 @@ export class AuthService {
     }
 
     // access token 재발급
-    const payload = new ArenaAuthTokenPayloadDto({ userId: authToken.userId });
-    const accessToken = this.jwtService.sign(payload);
+    const payload: ArenaAuthTokenPayloadTypes = { userId: authToken.userId };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<StringValue>('JWT_ACCESS_EXPIRES_IN') || '15m',
+      algorithm: 'HS256',
+    });
 
     // 새로운 refresh token 발급
     const newRefreshToken = randomUUID();
@@ -162,9 +185,14 @@ export class AuthService {
 
   async verifyArenaToken(token: string): Promise<ArenaAuthTokenPayloadDto> {
     try {
-      const decoded = await this.jwtService.verifyAsync<ArenaAuthTokenPayloadDto>(token);
-      return decoded;
+      const decoded = await this.jwtService.verifyAsync<ArenaAuthTokenPayloadTypes>(token, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        algorithms: ['HS256'],
+      });
+      return new ArenaAuthTokenPayloadDto({ userId: decoded.userId });
     } catch (error) {
+      console.error('Token verification error:', error);
+
       if (error instanceof TokenExpiredError) {
         throw new WellKnownError({
           message: 'Access token has expired',
@@ -198,5 +226,45 @@ export class AuthService {
     }
 
     return decoded;
+  }
+
+  async registerUser(param: RegisterUserWithProviderDto): Promise<UserEntity> {
+    if (param.provider === 'firebase') {
+      let decoded: DecodedIdToken | null = null;
+
+      try {
+        decoded = await firebaseAdmin.auth().verifyIdToken(param.token);
+      } catch {
+        throw new WellKnownError({
+          message: 'Invalid Firebase token',
+          errorCode: 'INVALID_FIREBASE_TOKEN',
+        });
+      }
+
+      if (!decoded.email) {
+        throw new WellKnownError({
+          message: 'Firebase token does not contain email',
+          errorCode: 'USER_NO_EMAIL',
+        });
+      }
+
+      const user = this.userRepository.create({
+        userId: idgen.shortId(),
+        email: decoded.email,
+        displayName: param.displayName,
+        uid: decoded.uid,
+        provider: param.provider,
+        avatarType: 'default',
+        avatarKey: '1',
+        message: '',
+      });
+
+      return this.userRepository.save(user);
+    } else {
+      throw new WellKnownError({
+        message: 'Unsupported authentication provider',
+        errorCode: 'UNSUPPORTED_AUTH_PROVIDER',
+      });
+    }
   }
 }
