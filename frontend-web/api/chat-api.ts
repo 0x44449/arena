@@ -1,7 +1,7 @@
 import api from "./api.axios";
 import { ChatMessageDto, CreateChatMessageDto } from "./generated";
 import { ApiResultDto } from "./models/api-result";
-import { InfinityPagedDto } from "./models/infinity-paged-dto";
+import { InfinityPagedDto } from "./models/infinity-paged.dto";
 
 async function getChatMessagesByWorkspaceId(workspaceId: string, param?:{
   seq?: number,

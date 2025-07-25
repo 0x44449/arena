@@ -77,7 +77,7 @@ export class AuthGuard implements CanActivate {
 
     const authHeader = request.headers.authorization || '';
     const [, idToken] = authHeader.split('Bearer ');
-    const sessionCookie = request.cookies.session || '';
+    const sessionCookie = request.cookies.arena_session || '';
 
     if (idToken) {
       return await this.verifyByToken(request, idToken);

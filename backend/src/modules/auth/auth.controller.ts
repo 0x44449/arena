@@ -37,9 +37,9 @@ export class AuthController {
   @Post('token/verify')
   @ApiBody({ type: VerifyArenaTokenDto })
   @ApiOkResultWith(singleOf(ArenaAuthTokenPayloadDto))
-  async verifyArenaToken(@Body() body: VerifyArenaTokenDto): Promise<ApiResultDto<ArenaAuthTokenPayloadDto | null>> {
+  async verifyArenaToken(@Body() body: VerifyArenaTokenDto): Promise<ApiResultDto<ArenaAuthTokenPayloadDto>> {
     const payload = await this.authService.verifyArenaTokenStrict(body.token);
 
-    return new ApiResultDto<ArenaAuthTokenPayloadDto | null>({ data: payload });
+    return new ApiResultDto<ArenaAuthTokenPayloadDto>({ data: payload });
   }
 }

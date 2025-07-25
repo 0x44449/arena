@@ -7,6 +7,7 @@ import { AuthTokenEntity } from "@/entities/auth-token.entity";
 import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from "@nestjs/jwt";
 import { JwtService } from "@nestjs/jwt/dist/jwt.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { createHash, randomUUID } from "crypto";
@@ -159,20 +160,34 @@ export class AuthService {
     });
   }
 
-  async verifyArenaToken(token: string): Promise<ArenaAuthTokenPayloadDto | null> {
+  async verifyArenaToken(token: string): Promise<ArenaAuthTokenPayloadDto> {
     try {
       const decoded = await this.jwtService.verifyAsync<ArenaAuthTokenPayloadDto>(token);
       return decoded;
-    } catch {
-      return null;
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new WellKnownError({
+          message: 'Access token has expired',
+          errorCode: 'ACCESS_TOKEN_EXPIRED',
+        });
+      } else if (error instanceof JsonWebTokenError) {
+        throw new WellKnownError({
+          message: 'Invalid access token',
+          errorCode: 'INVALID_ACCESS_TOKEN',
+        });
+
+      } else if (error instanceof NotBeforeError) {
+        throw new WellKnownError({
+          message: 'Access token is not active',
+          errorCode: 'ACCESS_TOKEN_NOT_ACTIVE',
+        });
+      }
+      throw error;
     }
   }
 
-  async verifyArenaTokenStrict(token: string): Promise<ArenaAuthTokenPayloadDto | null> {
+  async verifyArenaTokenStrict(token: string): Promise<ArenaAuthTokenPayloadDto> {
     const decoded = await this.verifyArenaToken(token);
-    if (!decoded) {
-      return null;
-    }
 
     const user = await this.userRepository.findOne({ where: { userId: decoded.userId } });
     if (!user) {
