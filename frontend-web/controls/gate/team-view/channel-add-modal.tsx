@@ -1,5 +1,5 @@
-import { CreateWorkspaceDto } from "@/api/generated";
-import workspaceApi from "@/api/workspace-api";
+import { CreateChannelDto } from "@/api/generated";
+import channelApi from "@/api/channel-api";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Folder, Hash, Volume2 } from "lucide-react";
 import { useState } from "react";
 
-interface WorkspaceAddModalProps {
+interface ChannelAddModalProps {
   teamId: string;
   isOpen: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -22,13 +22,13 @@ interface Category {
   name: string;
 }
 
-export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
+export default function ChannelAddModal(props: ChannelAddModalProps) {
   const { teamId, isOpen, onOpenChange } = props;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  const [workspaceType, setWorkspaceType] = useState<'text' | 'voice'>('text');
+  const [channelType, setChannelType] = useState<'text' | 'voice'>('text');
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const categories: Category[] = [
@@ -39,11 +39,11 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
   const selectedCategoryName = categories.find(cat => cat.id === selectedCategory)?.name || '';
 
   const queryClient = useQueryClient();
-  const workspaceMutation = useMutation({
-    mutationFn: async (param: CreateWorkspaceDto) => {
-      const response = await workspaceApi.createWorkspace(param);
+  const channelMutation = useMutation({
+    mutationFn: async (param: CreateChannelDto) => {
+      const response = await channelApi.createChannel(param);
       if (!response.success) {
-        throw new Error(response.errorCode || 'Failed to create workspace');
+        throw new Error(response.errorCode || 'Failed to create channel');
       }
       return response.data;
     }
@@ -51,17 +51,17 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
 
   const handleCreateClick = async () => {
     try {
-      await workspaceMutation.mutateAsync({ teamId, name, description });
-      queryClient.invalidateQueries({ queryKey: ['workspaces', teamId] });
+      await channelMutation.mutateAsync({ teamId, name, description });
+      queryClient.invalidateQueries({ queryKey: ['channels', teamId] });
 
       setName("");
       setDescription("");
       setSelectedCategory('');
-      setWorkspaceType('text');
+      setChannelType('text');
 
       onOpenChange?.(false);
     } catch (error) {
-      console.error("Failed to create workspace:", error);
+      console.error("Failed to create channel:", error);
       return;
     }
   }
@@ -70,22 +70,22 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md bg-white border border-[#E5E7EB] shadow-xl">
         <DialogHeader className="text-center pb-2">
-          <DialogTitle className="text-xl text-gray-800">새 워크스페이스 만들기</DialogTitle>
+          <DialogTitle className="text-xl text-gray-800">새 채널 만들기</DialogTitle>
           <DialogDescription className="sr-only">새로운 채널을 만들어 팀원들과 소통해보세요.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
           {/* Channel Type Selection */}
           <div className="space-y-3">
-            <Label className="text-gray-700 font-medium">워크스페이스 유형</Label>
+            <Label className="text-gray-700 font-medium">채널 유형</Label>
             <RadioGroup
-              value={workspaceType}
-              onValueChange={(value: 'text' | 'voice') => setWorkspaceType(value)}
+              value={channelType}
+              onValueChange={(value: 'text' | 'voice') => setChannelType(value)}
               className="space-y-2"
             >
               <div
                 className="flex items-center space-x-3 p-3 border border-[#E5E7EB] rounded-lg hover:bg-[#F9FAFB] transition-colors duration-150 cursor-pointer"
-                onClick={() => setWorkspaceType('text')}
+                onClick={() => setChannelType('text')}
               >
                 <RadioGroupItem value="text" id="text" className="text-[#8B5CF6]" />
                 <div className="flex items-center space-x-3 flex-1">
@@ -103,7 +103,7 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
 
               <div
                 className="flex items-center space-x-3 p-3 border border-[#E5E7EB] rounded-lg hover:bg-[#F9FAFB] transition-colors duration-150 cursor-pointer"
-                onClick={() => setWorkspaceType('voice')}
+                onClick={() => setChannelType('voice')}
               >
                 <RadioGroupItem value="voice" id="voice" className="text-[#8B5CF6]" />
                 <div className="flex items-center space-x-3 flex-1">
@@ -131,7 +131,7 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
             <Input
               id="channelName"
               type="text"
-              placeholder={workspaceType === 'text' ? '일반-대화' : '일반-음성'}
+              placeholder={channelType === 'text' ? '일반-대화' : '일반-음성'}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="bg-[#F9FAFB] border-[#E5E7EB] focus:border-[#8B5CF6] focus:ring-[#8B5CF6] focus:ring-2 focus:ring-opacity-20 text-gray-800 placeholder-gray-400"
@@ -140,7 +140,7 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
             />
             <div className="flex items-center justify-between">
               <p className="text-xs text-[#6B7280]">
-                {workspaceType === 'text' ? '#' : '🔊'} {name || '워크스페이스-이름'}
+                {channelType === 'text' ? '#' : '🔊'} {name || '채널-이름'}
               </p>
               <div className="text-xs text-[#6B7280]">
                 {name.length}/32
@@ -155,7 +155,7 @@ export default function WorkspaceAddModal(props: WorkspaceAddModalProps) {
             </Label>
             <textarea
               id="description"
-              placeholder="이 워크스페이스의 용도를 설명해주세요..."
+              placeholder="이 채널의 용도를 설명해주세요..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded-md focus:border-[#8B5CF6] focus:ring-[#8B5CF6] focus:ring-2 focus:ring-opacity-20 text-gray-800 placeholder-gray-400 resize-none"

@@ -6,9 +6,9 @@ import UserProfileCard from "@/controls/gate/user-profile-card";
 import { useParams } from "next/navigation";
 
 export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { teamId, workspaceId } = useParams<{
+  const { teamId, channelId } = useParams<{
     teamId?: string;
-    workspaceId?: string;
+    channelId?: string;
   }>();
 
   return (
@@ -20,7 +20,7 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
               <TeamSidebar teamId={teamId} />
             </div>
             <div className="flex flex-1">
-              <TeamView teamId={teamId} workspaceId={workspaceId} />
+              <TeamView teamId={teamId} channelId={channelId} />
             </div>
           </div>
 

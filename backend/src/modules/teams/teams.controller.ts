@@ -8,7 +8,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { CreateTeamDto } from "./dtos/create-team.dto";
 import { TeamsService } from "./teams.service";
-import { WorkspaceDto } from "@/dtos/workspace.dto";
+import { ChannelDto } from "@/dtos/channel.dto";
 
 @Controller('api/v1/teams')
 @UseGuards(AuthGuard)
@@ -46,13 +46,13 @@ export class TeamsController {
     return new ApiResultDto<TeamDto>({ data: TeamDto.fromEntity(team) });
   }
 
-  @Get(':teamId/workspaces')
-  @ApiOkResponseWith(WorkspaceDto, { isArray: true })
-  async getWorkspacesByTeamId(@Param('teamId') teamId: string): Promise<ApiResultDto<WorkspaceDto[]>> {
-    const workspaces = await this.teamsService.findWorkspacesByTeamId(teamId);
+  @Get(':teamId/channels')
+  @ApiOkResponseWith(ChannelDto, { isArray: true })
+  async getChannelsByTeamId(@Param('teamId') teamId: string): Promise<ApiResultDto<ChannelDto[]>> {
+    const channels = await this.teamsService.findChannelsByTeamId(teamId);
 
-    const result = new ApiResultDto<WorkspaceDto[]>({
-      data: workspaces.map(workspace => WorkspaceDto.fromEntity(workspace)),
+    const result = new ApiResultDto<ChannelDto[]>({
+      data: channels.map(channel => ChannelDto.fromEntity(channel)),
     });
     return result;
   }

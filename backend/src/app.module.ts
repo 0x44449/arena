@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { FilesModule } from './modules/files/files.module';
 import { TeamsModule } from './modules/teams/teams.module';
 import { ArenaOrmModule } from './arena-orm.module';
-import { WorkspacesModule } from './modules/workspaces/workspaces.module';
+import { ChannelsModule } from './modules/channels/channels.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { RedisModule } from './redis.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -17,7 +17,7 @@ import { AuthModule } from './modules/auth/auth.module';
     UsersModule,
     FilesModule,
     TeamsModule,
-    WorkspacesModule,
+    ChannelsModule,
     ChatModule,
     AuthModule,
   ]

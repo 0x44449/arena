@@ -9,7 +9,7 @@ export type ChatMessageDto = {
     attachments: Array<FileDto>;
     messageId: string;
     seq: number;
-    workspaceId: string;
+    channelId: string;
     message: string;
     createdAt: string;
     updatedAt: string;

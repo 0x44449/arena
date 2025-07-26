@@ -1,24 +1,24 @@
 import teamApi from "@/api/team-api";
 import { useQuery } from "@tanstack/react-query";
-import workspaceApi from "@/api/workspace-api";
+import channelApi from "@/api/channel-api";
 import { Calendar, Megaphone, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import WorkspaceButton from "./workspace-button";
-import WorkspaceAddModal from "./workspace-add-modal";
+import ChannelButton from "./channel-button";
+import ChannelAddModal from "./channel-add-modal";
 import { useModalDelayClose } from "@/components/modal-delay-close.hook";
 
 interface TeamViewProps {
   teamId?: string | null;
-  workspaceId?: string | null;
+  channelId?: string | null;
 }
 
 export default function TeamView(props: TeamViewProps) {
-  const { teamId, workspaceId } = props;
+  const { teamId, channelId } = props;
 
   const {
-    isModalOpen: isOpenWorkspaceAddModal,
-    setIsModalOpen: setIsOpenWorkspaceAddModal,
-    isModalMounted: isWorkspaceModalMounted
+    isModalOpen: isOpenChannelAddModal,
+    setIsModalOpen: setIsOpenChannelAddModal,
+    isModalMounted: isChannelModalMounted
   } = useModalDelayClose();
 
   const { data: team } = useQuery({
@@ -36,12 +36,12 @@ export default function TeamView(props: TeamViewProps) {
     enabled: !!teamId,
   });
 
-  const { data: workspaces } = useQuery({
-    queryKey: ['workspaces', teamId],
+  const { data: channels } = useQuery({
+    queryKey: ['channels', teamId],
     queryFn: async () => {
-      const response = await workspaceApi.getWorkspacesByTeamId(teamId!);
+      const response = await channelApi.getChannelsByTeamId(teamId!);
       if (!response.success) {
-        throw new Error(response.errorCode || 'Failed to fetch workspaces');
+        throw new Error(response.errorCode || 'Failed to fetch channels');
       }
       return response.data;
     },
@@ -61,7 +61,7 @@ export default function TeamView(props: TeamViewProps) {
       <div className="h-12 border-b border-[#E5E7EB] flex items-center justify-between px-4 bg-white">
         <h2 className="text-gray-800 font-semibold truncate">{team?.name}</h2>
         <button
-          onClick={() => setIsOpenWorkspaceAddModal(true)}
+          onClick={() => setIsOpenChannelAddModal(true)}
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F4F6] text-[#6B7280] hover:text-[#374151] transition-colors duration-150 cursor-pointer"
         >
           <Settings className="w-4 h-4" />
@@ -108,19 +108,19 @@ export default function TeamView(props: TeamViewProps) {
 
         <div className="mx-4 border-b border-[#E5E7EB]"></div>
 
-        {/* Workspaces List */}
+        {/* Channels List */}
         <div className="p-2 space-y-0.5">
-          {workspaces?.map(workspace => (
-            <WorkspaceButton key={workspace.workspaceId} workspace={workspace} active={workspace.workspaceId === workspaceId} />
+          {channels?.map(channel => (
+            <ChannelButton key={channel.channelId} channel={channel} active={channel.channelId === channelId} />
           ))}
         </div>
       </div>
 
-      {(team && isWorkspaceModalMounted) && (
-        <WorkspaceAddModal
+      {(team && isChannelModalMounted) && (
+        <ChannelAddModal
           teamId={team.teamId}
-          isOpen={isOpenWorkspaceAddModal}
-          onOpenChange={(changed: boolean) => setIsOpenWorkspaceAddModal(changed)}
+          isOpen={isOpenChannelAddModal}
+          onOpenChange={(changed: boolean) => setIsOpenChannelAddModal(changed)}
         />
       )}
     </div>

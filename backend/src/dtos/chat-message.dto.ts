@@ -18,7 +18,7 @@ export class ChatMessageDto extends OmitType(
     return {
       messageId: entity.messageId,
       seq: entity.seq,
-      workspaceId: entity.workspaceId,
+      channelId: entity.channelId,
       message: entity.message,
       sender: UserDto.fromEntity(entity.sender),
       attachments: entity.attachments.map(file => FileDto.fromEntity(file)),

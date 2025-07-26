@@ -2,10 +2,10 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn,
 import { UserEntity } from "./user.entity";
 import { TeamEntity } from "./team.entity";
 
-@Entity('Workspace')
-export class WorkspaceEntity {
-  @PrimaryColumn({ name: 'WorkspaceId' })
-  workspaceId: string;
+@Entity('Channel')
+export class ChannelEntity {
+  @PrimaryColumn({ name: 'ChannelId' })
+  channelId: string;
 
   @Column({ name: 'Name' })
   name: string;

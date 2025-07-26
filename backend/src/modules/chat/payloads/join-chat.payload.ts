@@ -1,3 +1,3 @@
 export interface JoinChatPayload {
-  workspaceId: string;
+  channelId: string;
 }

@@ -5,13 +5,13 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateTeamDto } from "./dtos/create-team.dto";
 import { idgen } from "@/commons/id-generator";
-import { WorkspaceEntity } from "@/entities/workspace.entity";
+import { ChannelEntity } from "@/entities/channel.entity";
 
 @Injectable()
 export class TeamsService {
   constructor(
     @InjectRepository(TeamEntity) private readonly teamsRepository: Repository<TeamEntity>,
-    @InjectRepository(WorkspaceEntity) private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    @InjectRepository(ChannelEntity) private readonly channelRepository: Repository<ChannelEntity>,
   ) {}
 
   async createTeam(param: CreateTeamDto, owner: UserEntity): Promise<TeamEntity> {
@@ -45,8 +45,8 @@ export class TeamsService {
     });
   }
 
-  async findWorkspacesByTeamId(teamId: string): Promise<WorkspaceEntity[]> {
-    return await this.workspaceRepository.find({
+  async findChannelsByTeamId(teamId: string): Promise<ChannelEntity[]> {
+    return await this.channelRepository.find({
       where: { teamId },
       relations: ['team', 'owner'],
     });

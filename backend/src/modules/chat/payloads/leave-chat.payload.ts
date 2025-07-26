@@ -1,3 +1,3 @@
 export interface LeaveChatPayload {
-  workspaceId: string;
+  channelId: string;
 }

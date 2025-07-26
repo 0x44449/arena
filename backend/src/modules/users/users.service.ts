@@ -23,38 +23,6 @@ export class UsersService {
     return this.userRepository.findOne({ where: { userId } });
   }
 
-  // async registerUser(param: RegisterUserDto): Promise<UserEntity> {
-  //   let uid = '';
-  //   if (param.provider === 'firebase') {
-  //     try {
-  //       const decoded = await fireabseAdmin.auth().verifyIdToken(param.token);
-  //       uid = decoded.uid;
-  //     } catch {
-  //       throw new WellKnownError({
-  //         message: 'Invalid Firebase token',
-  //         errorCode: 'INVALID_FIREBASE_TOKEN',
-  //       });
-  //     }
-  //   } else {
-  //     throw new WellKnownError({
-  //       message: 'Unsupported authentication provider',
-  //       errorCode: 'UNSUPPORTED_AUTH_PROVIDER',
-  //     });
-  //   }
-
-  //   const user = this.userRepository.create({
-  //     userId: idgen.shortId(),
-  //     email: param.email,
-  //     displayName: param.displayName,
-  //     uid: uid,
-  //     provider: param.provider,
-  //     avatarType: 'default',
-  //     avatarKey: '1',
-  //     message: '',
-  //   });
-  //   return this.userRepository.save(user);
-  // }
-
   async updateUserByUserId(param: UpdateUserDto, userId: string): Promise<UserEntity> {
     const user = await this.findUserByUserId(userId);
     if (!user) {

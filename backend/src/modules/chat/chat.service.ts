@@ -19,16 +19,16 @@ export class ChatService {
     private readonly chatGateway: ChatGateway
   ) {}
 
-  async getPagedMessagesByWorkspaceId(workspaceId: string, baseSeq: number, limit: number, direction: 'prev' | 'next'): Promise<InfinityPagedDto<ChatMessageEntity>> {
+  async getPagedMessagesByChannelId(channelId: string, baseSeq: number, limit: number, direction: 'prev' | 'next'): Promise<InfinityPagedDto<ChatMessageEntity>> {
     let hasNext = false;
     let hasPrev = false;
 
     const whereCondition: FindOptionsWhere<ChatMessageEntity> =
       direction === 'prev'
         ? baseSeq === -1
-          ? { workspaceId }
-          : { workspaceId, seq: LessThan(baseSeq) }
-        : { workspaceId, seq: MoreThan(baseSeq) };
+          ? { channelId }
+          : { channelId, seq: LessThan(baseSeq) }
+        : { channelId, seq: MoreThan(baseSeq) };
 
     // 정렬 순서 분기
     const orderCondition: FindOptionsOrder<ChatMessageEntity> =
@@ -55,10 +55,10 @@ export class ChatService {
       // Next/Prev 여부 확인 쿼리
       const [hasPrevResult, hasNextResult] = await Promise.all([
         this.chatMessageRepository.exists({
-          where: { workspaceId, seq: LessThan(minSeq) },
+          where: { channelId, seq: LessThan(minSeq) },
         }),
         this.chatMessageRepository.exists({
-          where: { workspaceId, seq: MoreThan(maxSeq) },
+          where: { channelId, seq: MoreThan(maxSeq) },
         }),
       ]);
       hasPrev = hasPrevResult;
@@ -77,15 +77,15 @@ export class ChatService {
     };
   }
 
-  async createMessage(workspaceId: string, param: CreateChatMessageDto, sender: UserEntity): Promise<ChatMessageEntity> {
+  async createMessage(channelId: string, param: CreateChatMessageDto, sender: UserEntity): Promise<ChatMessageEntity> {
     const attachments = param.attachementIds ? this.fileRepository.create(param.attachementIds.map(id => ({ fileId: id }))) : [];
-    const incrKey = `chat:workspace:${workspaceId}:seq`;
+    const incrKey = `chat:channel:${channelId}:seq`;
 
     // 메세지 SEQ값 채번, 0부터 시작
     const exists = await this.redis.exists(incrKey);
     if (!exists) {
       const last = await this.chatMessageRepository.findOne({
-        where: { workspaceId },
+        where: { channelId },
         order: { seq: 'DESC' },
         select: ['seq']
       });
@@ -96,7 +96,7 @@ export class ChatService {
 
     const message = this.chatMessageRepository.create({
       seq,
-      workspaceId,
+      channelId,
       message: param.message,
       senderId: sender.userId,
       attachments,
@@ -113,7 +113,7 @@ export class ChatService {
     }
 
     // 메세지 생성 알림
-    this.chatGateway.notifyMessage(workspaceId, saved);
+    this.chatGateway.notifyMessage(channelId, saved);
 
     return saved;
   }

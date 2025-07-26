@@ -3,7 +3,6 @@ import teamApi from "@/api/team-api";
 import TeamButton from "./team-button";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import TeamAddModal from "./team-add-modal";
 import { useModalDelayClose } from "@/components/modal-delay-close.hook";
 

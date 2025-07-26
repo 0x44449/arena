@@ -25,16 +25,6 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  // @AllowPublic()
-  // @Post('')
-  // @ApiOkResponseWith(UserDto)
-  // @ApiBody({ type: RegisterUserDto })
-  // async register(@Body() dto: RegisterUserDto): Promise<ApiResultDto<UserDto>> {
-  //   const user = await this.usersService.registerUser(dto);
-
-  //   return new ApiResultDto<UserDto>({ data: UserDto.fromEntity(user) });
-  // }
-
   @Get('me')
   @ApiOkResponseWith(UserDto)
   async getMe(@ReqCred() credential: ArenaCredential): Promise<ApiResultDto<UserDto | null>> {

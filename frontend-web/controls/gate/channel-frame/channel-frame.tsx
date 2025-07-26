@@ -1,16 +1,16 @@
 import teamApi from "@/api/team-api";
-import workspaceApi from "@/api/workspace-api";
+import channelApi from "@/api/channel-api";
 import { useQuery } from "@tanstack/react-query";
 import { Hash } from "lucide-react";
 
-interface WorkspaceViewProps {
+interface ChannelViewProps {
   teamId: string;
-  workspaceId: string;
+  channelId: string;
   children?: React.ReactNode;
 }
 
-export default function WorkspaceView(props: WorkspaceViewProps) {
-  const { teamId, workspaceId, children } = props;
+export default function ChannelView(props: ChannelViewProps) {
+  const { teamId, channelId, children } = props;
 
   const { data: team } = useQuery({
     queryKey: ['team', teamId],
@@ -26,12 +26,12 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
     refetchOnReconnect: false,
   });
 
-  const { data: workspace } = useQuery({
-    queryKey: ['workspace', workspaceId],
+  const { data: channel } = useQuery({
+    queryKey: ['channel', channelId],
     queryFn: async () => {
-      const response = await workspaceApi.getWorkspaceByWorkspaceId(workspaceId);
+      const response = await channelApi.getChannelByChannelId(channelId);
       if (!response.success) {
-        throw new Error(response.errorCode || 'Failed to fetch workspace');
+        throw new Error(response.errorCode || 'Failed to fetch channel');
       }
       return response.data;
     },
@@ -40,7 +40,7 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
     refetchOnReconnect: false,
   });
 
-  if (!team || !workspace) {
+  if (!team || !channel) {
     return <div className="flex flex-1 bg-white"></div>;
   }
 
@@ -56,11 +56,11 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
           <Hash className="w-5 h-5 text-[#8B5CF6]" />
           <div>
             <h3 className="text-gray-800 font-semibold">
-              {workspace.name}
+              {channel.name}
             </h3>
-            {workspace.description && (
+            {channel.description && (
               <p className="text-[#6B7280] text-sm mt-0.5">
-                {workspace.description}
+                {channel.description}
               </p>
             )}
           </div>

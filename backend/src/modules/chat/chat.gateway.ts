@@ -7,11 +7,6 @@ import { JoinChatPayload } from "./payloads/join-chat.payload";
 import { LeaveChatPayload } from "./payloads/leave-chat.payload";
 import { ChatMessageDto } from "@/dtos/chat-message.dto";
 import { ChatMessageEntity } from "@/entities/chat-message.entity";
-import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
-import firebaseAdmin from "@/commons/firebase.plugin";
-import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "@/entities/user.entity";
-import { Repository } from "typeorm";
 import { AuthService } from "../auth/auth.service";
 
 @WebSocketGateway({
@@ -54,28 +49,28 @@ export class ChatGateway implements OnGatewayConnection {
 
   @SubscribeMessage('chat:join')
   async handleJoin(@ConnectedSocket() client: ArenaSocket, @MessageBody() payload: JoinChatPayload) {
-    const { workspaceId } = payload;
+    const { channelId } = payload;
     const credential = client.data.credential;
     const userId = credential.user.userId;
 
-    await client.join(workspaceId);
+    await client.join(channelId);
 
-    client.to(workspaceId).emit('system', `User ${userId} has joined the chat in workspace.`);
+    client.to(channelId).emit('system', `User ${userId} has joined the chat in channel ${channelId}.`);
   }
 
   @SubscribeMessage('chat:leave')
   async handleLeave(@ConnectedSocket() client: ArenaSocket, @MessageBody() payload: LeaveChatPayload) {
-    const { workspaceId } = payload;
+    const { channelId } = payload;
     const credential = client.data.credential;
     const userId = credential.user.userId;
 
-    await client.leave(workspaceId);
+    await client.leave(channelId);
 
-    client.to(workspaceId).emit('system', `User ${userId} has left the chat in workspace.`);
+    client.to(channelId).emit('system', `User ${userId} has left the chat in channel ${channelId}.`);
   }
 
-  notifyMessage(workspaceId: string, message: ChatMessageEntity) {
+  notifyMessage(channelId: string, message: ChatMessageEntity) {
     const messageDto = ChatMessageDto.fromEntity(message);
-    this.server.to(workspaceId).emit('chat:message', messageDto);
+    this.server.to(channelId).emit('chat:message', messageDto);
   }
 }

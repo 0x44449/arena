@@ -4,10 +4,10 @@ import { TeamsService } from "./teams.service";
 import { TeamEntity } from "@/entities/team.entity";
 import { UserEntity } from "@/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { WorkspaceEntity } from "@/entities/workspace.entity";
+import { ChannelEntity } from "@/entities/channel.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TeamEntity, WorkspaceEntity, UserEntity])],
+  imports: [TypeOrmModule.forFeature([TeamEntity, ChannelEntity, UserEntity])],
   controllers: [TeamsController],
   providers: [TeamsService],
   exports: [TypeOrmModule],

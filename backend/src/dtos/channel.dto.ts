@@ -1,10 +1,10 @@
-import { WorkspaceEntity } from "@/entities/workspace.entity";
+import { ChannelEntity } from "@/entities/channel.entity";
 import { UserDto } from "./user.dto";
 import { OmitType } from "@nestjs/swagger";
 import { TeamDto } from "./team.dto";
 
-export class WorkspaceDto extends OmitType(
-  WorkspaceEntity,
+export class ChannelDto extends OmitType(
+  ChannelEntity,
   [
     'team',
     'owner',
@@ -13,9 +13,9 @@ export class WorkspaceDto extends OmitType(
 ) {
   owner: UserDto;
 
-  public static fromEntity(entity: WorkspaceEntity): WorkspaceDto {
+  public static fromEntity(entity: ChannelEntity): ChannelDto {
     return {
-      workspaceId: entity.workspaceId,
+      channelId: entity.channelId,
       name: entity.name,
       description: entity.description,
       teamId: entity.teamId,

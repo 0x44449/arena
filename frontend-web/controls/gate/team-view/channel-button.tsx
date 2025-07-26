@@ -1,21 +1,21 @@
-import { WorkspaceDto } from "@/api/generated";
+import { ChannelDto } from "@/api/generated";
 import { cn } from "@/lib/utils";
 import { Hash } from "lucide-react";
 import Link from "next/link";
 
-interface WorkspaceButtonProps {
-  workspace: WorkspaceDto;
+interface ChannelButtonProps {
+  channel: ChannelDto;
   active?: boolean;
-  onClick?: (workspace: WorkspaceDto) => void;
+  onClick?: (channel: ChannelDto) => void;
 }
 
-export default function WorkspaceButton(props: WorkspaceButtonProps) {
-  const { workspace, active, onClick } = props;
+export default function ChannelButton(props: ChannelButtonProps) {
+  const { channel, active, onClick } = props;
 
   return (
-    <Link href={`/gate/${workspace.teamId}/${workspace.workspaceId}`} className="flex">
+    <Link href={`/gate/${channel.teamId}/${channel.channelId}`} className="flex">
       <button
-        onClick={() => onClick?.(workspace)}
+        onClick={() => onClick?.(channel)}
         className={cn(
           "w-full flex items-center space-x-2 px-2 py-1.5 rounded text-sm transition-colors duration-150 group cursor-pointer",
           active
@@ -24,7 +24,7 @@ export default function WorkspaceButton(props: WorkspaceButtonProps) {
         )}
       >
         <Hash className="w-4 h-4 flex-shrink-0" />
-        <span className="truncate">{workspace.name}</span>
+        <span className="truncate">{channel.name}</span>
       </button>
     </Link>
   )

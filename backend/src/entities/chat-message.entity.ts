@@ -15,9 +15,9 @@ export class ChatMessageEntity {
   @Index()
   seq: number;
 
-  @Column({ name: 'WorkspaceId' })
+  @Column({ name: 'ChannelId' })
   @Index()
-  workspaceId: string;
+  channelId: string;
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'SenderId' })

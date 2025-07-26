@@ -20,10 +20,10 @@ export class ChatController {
     private readonly chatService: ChatService,
   ) {}
 
-  @Get(':workspaceId/messages')
+  @Get(':channelId/messages')
   @ApiOkResultWith(infinityPagedOf(ChatMessageDto))
   async getChatMessages(
-    @Param('workspaceId') workspaceId: string,
+    @Param('channelId') channelId: string,
     @ReqCred() credential: ArenaCredential,
     @Query() query: GetChatMessagesQuery,
   ): Promise<ApiResultDto<InfinityPagedDto<ChatMessageDto>>> {
@@ -39,7 +39,7 @@ export class ChatController {
       direction = 'prev';
     }
 
-    const paged = await this.chatService.getPagedMessagesByWorkspaceId(workspaceId, seq, limit, direction);
+    const paged = await this.chatService.getPagedMessagesByChannelId(channelId, seq, limit, direction);
 
     const result = new ApiResultDto<InfinityPagedDto<ChatMessageDto>>({
       data: new InfinityPagedDto<ChatMessageDto>({
@@ -51,14 +51,14 @@ export class ChatController {
     return result;
   }
 
-  @Post(':workspaceId/messages')
+  @Post(':channelId/messages')
   @ApiOkResultWith(singleOf(ChatMessageDto))
   async createChatMessage(
-    @Param('workspaceId') workspaceId: string,
+    @Param('channelId') channelId: string,
     @Body() param: CreateChatMessageDto,
     @ReqCred() credential: ArenaCredential
   ): Promise<ApiResultDto<ChatMessageDto>> {
-    const messageEntity = await this.chatService.createMessage(workspaceId, param, credential.user);
+    const messageEntity = await this.chatService.createMessage(channelId, param, credential.user);
     const messageDto = ChatMessageDto.fromEntity(messageEntity);
 
     const result = new ApiResultDto<ChatMessageDto>({ data: messageDto });

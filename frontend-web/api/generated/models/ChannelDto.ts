@@ -2,9 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type CreateWorkspaceDto = {
+import type { UserDto } from './UserDto';
+export type ChannelDto = {
+    owner: UserDto;
+    channelId: string;
     name: string;
     description: string;
     teamId: string;
+    createdAt: string;
+    updatedAt: string;
 };
 

@@ -12,11 +12,11 @@ import { Textarea } from "@/components/ui/textarea";
 
 interface ChatMainProps {
   teamId: string;
-  workspaceId: string;
+  channelId: string;
 }
 
 export default function ChatMain(props: ChatMainProps) {
-  const { teamId, workspaceId } = props;
+  const { teamId, channelId } = props;
 
   const [messages, setMessages] = useState<ChatMessageDto[]>([]);
   const [hoveredMessage, setHoveredMessage] = useState<string | null>(null);
@@ -30,12 +30,12 @@ export default function ChatMain(props: ChatMainProps) {
       ws.connect();
       console.log('ws connecting...');
     }
-    ws.emit('chat:join', { workspaceId });
+    ws.emit('chat:join', { channelId });
     ws.on('chat:message', (message: ChatMessageDto) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    const result = await chatApi.getChatMessagesByWorkspaceId(workspaceId, {
+    const result = await chatApi.getChatMessagesByChannelId(channelId, {
       limit: 50,
       direction: 'prev',
       seq: -1,
@@ -53,7 +53,7 @@ export default function ChatMain(props: ChatMainProps) {
 
     return () => {
       ws.off('chat:message');
-      ws.emit('chat:leave', { workspaceId });
+      ws.emit('chat:leave', { channelId });
       console.log('ws disconnected');
     }
   }, []);
@@ -75,7 +75,7 @@ export default function ChatMain(props: ChatMainProps) {
       const trimmedMessage = messageInput.trim();
       if (!trimmedMessage) return;
 
-      await chatApi.createChatMessage(workspaceId, {
+      await chatApi.createChatMessage(channelId, {
         message: trimmedMessage
       });
       setMessageInput("");
