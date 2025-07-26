@@ -31,29 +31,6 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  // async createSessionCookie(token: string): Promise<string> {
-  //   let decoded: DecodedIdToken | null = null;
-  //   try {
-  //     decoded = await firebaseAdmin.auth().verifyIdToken(token);
-  //   } catch {
-  //     throw new WellKnownError({
-  //       message: 'Invalid ID token',
-  //       errorCode: 'INVALID_ID_TOKEN',
-  //     });
-  //   }
-
-  //   const user = await this.userRepository.findOne({ where: { uid: decoded.uid } });
-  //   if (!user) {
-  //     throw new WellKnownError({
-  //       message: 'User not found',
-  //       errorCode: 'USER_NOT_FOUND',
-  //     });
-  //   }
-
-  //   const sessionCookie = await firebaseAdmin.auth().createSessionCookie(token, { expiresIn: 5 * 60 * 60 * 24 * 1000 }); // 5 days
-  //   return sessionCookie;
-  // }
-
   async issueArenaTokens(param: IssueArenaTokenDto): Promise<ArenaAuthTokenDto> {
     const { provider, token } = param;
 
@@ -63,11 +40,17 @@ export class AuthService {
       try {
         decoded = await firebaseAdmin.auth().verifyIdToken(token);
       } catch {
-        throw new UnauthorizedError('Invalid ID token');
+        throw new WellKnownError({
+          message: 'Invalid Firebase token',
+          errorCode: 'INVALID_FIREBASE_TOKEN',
+        });
       }
 
       if (!decoded) {
-        throw new UnauthorizedError('Token verification failed');
+        throw new WellKnownError({
+          message: 'Token verification failed',
+          errorCode: 'TOKEN_VERIFICATION_FAILED',
+        });
       }
 
       const user = await this.userRepository.findOne({ where: { uid: decoded.uid } });
@@ -80,11 +63,7 @@ export class AuthService {
 
       // access token 발급
       const payload: ArenaAuthTokenPayloadTypes = { userId: user.userId };
-      const accessToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<StringValue>('JWT_ACCESS_EXPIRES_IN') || '15m',
-        algorithm: 'HS256',
-      });
+      const accessToken = this.jwtService.sign(payload);
 
       // refresh token 발급
       const refreshToken = randomUUID();
@@ -151,11 +130,7 @@ export class AuthService {
 
     // access token 재발급
     const payload: ArenaAuthTokenPayloadTypes = { userId: authToken.userId };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<StringValue>('JWT_ACCESS_EXPIRES_IN') || '15m',
-      algorithm: 'HS256',
-    });
+    const accessToken = this.jwtService.sign(payload);
 
     // 새로운 refresh token 발급
     const newRefreshToken = randomUUID();
@@ -185,27 +160,24 @@ export class AuthService {
 
   async verifyArenaToken(token: string): Promise<ArenaAuthTokenPayloadDto> {
     try {
-      const decoded = await this.jwtService.verifyAsync<ArenaAuthTokenPayloadTypes>(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        algorithms: ['HS256'],
-      });
+      const decoded = await this.jwtService.verifyAsync<ArenaAuthTokenPayloadTypes>(token);
       return new ArenaAuthTokenPayloadDto({ userId: decoded.userId });
     } catch (error) {
       console.error('Token verification error:', error);
 
       if (error instanceof TokenExpiredError) {
-        throw new WellKnownError({
+        throw new UnauthorizedError({
           message: 'Access token has expired',
           errorCode: 'ACCESS_TOKEN_EXPIRED',
         });
       } else if (error instanceof JsonWebTokenError) {
-        throw new WellKnownError({
+        throw new UnauthorizedError({
           message: 'Invalid access token',
           errorCode: 'INVALID_ACCESS_TOKEN',
         });
 
       } else if (error instanceof NotBeforeError) {
-        throw new WellKnownError({
+        throw new UnauthorizedError({
           message: 'Access token is not active',
           errorCode: 'ACCESS_TOKEN_NOT_ACTIVE',
         });
@@ -214,18 +186,18 @@ export class AuthService {
     }
   }
 
-  async verifyArenaTokenStrict(token: string): Promise<ArenaAuthTokenPayloadDto> {
+  async verifyArenaTokenStrict(token: string): Promise<UserEntity> {
     const decoded = await this.verifyArenaToken(token);
 
     const user = await this.userRepository.findOne({ where: { userId: decoded.userId } });
     if (!user) {
-      throw new WellKnownError({
+      throw new UnauthorizedError({
         message: 'User not found',
         errorCode: 'USER_NOT_FOUND',
       });
     }
 
-    return decoded;
+    return user;
   }
 
   async registerUser(param: RegisterUserWithProviderDto): Promise<UserEntity> {

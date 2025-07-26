@@ -12,7 +12,7 @@ export class UnauthorizedExceptionFilter implements ExceptionFilter {
     response.status(401).json(new ApiResultDto({
       success: false,
       errorMessage: 'Unauthorized',
-      errorCode: '401',
+      errorCode: exception.errorCode || 'UNAUTHORIZED',
     }));
   }
 }

@@ -28,7 +28,10 @@ let isRefreshing = false;
 let pendingRequests: PendingRequest[] = [];
 
 function processQueue() {
-  pendingRequests.forEach(({ resolve }) => resolve());
+  pendingRequests.forEach(({ resolve }) => {
+    console.log('Processing pending request', resolve.name);
+    return resolve();
+  });
   pendingRequests = [];
 }
 
@@ -43,31 +46,40 @@ function useAuthInterceptor(instance: AxiosInstance) {
 
     // Access token이 만료된 경우
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+      if (error.response?.data?.errorCode === 'ACCESS_TOKEN_EXPIRED') {
+        originalRequest._retry = true;
 
-      if (!isRefreshing) {
-        console.log('Access token expired, refreshing...');
-        isRefreshing = true;
+        if (!isRefreshing) {
+          console.log('Access token expired, refreshing...');
+          isRefreshing = true;
+          
+          try {
+            const refreshed = await authApi.refresh();
 
-        try {
-          await authApi.refresh();
-          processQueue();
+            if (!refreshed.success) {
+              processQueueError(new Error(refreshed.errorCode));
+              location.href = '/login';
+              return Promise.reject(error);
+            }
 
-          isRefreshing = false;
-          return instance(originalRequest);
-        } catch (err) {
-          console.error('Failed to refresh token:', err);
-          processQueueError(err);
+            processQueue();
 
-          return Promise.reject(error);
-        } finally {
-          isRefreshing = false;
+            isRefreshing = false;
+            return instance(originalRequest);
+          } catch (err) {
+            console.error('Failed to refresh token:', err);
+            processQueueError(err);
+
+            return Promise.reject(error);
+          } finally {
+            isRefreshing = false;
+          }
         }
-      }
 
-      return new Promise((resolve, reject) => {
-        pendingRequests.push({ resolve: () => resolve(instance(originalRequest)), reject });
-      });
+        return new Promise((resolve, reject) => {
+          pendingRequests.push({ resolve: () => resolve(instance(originalRequest)), reject });
+        });
+      }
     }
 
     return Promise.reject(error);
@@ -76,40 +88,5 @@ function useAuthInterceptor(instance: AxiosInstance) {
 
 useAuthInterceptor(api);
 useAuthInterceptor(api.frontend);
-
-// api.interceptors.response.use((res) => res, async (error) => {
-//   const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-
-//   // Access token이 만료된 경우
-//   if (error.response?.status === 401 && !originalRequest._retry) {
-//     originalRequest._retry = true;
-
-//     if (!isRefreshing) {
-//       console.log('Access token expired, refreshing...');
-//       isRefreshing = true;
-
-//       try {
-//         await authApi.refresh();
-//         processQueue();
-
-//         isRefreshing = false;
-//         return api(originalRequest);
-//       } catch (err) {
-//         console.error('Failed to refresh token:', err);
-//         processQueueError(err);
-
-//         return Promise.reject(error);
-//       } finally {
-//         isRefreshing = false;
-//       }
-//     }
-
-//     return new Promise((resolve, reject) => {
-//       pendingRequests.push({ resolve: () => resolve(api(originalRequest)), reject });
-//     });
-//   }
-
-//   return Promise.reject(error);
-// });
 
 export default api;

@@ -6,6 +6,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ChatGateway } from "./chat.gateway";
 import { ChatService } from "./chat.service";
 import { ChatController } from "./chat.controller";
+import { AuthModule } from "../auth/auth.module";
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { ChatController } from "./chat.controller";
       ChatMessageEntity,
       FileEntity,
       UserEntity,
-    ])
+    ]),
   ],
   providers: [ChatGateway, ChatService],
   controllers: [ChatController],

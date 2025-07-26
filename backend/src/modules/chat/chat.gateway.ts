@@ -1,8 +1,7 @@
 import ArenaCredential from "@/commons/arena-credential";
 import { ArenaSocket } from "@/commons/arena-socket";
-import ClientCred from "@/decorators/client-cred.decorator";
 import { Injectable } from "@nestjs/common";
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { JoinChatPayload } from "./payloads/join-chat.payload";
 import { LeaveChatPayload } from "./payloads/leave-chat.payload";
@@ -13,14 +12,15 @@ import firebaseAdmin from "@/commons/firebase.plugin";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "@/entities/user.entity";
 import { Repository } from "typeorm";
+import { AuthService } from "../auth/auth.service";
 
 @WebSocketGateway({
   namespace: '/feature/chat'
 })
 @Injectable()
-export class ChatGateway {
+export class ChatGateway implements OnGatewayConnection {
   constructor(
-    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+    private readonly authService: AuthService,
   ) {}
 
   @WebSocketServer()
@@ -28,26 +28,25 @@ export class ChatGateway {
 
   /** Lifecycle hook - client 연결시 자동 호출 */
   async handleConnection(client: ArenaSocket) {
-    const token = client.handshake.auth['token'];
+    let token = client.handshake.auth['token'];
+    if (!token) {
+      const cookie = client.handshake.headers.cookie;
+      if (cookie) {
+        const cookieToken = cookie.split('; ').find(row => row.startsWith('arena_session='));
+        if (cookieToken) {
+          const tokenValue = cookieToken.split('=')[1];
+          if (tokenValue) {
+            token = tokenValue;
+          }
+        }
+      }
+    }
+
     if (!token) {
       return client.disconnect();
     }
 
-    // const tokenPayload = this.authService.verifyToken(token);
-    let decoded: DecodedIdToken | null = null;
-    try {
-      decoded = await firebaseAdmin.auth().verifyIdToken(token);
-    } catch {
-      return client.disconnect();
-    }
-    if (!decoded) {
-      return client.disconnect();
-    }
-
-    const user = await this.userRepository.findOne({ where: { uid: decoded.uid } });
-    if (!user) {
-      return client.disconnect();
-    }
+    const user = await this.authService.verifyArenaTokenStrict(token);
 
     const credential: ArenaCredential = { user: user };
     client.data.credential = credential;

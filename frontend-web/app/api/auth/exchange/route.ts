@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     httpOnly: true,
     secure: true,
     sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 5, // 5 days
   });
 
   res.cookies.set('arena_session_refresh', result.data.refreshToken, {
@@ -65,22 +66,8 @@ export async function POST(request: NextRequest) {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
+    maxAge: 60 * 60 * 24 * 5, // 5 days
   });
 
   return res;
-
-  // const headers = new Headers(response.headers);
-  // headers.append('Set-Cookie', `arena_session=${result.data.accessToken}; Domain=${process.env.SESSION_COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax`);
-  // headers.append('Set-Cookie', `arena_session_refresh=${result.data.refreshToken}; Domain=${process.env.SESSION_REFRESH_COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Strict`);
-
-  // return new Response(JSON.stringify(result), {
-  //   status: response.status,
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'Set-Cookie': [
-  //       `arena_session=${result.data.accessToken}; Domain=${process.env.SESSION_COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-  //       `arena_session_refresh=${result.data.refreshToken}; Domain=${process.env.SESSION_REFRESH_COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Strict`,
-  //     ]
-  //   },
-  // });
 }

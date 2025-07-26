@@ -4,8 +4,7 @@ import { AuthService } from "./auth.service";
 import { UserEntity } from "@/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthTokenEntity } from "@/entities/auth-token.entity";
-import { JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { ArenaJwtModule } from "@/arena-jwt.module";
 
 @Global()
@@ -13,9 +12,10 @@ import { ArenaJwtModule } from "@/arena-jwt.module";
   imports: [
     TypeOrmModule.forFeature([UserEntity, AuthTokenEntity]),
     ArenaJwtModule.register(),
+    ConfigModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtService, ConfigService],
+  providers: [AuthService],
   exports: [TypeOrmModule, AuthService],
 })
 export class AuthModule {}
