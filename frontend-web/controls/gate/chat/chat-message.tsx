@@ -1,5 +1,7 @@
-import { ChatMessageDto } from "@/api/generated";
-import { Heart, MoreHorizontal, Pin, Reply } from "lucide-react";
+import { ChatMessageDto, FileDto } from "@/api/generated";
+import { ExternalLink, Heart, MoreHorizontal, Pin, Reply } from "lucide-react";
+import Image from 'next/image';
+import { useState } from "react";
 
 interface ChatMessageProps {
   message: ChatMessageDto;
@@ -9,6 +11,8 @@ interface ChatMessageProps {
 
 export default function ChatMessage(props: ChatMessageProps) {
   const { message, prevMessage, hovered } = props;
+
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   const isConsecutiveMessage = (currentMessage: ChatMessageDto, prevMessage?: ChatMessageDto) => {
     if (!prevMessage) return false;
@@ -30,6 +34,69 @@ export default function ChatMessage(props: ChatMessageProps) {
       hour: '2-digit',
       minute: '2-digit'
     }).format(timestamp);
+  };
+
+  const renderImageAttachments = (attachments: FileDto[]) => {
+    const images = attachments.filter(att => att.mimeType.startsWith('image/'));
+    if (images.length === 0) return null;
+
+    const renderSingleImage = (image: FileDto) => (
+      <div key={image.fileId} className="relative group">
+        <div
+          className="relative rounded-lg overflow-hidden cursor-pointer max-w-sm"
+        // onClick={() => setExpandedImage(expandedImage === image.url ? null : image.url)}
+        >
+          <img
+            src={image.url}
+            alt={image.name}
+            className={`w-full h-auto transition-all duration-200 ${expandedImage === image.url ? 'max-w-2xl max-h-96' : 'max-h-64'
+              } object-cover hover:brightness-95`}
+          />
+        </div>
+        <div className="mt-1 text-xs text-[#6B7280]">
+          {image.name}
+          {/* {image.width && image.height && (
+            <span className="ml-2">{image.width}×{image.height}</span>
+          )} */}
+        </div>
+      </div>
+    );
+
+    if (images.length === 1) {
+      return <div className="mt-2">{renderSingleImage(images[0])}</div>;
+    }
+
+    // Multiple images grid
+    return (
+      <div className="mt-2">
+        <div className={`grid gap-2 ${images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'} max-w-md`}>
+          {images.slice(0, 4).map(image => (
+            <div key={image.fileId} className="relative group">
+              <div
+                className="relative rounded-lg overflow-hidden cursor-pointer aspect-square"
+              // onClick={() => setExpandedImage(expandedImage === image.url ? null : image.url)}
+              >
+                <img
+                  src={image.url}
+                  alt={image.name}
+                  className="w-full h-full object-cover hover:brightness-95 transition-all duration-200"
+                />
+              </div>
+            </div>
+          ))}
+          {images.length > 4 && (
+            <div className="flex items-center justify-center bg-[#F3F4F6] rounded-lg aspect-square">
+              <span className="text-[#6B7280] text-sm">+{images.length - 4}</span>
+            </div>
+          )}
+        </div>
+        {images.length > 1 && (
+          <div className="mt-1 text-xs text-[#6B7280]">
+            {images.length}개의 이미지
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -66,9 +133,18 @@ export default function ChatMessage(props: ChatMessageProps) {
               </span>
             </div>
           )}
-          <div className="text-gray-800 leading-relaxed">
-            {message.message}
-          </div>
+
+          {/* Message Content */}
+          {message.message && (
+            <div className="text-gray-800 leading-relaxed">
+              {message.message}
+            </div>
+          )}
+
+          {/* Attachments */}
+          {message.attachments && message.attachments.length > 0 && (
+            renderImageAttachments(message.attachments)
+          )}
         </div>
       </div>
 

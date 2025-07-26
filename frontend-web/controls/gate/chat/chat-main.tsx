@@ -6,6 +6,7 @@ import ChatMessage from "./chat-message";
 import { ChatMessageDto } from "@/api/generated";
 import chatApi from "@/api/chat-api";
 import ws from "@/api/ws.socket";
+import fileApi from "@/api/file-api";
 
 interface SelectedImage {
   id: string;
@@ -64,6 +65,39 @@ export default function ChatMain(props: ChatMainProps) {
     }
   }, []);
 
+  const sendMessage = async () => {
+    const trimmedMessage = messageInput.trim();
+    if (!trimmedMessage) return;
+
+    const attachmentIds: string[] = [];
+
+    // 첨부파일 존재시 파일 전송
+    if (images.length > 0) {
+      const uploadFiles = images.map(img => img.file);
+      const uploaded = await fileApi.uploadMultipleFiles(uploadFiles);
+
+      if (!uploaded.success) {
+        console.error("Failed to upload files:", uploaded.errorCode);
+        return;
+      }
+
+      attachmentIds.push(...uploaded.data.map(file => file.fileId));
+    }
+
+    const sended = await chatApi.createChatMessage(channelId, {
+      message: trimmedMessage,
+      attachmentIds: attachmentIds,
+    });
+
+    if (!sended.success) {
+      console.error("Failed to send chat message:", sended.errorCode);
+      return;
+    }
+
+    setMessageInput("");
+    setImages([]);
+  }
+
   const handleMessageInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     console.log('Message input changed:', e.target.value);
     setMessageInput(e.target.value);
@@ -77,14 +111,7 @@ export default function ChatMain(props: ChatMainProps) {
     console.log('Key pressed:', e.key);
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-
-      const trimmedMessage = messageInput.trim();
-      if (!trimmedMessage) return;
-
-      await chatApi.createChatMessage(channelId, {
-        message: trimmedMessage
-      });
-      setMessageInput("");
+      await sendMessage();
     }
   }
 

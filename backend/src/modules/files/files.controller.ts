@@ -1,5 +1,5 @@
 import { AuthGuard } from "@/guards/auth.guard";
-import { Controller, Get, Param, Post, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Post, Res, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { FilesService } from "./files.service";
 import { ArenaFileInterceptor } from "@/commons/file-uploader/arena-file-interceptor";
@@ -14,6 +14,8 @@ import { join } from "path";
 import * as fs from "fs";
 import { Response } from "express";
 import { ApiOkResponseBinary } from "@/decorators/api-ok-response-binary.decorator";
+import { ArenaFilesInterceptor } from "@/commons/file-uploader/arena-files-interceptor";
+import { ApiMultipartsBody } from "@/decorators/api-multiparts-body.decorator";
 
 @Controller('api/v1/files')
 @UseGuards(AuthGuard)
@@ -51,6 +53,17 @@ export class FilesController {
     const savedFile = await this.filesService.uploadFile(file, credential.user);
 
     const result = new ApiResultDto<FileDto>({ data: FileDto.fromEntity(savedFile) });
+    return result;
+  }
+
+  @Post('multiple')
+  @UseInterceptors(ArenaFilesInterceptor())
+  @ApiMultipartsBody()
+  @ApiOkResponseWith(FileDto, { isArray: true })
+  async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[], @ReqCred() credential: ArenaCredential): Promise<ApiResultDto<FileDto[]>> {
+    const savedFiles = await this.filesService.uploadMultipleFiles(files, credential.user);
+
+    const result = new ApiResultDto<FileDto[]>({ data: savedFiles.map(file => FileDto.fromEntity(file)) });
     return result;
   }
 }

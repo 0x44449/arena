@@ -4,6 +4,6 @@
 /* eslint-disable */
 export type CreateChatMessageDto = {
     message: string;
-    attachementIds?: Array<string>;
+    attachmentIds?: Array<string>;
 };
 

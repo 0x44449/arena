@@ -47,4 +47,33 @@ export class FilesService {
       });
     }
   }
+
+  async uploadMultipleFiles(uploadedFiles: Express.Multer.File[], uploader: UserEntity): Promise<FileEntity[]> {
+    if (!uploadedFiles || uploadedFiles.length === 0) {
+      throw new WellKnownError({
+        message: "No files to upload",
+        errorCode: "UPLOAD_FILES_NOT_FOUND",
+      });
+    }
+
+    const files = uploadedFiles.map(file => this.fileRepository.create({
+      fileId: idgen.shortId(),
+      originalName: file.originalname,
+      storedName: file.filename,
+      mimeType: file.mimetype,
+      size: file.size,
+      path: file.destination,
+      uploader: uploader,
+      category: 'file',
+    }));
+
+    try {
+      return await this.fileRepository.save(files);
+    } catch (error) {
+      throw new WellKnownError({
+        message: "Failed to save files",
+        errorCode: "FILE_SAVE_ERROR",
+      });
+    }
+  }
 }

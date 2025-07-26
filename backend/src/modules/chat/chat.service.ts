@@ -40,7 +40,7 @@ export class ChatService {
       where: whereCondition,
       order: orderCondition,
       take: limit,
-      relations: ['sender', 'attachments'],
+      relations: ['sender', 'attachments', 'attachments.uploader'],
     });
 
     // Next/Prev 여부 판단
@@ -78,7 +78,7 @@ export class ChatService {
   }
 
   async createMessage(channelId: string, param: CreateChatMessageDto, sender: UserEntity): Promise<ChatMessageEntity> {
-    const attachments = param.attachementIds ? this.fileRepository.create(param.attachementIds.map(id => ({ fileId: id }))) : [];
+    const attachments = param.attachmentIds ? this.fileRepository.create(param.attachmentIds.map(id => ({ fileId: id }))) : [];
     const incrKey = `chat:channel:${channelId}:seq`;
 
     // 메세지 SEQ값 채번, 0부터 시작
@@ -105,7 +105,7 @@ export class ChatService {
     await this.chatMessageRepository.save(message);
     const saved = await this.chatMessageRepository.findOne({
       where: { messageId: message.messageId },
-      relations: ['sender', 'attachments'],
+      relations: ['sender', 'attachments', 'attachments.uploader'],
     });
 
     if (!saved) {

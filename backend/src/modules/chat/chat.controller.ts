@@ -53,11 +53,7 @@ export class ChatController {
 
   @Post(':channelId/messages')
   @ApiOkResultWith(singleOf(ChatMessageDto))
-  async createChatMessage(
-    @Param('channelId') channelId: string,
-    @Body() param: CreateChatMessageDto,
-    @ReqCred() credential: ArenaCredential
-  ): Promise<ApiResultDto<ChatMessageDto>> {
+  async createChatMessage(@Param('channelId') channelId: string, @Body() param: CreateChatMessageDto, @ReqCred() credential: ArenaCredential): Promise<ApiResultDto<ChatMessageDto>> {
     const messageEntity = await this.chatService.createMessage(channelId, param, credential.user);
     const messageDto = ChatMessageDto.fromEntity(messageEntity);
 

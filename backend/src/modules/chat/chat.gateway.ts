@@ -41,10 +41,13 @@ export class ChatGateway implements OnGatewayConnection {
       return client.disconnect();
     }
 
-    const user = await this.authService.verifyArenaTokenStrict(token);
-
-    const credential: ArenaCredential = { user: user };
-    client.data.credential = credential;
+    try {
+      const user = await this.authService.verifyArenaTokenStrict(token);
+      const credential: ArenaCredential = { user: user };
+      client.data.credential = credential;
+    } catch {
+      return client.disconnect();
+    }
   }
 
   @SubscribeMessage('chat:join')
