@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQuery } from "@tanstack/react-query";
-import { Gift, Plus, Smile } from "lucide-react";
+import { Gift, Plus, Smile, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ChatMessage from "./chat-message";
 import { ChatMessageDto } from "@/api/generated";
 import chatApi from "@/api/chat-api";
 import ws from "@/api/ws.socket";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
+interface SelectedImage {
+  id: string;
+  file: File;
+  preview: string;
+}
 
 interface ChatMainProps {
   teamId: string;
@@ -20,6 +23,9 @@ export default function ChatMain(props: ChatMainProps) {
 
   const [messages, setMessages] = useState<ChatMessageDto[]>([]);
   const [hoveredMessage, setHoveredMessage] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [images, setImages] = useState<SelectedImage[]>([]);
 
   const [messageInput, setMessageInput] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -82,12 +88,60 @@ export default function ChatMain(props: ChatMainProps) {
     }
   }
 
+  const handlePlusButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    const newImages: SelectedImage[] = [];
+
+    Array.from(files).forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        const imageId = Date.now().toString() + Math.random();
+        const preview = URL.createObjectURL(file);
+
+        newImages.push({
+          id: imageId,
+          file,
+          preview
+        });
+      }
+    });
+
+    setImages(prev => [...prev, ...newImages]);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = (imageId: string) => {
+    setImages(prev => {
+      const imageToRemove = prev.find(img => img.id === imageId);
+      if (imageToRemove) {
+        URL.revokeObjectURL(imageToRemove.preview);
+      }
+      return prev.filter(img => img.id !== imageId);
+    });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 h-full">
       {/* Messages Area */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1">
+      <ScrollArea ref={scrollAreaRef} className="flex flex-1 min-h-0 min-w-0 overflow-y-auto">
         <div className="py-4">
-          {/* Messages */}
           <div className="space-y-0.5">
             {messages.map((message, index) => (
               <div
@@ -106,11 +160,64 @@ export default function ChatMain(props: ChatMainProps) {
         </div>
       </ScrollArea>
 
+      {/* Image Preview Area */}
+      <div className="flex w-full px-2 min-w-0">
+        {images.length > 0 && (
+          <div className="flex flex-col p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg w-full min-w-0">
+            <div className="flex items-center justify-between mb-2 w-full min-w-0">
+              <span className="text-sm text-[#6B7280] font-medium">
+                {images.length}개의 이미지 선택됨
+              </span>
+              <button
+                onClick={() => {
+                  images.forEach(img => URL.revokeObjectURL(img.preview));
+                  setImages([]);
+                }}
+                className="text-xs text-[#8B5CF6] hover:text-[#7C3AED] transition-colors duration-150"
+              >
+                모두 제거
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {images.map((image) => (
+                <div key={image.id} className="relative group flex-shrink-0">
+                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src={image.preview}
+                      alt={image.file.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      onClick={() => handleRemoveImage(image.id)}
+                      className="absolute top-1 right-1 w-5 h-5 bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                  <div className="mt-1 w-24">
+                    <div className="text-xs text-[#6B7280] truncate">
+                      {image.file.name}
+                    </div>
+                    <div className="text-xs text-[#9CA3AF]">
+                      {formatFileSize(image.file.size)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Message Input */}
-      <div className="flex w-full p-2 bg-white border-t border-[#F3F4F6]">
+      {/* <div className="flex w-full p-2 bg-white border-t border-[#F3F4F6]"> */}
+      <div className="flex w-full p-2">
         <div className="flex flex-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg">
           <div className="flex flex-1 flex-row space-x-2 p-2 items-center">
-            <button className="p-0.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150 flex-shrink-0">
+            <button
+              className="p-0.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150 flex-shrink-0"
+              onClick={handlePlusButtonClick}
+            >
               <Plus className="w-5 h-5 text-[#6B7280]" />
             </button>
 
@@ -143,53 +250,15 @@ export default function ChatMain(props: ChatMainProps) {
         </div>
       </div>
 
-      {/* <div className="p-2 bg-white border-t border-[#F3F4F6]">
-        <div className="relative">
-          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg overflow-hidden hover:border-[#8B5CF6] transition-colors duration-200">
-            <div className="flex items-end space-x-2 p-2">
-              <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150 flex-shrink-0">
-                <Plus className="w-5 h-5 text-[#6B7280]" />
-              </button>
-              <div className="flex flex-1 justify-center items-center">
-                <textarea
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={`#에 메시지 보내기`}
-                  className="w-full bg-transparent text-gray-800 placeholder-[#9CA3AF] resize-none focus:outline-none max-h-32 border"
-                  rows={1}
-                  style={{
-                    height: 'auto',
-                    minHeight: '20px'
-                  }}
-                  onInput={(e) => {
-                    const target = e.target as HTMLTextAreaElement;
-                    target.style.height = 'auto';
-                    target.style.height = 10 + target.scrollHeight + 'px';
-                  }}
-                />
-              </div>
-              <div className="flex items-center space-x-1 flex-shrink-0">
-                <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150">
-                  <Gift className="w-5 h-5 text-[#6B7280]" />
-                </button>
-                <button className="p-1.5 hover:bg-[#E5E7EB] rounded transition-colors duration-150">
-                  <Smile className="w-5 h-5 text-[#6B7280]" />
-                </button>
-              </div>
-              {messageInput.trim() && (
-                <Button
-                  // onClick={handleSendMessage}
-                  // className="absolute right-3 bottom-3 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-3 py-1.5 text-sm h-auto"
-                  className="right-3 bottom-3 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-3 py-1.5 text-sm h-auto"
-                >
-                  전송
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div> */}
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileSelect}
+        className="hidden"
+      />
     </div>
   )
 }

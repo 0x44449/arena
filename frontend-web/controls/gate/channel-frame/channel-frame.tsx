@@ -45,7 +45,7 @@ export default function ChannelView(props: ChannelViewProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-white">
+    <div className="flex flex-1 flex-col bg-white min-h-0 min-w-0">
       <div className="px-6 pt-4 pb-2 bg-white">
         <div className="flex items-center space-x-3">
           {/* {currentChannel?.type === 'voice' ? (
@@ -68,7 +68,7 @@ export default function ChannelView(props: ChannelViewProps) {
         <div className="mt-2 h-px bg-gradient-to-r from-[#E5E7EB] to-transparent"></div>
       </div>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-h-0 min-w-0">
         {children}
       </div>
     </div>

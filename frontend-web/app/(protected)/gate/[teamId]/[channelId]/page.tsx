@@ -11,10 +11,8 @@ export default function Page() {
   }>();
 
   return (
-    <div className="flex flex-1 bg-white">
-      <ChannelFrame teamId={teamId} channelId={channelId}>
-        <ChatMain teamId={teamId} channelId={channelId} />
-      </ChannelFrame>
-    </div>
+    <ChannelFrame teamId={teamId} channelId={channelId}>
+      <ChatMain teamId={teamId} channelId={channelId} />
+    </ChannelFrame>
   )
 }

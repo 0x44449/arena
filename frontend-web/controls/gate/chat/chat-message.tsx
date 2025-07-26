@@ -14,7 +14,7 @@ export default function ChatMessage(props: ChatMessageProps) {
     if (!prevMessage) return false;
     const currentDate = new Date(currentMessage.createdAt);
     const prevDate = new Date(prevMessage.createdAt);
-    
+
     return currentMessage.sender.userId === prevMessage.sender.userId &&
       currentDate.getFullYear() === prevDate.getFullYear() &&
       currentDate.getMonth() === prevDate.getMonth() &&
@@ -33,12 +33,7 @@ export default function ChatMessage(props: ChatMessageProps) {
   };
 
   return (
-    <div
-      // key={message.messageId}
-      className="group relative px-6 py-1 hover:bg-[#F9FAFB] transition-colors duration-150"
-    // onMouseEnter={() => setHoveredMessage(message.messageId)}
-    // onMouseLeave={() => setHoveredMessage(null)}
-    >
+    <div className="flex flex-col group relative px-6 py-1 hover:bg-[#F9FAFB] transition-colors duration-150">
       <div className="flex items-start space-x-4">
         {!isConsecutive ? (
           <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-1">
