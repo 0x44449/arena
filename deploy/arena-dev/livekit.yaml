@@ -1,0 +1,26 @@
+# livekit/livekit.dev.yaml
+# 브라우저가 접속할 공개 WS 주소
+ws_url: "wss://voice.arena-dev.com"
+
+port: 7880
+
+# API 키/시크릿 (테스트용 예시)
+keys:
+  devkey: devsecret
+
+# NAT 뒤면 외부 IP를 명시
+external_ip: "192.168.100.2"
+
+rtc:
+  udp_port: 50000
+  udp_port_range: 50
+  use_external_ip: true
+
+# 외부 TURN 사용 등록
+turn:
+  servers:
+    - "turn:turn.arena-dev.com:3478?transport=udp"
+    - "turns:turn.arena-dev.com:5349"
+
+# (선택) 로그 레벨 등 기타 옵션…
+# log_level: info
