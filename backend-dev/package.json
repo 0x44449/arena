@@ -29,6 +29,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.6",
     "jose": "^6.1.0",
+    "nanoid": "^5.1.6",
     "pg": "^8.16.3",
     "pg-query-stream": "^4.10.3",
     "reflect-metadata": "^0.2.2",

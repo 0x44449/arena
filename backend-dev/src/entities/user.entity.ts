@@ -8,17 +8,14 @@ export class UserEntity {
   @Column({ name: "Email", unique: true })
   email: string;
 
-  @Column({ name: "Provider" })
-  provider: string;
-
-  @Column({ name: "ProviderUid", unique: true })
-  providerUid: string;
+  @Column({ name: "Uid", unique: true })
+  uid: string;
 
   @Column({ name: "DisplayName" })
   displayName: string;
 
-  @Column({ name: "AvatarFileId" })
-  avatarFileId: string;
+  @Column({ name: "AvatarId" })
+  avatarId: string;
 
   @Column({ name: "Message" })
   message: string;

@@ -1,12 +1,16 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { AuthGuard } from "@/auth/auth-guard";
 import type ArenaWebCredential from "@/auth/arena-web-credential";
 import ReqCredential from "@/auth/arena-credential.decorator";
 import { AllowOnlyToken } from "@/auth/allow-only-token.decorator";
+import { UserDto } from "@/dtos/user.dto";
+import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";
+import { ApiOkResponse } from "@nestjs/swagger";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
-@Controller("api/v1/user")
+@Controller("api/v1/users")
 @UseGuards(AuthGuard)
 export class UserController {
   constructor(
@@ -14,20 +18,47 @@ export class UserController {
   ) {}
 
   @Post("register")
+  @ApiOkResponse({ type: withApiResult(UserDto) })
   @AllowOnlyToken()
-  async registerUser(@Body() body: CreateUserDto): Promise<string> {
-    const user = await this.userService.createUser(body);
-    return "user registered";
+  async registerUser(@Body() body: CreateUserDto, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<UserDto>> {
+    const user = await this.userService.createUser({
+      uid: credential.payload.sub!,
+      email: credential.payload.email,
+      displayName: body.displayName,
+    });
+
+    return new ApiResultDto<UserDto>({
+      success: true,
+      data: UserDto.fromEntity(user),
+    });
   }
 
   @Get("me")
-  getUserInfo(@ReqCredential() credential: ArenaWebCredential): string {
-    return "user info";
+  @ApiOkResponse({ type: withApiResult(UserDto) })
+  async getUserInfo(@ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<UserDto>> {
+    const user = await this.userService.findUserByUserId(credential.user!.userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return new ApiResultDto<UserDto>({
+      success: true,
+      data: UserDto.fromEntity(user),
+    });
   }
 
   @Patch("me")
-  updateUserInfo(@ReqCredential() credential: ArenaWebCredential): string {
-    return "user info updated";
+  @ApiOkResponse({ type: withApiResult(UserDto) })
+  async updateUserInfo(@Body() body: UpdateUserDto, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<UserDto>> {
+    const user = await this.userService.updateUser(credential.user!.userId, body);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return new ApiResultDto<UserDto>({
+      success: true,
+      data: UserDto.fromEntity(user),
+    });
   }
 
   @Patch("me/avatar")
@@ -36,8 +67,17 @@ export class UserController {
   }
 
   @Get(":userId")
-  getUserInfoById(): string {
-    return "user info by id";
+  @ApiOkResponse({ type: withApiResult(UserDto) })
+  async getUserInfoById(@Param('userId') userId: string): Promise<ApiResultDto<UserDto>> {
+    const user = await this.userService.findUserByUserId(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return new ApiResultDto<UserDto>({
+      success: true,
+      data: UserDto.fromEntity(user),
+    });
   }
 
   @Get(":userId/avatar/thumbnail.png")
