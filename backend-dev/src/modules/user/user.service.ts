@@ -22,11 +22,6 @@ export class UserService {
   }
 
   async createUser(param: { email: string, displayName: string, uid: string }): Promise<UserEntity> {
-    const existingUser = await this.findUserByEmail(param.email);
-    if (existingUser) {
-      throw new Error('User already exists');
-    }
-
     const userEntity = this.userRepository.create({
       userId: nanoid(12),
       email: param.email,
