@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import "reflect-metadata";
+import { WellKnownExceptionFilter } from './exceptions/well-known-exception-filter';
+import { UnauthorizedExceptionFilter } from './exceptions/unauthorized-exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +16,9 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, documentFactory);
+
+  // ExceptionFilter 설치
+  app.useGlobalFilters(new WellKnownExceptionFilter(), new UnauthorizedExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 }
