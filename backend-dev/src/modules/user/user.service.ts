@@ -2,10 +2,11 @@ import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { CreateUserDto } from "./dtos/create-user.dto";
+import { UpdateUserDto } from "./dtos/update-user.dto";
 import ArenaWebCredential from "@/auth/arena-web-credential";
 import { nanoid } from "nanoid";
+import { WellKnownError } from "@/exceptions/well-known-error";
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,15 @@ export class UserService {
   }
 
   async createUser(param: { email: string, displayName: string, uid: string }): Promise<UserEntity> {
-    const userEntity = this.userRepository.create({
+    const existingUser = await this.findUserByEmail(param.email);
+    if (existingUser) {
+      throw new WellKnownError({
+        message: "User already exists",
+        errorCode: "USER_ALREADY_EXISTS",
+      });
+    }
+
+    const user = this.userRepository.create({
       userId: nanoid(12),
       email: param.email,
       uid: param.uid,
@@ -31,11 +40,19 @@ export class UserService {
       avatarId: "default",
     });
 
-    return await this.userRepository.save(userEntity);
+    return await this.userRepository.save(user);
   }
 
-  async updateUser(userId: string, param: UpdateUserDto): Promise<UserEntity | null> {
+  async updateUser(userId: string, param: UpdateUserDto): Promise<UserEntity> {
     await this.userRepository.update(userId, param);
-    return await this.userRepository.findOne({ where: { userId } });
+    const updated = await this.userRepository.findOne({ where: { userId } });
+    if (!updated) {
+      throw new WellKnownError({
+        message: "Failed to update user",
+        errorCode: "USER_NOT_FOUND",
+      });
+    }
+
+    return updated;
   }
 }

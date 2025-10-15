@@ -1,9 +1,13 @@
 import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";
 import { TeamDto } from "@/dtos/team.dto";
-import { Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
 import { TeamService } from "./team.service";
 import { WellKnownError } from "@/exceptions/well-known-error";
+import { CreateTeamDto } from "./dtos/create-team.dto";
+import ReqCredential from "@/auth/arena-credential.decorator";
+import type ArenaWebCredential from "@/auth/arena-web-credential";
+import { UpdateTeamDto } from "./dtos/update-team.dto";
 
 @Controller("api/v1/teams")
 export class TeamController {
@@ -26,18 +30,30 @@ export class TeamController {
   }
 
   @Post()
-  createTeam(): string {
-    return "Team created";
+  @ApiOkResponse({ type: () => withApiResult(TeamDto) })
+  async createTeam(@Body() body: CreateTeamDto, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<TeamDto>> {
+    const team = await this.teamService.createTeam({
+      name: body.name,
+      description: body.description || "",
+      ownerId: credential.user!.userId,
+    });
+    
+    return new ApiResultDto<TeamDto>({ data: TeamDto.fromEntity(team) });
   }
 
   @Patch(":teamId")
-  updateTeam(): string {
-    return "Team updated";
+  @ApiOkResponse({ type: () => withApiResult(TeamDto) })
+  async updateTeam(@Param("teamId") teamId: string, @Body() body: UpdateTeamDto, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<TeamDto>> {
+    const team = await this.teamService.updateTeam(teamId, body, credential.user!);
+
+    return new ApiResultDto<TeamDto>({ data: TeamDto.fromEntity(team) });
   }
 
   @Delete(":teamId")
-  deleteTeam(): string {
-    return "Team deleted";
+  @ApiOkResponse({ type: () => withApiResult(Object) })
+  async deleteTeam(@Param("teamId") teamId: string, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<null>> {
+    await this.teamService.deleteTeam(teamId, credential.user!);
+    return new ApiResultDto<null>({ data: null });
   }
 
   @Get(":teamId/channels")
