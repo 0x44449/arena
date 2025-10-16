@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
-import { AuthGuard } from "@/auth/auth-guard";
+import { ArenaWebAuthGuard } from "@/auth/arena-web-auth-guard";
 import type ArenaWebCredential from "@/auth/arena-web-credential";
 import ReqCredential from "@/auth/arena-credential.decorator";
 import { AllowOnlyToken } from "@/auth/allow-only-token.decorator";
@@ -12,7 +12,7 @@ import { UpdateUserDto } from "./dtos/update-user.dto";
 import { WellKnownError } from "@/exceptions/well-known-error";
 
 @Controller("api/v1/users")
-@UseGuards(AuthGuard)
+@UseGuards(ArenaWebAuthGuard)
 export class UserController {
   constructor(
     private readonly userService: UserService,

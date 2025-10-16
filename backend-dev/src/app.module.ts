@@ -3,6 +3,9 @@ import { UserModule } from './modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeamModule } from './modules/team/team.module';
+import { ChannelModule } from './modules/channel/channel.module';
+import { ArenaWebAuthGuard } from './auth/arena-web-auth-guard';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -21,8 +24,10 @@ import { TeamModule } from './modules/team/team.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule,
+    AuthModule,
     TeamModule,
-  ]
+    ChannelModule,
+    UserModule,
+  ],
 })
 export class AppModule {}

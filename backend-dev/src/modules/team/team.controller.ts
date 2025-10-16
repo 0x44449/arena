@@ -1,6 +1,6 @@
 import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";
 import { TeamDto } from "@/dtos/team.dto";
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
 import { TeamService } from "./team.service";
 import { WellKnownError } from "@/exceptions/well-known-error";
@@ -8,8 +8,10 @@ import { CreateTeamDto } from "./dtos/create-team.dto";
 import ReqCredential from "@/auth/arena-credential.decorator";
 import type ArenaWebCredential from "@/auth/arena-web-credential";
 import { UpdateTeamDto } from "./dtos/update-team.dto";
+import { ArenaWebAuthGuard } from "@/auth/arena-web-auth-guard";
 
 @Controller("api/v1/teams")
+@UseGuards(ArenaWebAuthGuard)
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,

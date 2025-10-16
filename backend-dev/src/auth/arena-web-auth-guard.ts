@@ -1,16 +1,16 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { ALLOW_PUBLIC_KEY } from "./allow-public.decorator";
 import { Reflector } from "@nestjs/core";
-import { verifySupabaseJwt } from "./supabase.jwt";
 import { ArenaWebRequest } from "./arena-web-request";
 import { ALLOW_ONLY_TOKEN_KEY } from "./allow-only-token.decorator";
-import { UserService } from "@/modules/user/user.service";
+import { AuthService } from "@/modules/auth/auth.service";
+import { UnauthorizedError } from "@/exceptions/unauthorized-error";
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class ArenaWebAuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -23,36 +23,48 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<ArenaWebRequest>();
     const authHeader = request.headers.authorization;
     if (!authHeader) {
-      throw new Error('No authentication token provided');
+      throw new UnauthorizedError({
+        message: 'No authentication token provided',
+        errorCode: 'NO_AUTH_TOKEN',
+      });
     }
 
     const [, token] = authHeader.split('Bearer ');
     if (!token) {
-      throw new Error('No authentication token provided');
+      throw new UnauthorizedError({
+        message: 'No authentication token provided',
+        errorCode: 'NO_AUTH_TOKEN',
+      });
     }
 
-    const payload = await verifySupabaseJwt(token);
+    const credential = await this.authService.verifyToken(token);
+    if (!credential.payload) {
+      throw new UnauthorizedError({
+        message: 'Invalid authentication token',
+        errorCode: 'INVALID_AUTH_TOKEN',
+      });
+    }
+
     const allowOnlyToken = this.reflector.getAllAndOverride<boolean>(ALLOW_ONLY_TOKEN_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
     if (allowOnlyToken) {
       request.credential = {
-        user: null,
-        payload,
+        user: credential.user,
+        payload: credential.payload,
       };
       return true;
     }
 
-    const user = await this.userService.findUserByEmail(payload.email as string);
-    if (!user) {
-      throw new Error('User not registered');
+    if (!credential.user) {
+      throw new UnauthorizedError({
+        message: 'User not found for the given token',
+        errorCode: 'USER_NOT_FOUND',
+      });
     }
 
-    request.credential = {
-      user,
-      payload,
-    };
+    request.credential = credential;
     return true;
   }
 }
