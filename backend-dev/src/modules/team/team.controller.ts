@@ -55,6 +55,7 @@ export class TeamController {
   @ApiOkResponse({ type: () => withApiResult(Object) })
   async deleteTeam(@Param("teamId") teamId: string, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<null>> {
     await this.teamService.deleteTeam(teamId, credential.user!);
+    
     return new ApiResultDto<null>({ data: null });
   }
 

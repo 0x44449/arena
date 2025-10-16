@@ -14,7 +14,7 @@ export class TeamService {
   ) {}
 
   async createTeam(param: { name: string; description: string; ownerId: string }): Promise<TeamEntity> {
-    const team = await this.teamRepository.create({
+    const team = this.teamRepository.create({
       teamId: nanoid(12),
       name: param.name,
       description: param.description,
