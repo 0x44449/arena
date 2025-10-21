@@ -8,7 +8,7 @@ import { ChatController } from "./chat.controller";
 
 @Module({
   imports: [TypeOrmModule.forFeature([ChatMessageEntity]), RedisModule.forFeature()],
-  controllers: [ChatGateway, ChatService],
-  providers: [ChatController],
+  controllers: [ChatController],
+  providers: [ChatGateway, ChatService],
 })
 export class ChatModule {}

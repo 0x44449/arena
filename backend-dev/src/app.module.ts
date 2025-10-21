@@ -4,13 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeamModule } from './modules/team/team.module';
 import { ChannelModule } from './modules/channel/channel.module';
-import { ArenaWebAuthGuard } from './auth/web/arena-web-auth-guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './libs/redis/redis.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -38,6 +38,7 @@ import { RedisModule } from './libs/redis/redis.module';
     TeamModule,
     ChannelModule,
     UserModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
