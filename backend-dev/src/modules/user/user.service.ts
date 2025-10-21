@@ -2,9 +2,7 @@ import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
-import ArenaWebCredential from "@/auth/arena-web-credential";
 import { nanoid } from "nanoid";
 import { WellKnownError } from "@/exceptions/well-known-error";
 

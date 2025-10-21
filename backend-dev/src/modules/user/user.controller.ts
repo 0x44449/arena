@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
-import { ArenaWebAuthGuard } from "@/auth/arena-web-auth-guard";
-import type ArenaWebCredential from "@/auth/arena-web-credential";
-import ReqCredential from "@/auth/arena-credential.decorator";
+import { ArenaWebAuthGuard } from "@/auth/web/arena-web-auth-guard";
+import type ArenaWebCredential from "@/auth/web/arena-web-credential";
+import ReqCredential from "@/auth/web/arena-web-credential.decorator";
 import { AllowOnlyToken } from "@/auth/allow-only-token.decorator";
 import { UserDto } from "@/dtos/user.dto";
 import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";

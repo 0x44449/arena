@@ -27,9 +27,9 @@ export class ChannelEntity {
   @JoinColumn({ name: "OwnerId" })
   owner: UserEntity;
 
-  @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
+  @CreateDateColumn({ name: "CreatedAt", type: "timestamptz" })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'UpdatedAt', type: 'timestamptz', nullable: true })
+  @UpdateDateColumn({ name: "UpdatedAt", type: "timestamptz", nullable: true })
   updatedAt: Date;
 }

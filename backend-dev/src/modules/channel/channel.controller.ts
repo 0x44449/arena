@@ -4,10 +4,10 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@n
 import { ApiOkResponse } from "@nestjs/swagger";
 import { ChannelService } from "./channel.service";
 import { WellKnownError } from "@/exceptions/well-known-error";
-import { ArenaWebAuthGuard } from "@/auth/arena-web-auth-guard";
+import { ArenaWebAuthGuard } from "@/auth/web/arena-web-auth-guard";
 import { CreateChannelDto } from "./dtos/create-channel.dto";
-import ReqCredential from "@/auth/arena-credential.decorator";
-import type ArenaWebCredential from "@/auth/arena-web-credential";
+import ReqCredential from "@/auth/web/arena-web-credential.decorator";
+import type ArenaWebCredential from "@/auth/web/arena-web-credential";
 import { UpdateChannelDto } from "./dtos/update-channel.dto";
 
 @Controller("api/v1/channels")

@@ -12,16 +12,16 @@ export class TeamEntity {
   @Column("text", { name: "Description" })
   description: string;
 
-  @Column({ name: 'OwnerId' })
+  @Column({ name: "OwnerId" })
   ownerId: string;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'OwnerId' })
+  @JoinColumn({ name: "OwnerId" })
   owner: UserEntity;
 
-  @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
+  @CreateDateColumn({ name: "CreatedAt", type: "timestamptz" })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'UpdatedAt', type: 'timestamptz', nullable: true })
+  @UpdateDateColumn({ name: "UpdatedAt", type: "timestamptz", nullable: true })
   updatedAt: Date;
 }

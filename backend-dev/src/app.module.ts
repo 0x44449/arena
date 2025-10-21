@@ -4,8 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeamModule } from './modules/team/team.module';
 import { ChannelModule } from './modules/channel/channel.module';
-import { ArenaWebAuthGuard } from './auth/arena-web-auth-guard';
+import { ArenaWebAuthGuard } from './auth/web/arena-web-auth-guard';
 import { AuthModule } from './modules/auth/auth.module';
+import { RedisModule } from './libs/redis/redis.module';
 
 @Module({
   imports: [
@@ -21,6 +22,15 @@ import { AuthModule } from './modules/auth/auth.module';
         database: configService.get<string>('DATABASE_NAME'),
         synchronize: true,
         logging: false,
+      }),
+      inject: [ConfigService],
+    }),
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        host: configService.get('REDIS_HOST') || 'redis',
+        port: Number(configService.get('REDIS_PORT') || 6379),
+        password: configService.get('REDIS_PASSWORD'),
+        db: 0,
       }),
       inject: [ConfigService],
     }),

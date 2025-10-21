@@ -20,9 +20,9 @@ export class UserEntity {
   @Column({ name: "Message" })
   message: string;
 
-  @CreateDateColumn({ name: 'CreatedAt', type: 'timestamptz' })
+  @CreateDateColumn({ name: "CreatedAt", type: "timestamptz" })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'UpdatedAt', type: 'timestamptz', nullable: true })
+  @UpdateDateColumn({ name: "UpdatedAt", type: "timestamptz", nullable: true })
   updatedAt: Date;
 }

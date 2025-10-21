@@ -1,5 +1,5 @@
-import ArenaWebCredential from "@/auth/arena-web-credential";
-import { verifySupabaseJwt } from "@/auth/supabase.jwt";
+import ArenaWebCredential from "@/auth/web/arena-web-credential";
+import { verifySupabaseJwt } from "@/auth/web/supabase.jwt";
 import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";

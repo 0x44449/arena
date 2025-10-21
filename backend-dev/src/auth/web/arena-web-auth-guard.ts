@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { ALLOW_PUBLIC_KEY } from "./allow-public.decorator";
+import { ALLOW_PUBLIC_KEY } from "../allow-public.decorator";
 import { Reflector } from "@nestjs/core";
 import { ArenaWebRequest } from "./arena-web-request";
-import { ALLOW_ONLY_TOKEN_KEY } from "./allow-only-token.decorator";
+import { ALLOW_ONLY_TOKEN_KEY } from "../allow-only-token.decorator";
 import { AuthService } from "@/modules/auth/auth.service";
 import { UnauthorizedError } from "@/exceptions/unauthorized-error";
 
