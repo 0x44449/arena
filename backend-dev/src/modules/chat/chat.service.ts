@@ -3,9 +3,10 @@ import { InjectRedis } from "@/libs/redis/redis.module";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import Redis from "ioredis";
-import { Repository } from "typeorm";
+import { FindOptionsOrder, FindOptionsWhere, LessThan, MoreThan, Repository } from "typeorm";
 import { CreateChatMessageDto } from "./dtos/create-chat-message.dto";
 import { UserEntity } from "@/entities/user.entity";
+import { InfinityPagedDto } from "@/dtos/infinity-paged.dto";
 
 interface RedisEx extends Redis {
   initMaxAndIncr(key: string, dbmax: number, doIncr: number): Promise<number>;
@@ -59,7 +60,7 @@ export class ChatService implements OnModuleInit {
         order: { seq: "DESC" },
         select: ["seq"],
       });
-      
+
       const lastSeq = last ? last.seq : -1;
       seq = await this.redis.initMaxAndIncr(seqKey, lastSeq, 1);
     }
@@ -70,8 +71,72 @@ export class ChatService implements OnModuleInit {
       message: param.message,
       sender,
     });
-    
+
     const created = await this.chatMessageRepository.save(message);
     return created;
+  }
+
+  async getPagedMessages(
+    channelId: string,
+    param: {
+      baseSeq: number;
+      limit: number;
+      direction: 'next' | 'prev';
+    }
+  ): Promise<InfinityPagedDto<ChatMessageEntity>> {
+    let hasNext = false;
+    let hasPrev = false;
+
+    const whereCondition: FindOptionsWhere<ChatMessageEntity> =
+      param.direction === 'prev'
+        ? param.baseSeq === -1
+          ? { channelId }
+          : { channelId, seq: LessThan(param.baseSeq) }
+        : { channelId, seq: MoreThan(param.baseSeq) };
+
+    const orderCondition: FindOptionsOrder<ChatMessageEntity> =
+      param.direction === 'prev'
+        ? { seq: 'DESC' }  // base 바로 이전 메시지부터, 오래된 순으로
+        : { seq: 'ASC' };  // base 바로 다음 메시지부터, 최신 순으로
+
+    const messages = await this.chatMessageRepository.find({
+      where: whereCondition,
+      order: orderCondition,
+      take: param.limit,
+      relations: ['sender', 'attachments', 'attachments.uploader'],
+    });
+
+    // Next/Prev 여부 판단
+    if (messages.length === 0) {
+      hasPrev = false;
+      hasNext = false;
+    } else {
+      const seqs = messages.map(m => m.seq);
+      const minSeq = Math.min(...seqs);
+      const maxSeq = Math.max(...seqs);
+
+      // Next/Prev 여부 확인 쿼리
+      const [hasPrevResult, hasNextResult] = await Promise.all([
+        this.chatMessageRepository.exists({
+          where: { channelId, seq: LessThan(minSeq) },
+        }),
+        this.chatMessageRepository.exists({
+          where: { channelId, seq: MoreThan(maxSeq) },
+        }),
+      ]);
+      hasPrev = hasPrevResult;
+      hasNext = hasNextResult;
+    }
+
+    // 메시지 순서 보정
+    if (param.direction === 'prev') {
+      messages.reverse(); // prev는 오래된 순으로 정렬되어야 하므로 역순으로
+    }
+
+    return {
+      items: messages,
+      hasNext,
+      hasPrev,
+    };
   }
 }

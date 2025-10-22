@@ -2,9 +2,11 @@ import type ArenaWebCredential from "@/auth/web/arena-web-credential";
 import ReqCredential from "@/auth/web/arena-web-credential.decorator";
 import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";
 import { ChatMessageDto } from "@/dtos/chat-message.dto";
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
 import { ChatService } from "./chat.service";
+import { InfinityPagedDto, withInfinityPaged } from "@/dtos/infinity-paged.dto";
+import { GetChatMessageQueryDto } from "./dtos/get-chat-messages-query.dto";
 
 @Controller("api/v1/chat")
 export class ChatController {
@@ -13,25 +15,48 @@ export class ChatController {
   ) {}
 
   @Get(":channelId/messages")
-  getChats(): string {
-    return "List of chats";
+  @ApiOkResponse({ type: () => withApiResult(withInfinityPaged(ChatMessageDto)) })
+  async getPagedMessages(
+    @Param("channelId") channelId: string, @Query() query: GetChatMessageQueryDto,
+  ): Promise<ApiResultDto<InfinityPagedDto<ChatMessageDto>>> {
+    let { seq, limit, direction } = query;
+
+    seq = typeof seq === "number" ? seq : -1;
+    limit = typeof limit === "number" ? limit : 20;
+    direction = direction === "next" || direction === "prev" ? direction : "prev";
+
+    const messages = await this.chatService.getPagedMessages(channelId, {
+      baseSeq:  seq,
+      limit: limit,
+      direction: direction,
+    });
+
+    return new ApiResultDto<InfinityPagedDto<ChatMessageDto>>({
+      data: new InfinityPagedDto<ChatMessageDto>({
+        items: messages.items.map(message => ChatMessageDto.fromEntity(message)),
+        hasNext: messages.hasNext,
+        hasPrev: messages.hasPrev,
+      })
+    });
   }
 
   @Post(":channelId/messages")
   @ApiOkResponse({ type: () => withApiResult(ChatMessageDto) })
-  async createChatMessage(@Param("channelId") channelId: string, @Body() body: ChatMessageDto, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<ChatMessageDto>> {
+  async createMessage(
+    @Param("channelId") channelId: string, @Body() body: ChatMessageDto, @ReqCredential() credential: ArenaWebCredential
+  ): Promise<ApiResultDto<ChatMessageDto>> {
     const chatMessage = await this.chatService.createMessage(channelId, body, credential.user!);
 
     return new ApiResultDto<ChatMessageDto>({ data: ChatMessageDto.fromEntity(chatMessage) });
   }
 
   @Patch(":channelId/messages/:messageId")
-  updateChat(): string {
+  updateMessage(): string {
     return "Chat updated";
   }
 
   @Delete(":channelId/messages/:messageId")
-  deleteChat(): string {
+  deleteMessage(): string {
     return "Chat deleted";
   }
 }
