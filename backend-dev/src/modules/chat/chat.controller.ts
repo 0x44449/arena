@@ -2,13 +2,15 @@ import type ArenaWebCredential from "@/auth/web/arena-web-credential";
 import ReqCredential from "@/auth/web/arena-web-credential.decorator";
 import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";
 import { ChatMessageDto } from "@/dtos/chat-message.dto";
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
 import { ChatService } from "./chat.service";
 import { InfinityPagedDto, withInfinityPaged } from "@/dtos/infinity-paged.dto";
 import { GetChatMessageQueryDto } from "./dtos/get-chat-messages-query.dto";
+import { ArenaWebAuthGuard } from "@/auth/web/arena-web-auth-guard";
 
 @Controller("api/v1/chat")
+@UseGuards(ArenaWebAuthGuard)
 export class ChatController {
   constructor(
     private readonly chatService: ChatService,
