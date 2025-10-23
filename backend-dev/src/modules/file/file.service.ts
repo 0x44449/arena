@@ -3,7 +3,7 @@ import { UserEntity } from "@/entities/user.entity";
 import { WellKnownError } from "@/exceptions/well-known-error";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { randomUUID } from "crypto";
+import { nanoid } from "nanoid";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -44,7 +44,7 @@ export class FileService {
     }
 
     const fileEntity = this.fileRepository.create({
-      fileId: randomUUID(),
+      fileId: nanoid(12),
       originalName: multerFile.originalname,
       storedName: multerFile.filename,
       mimeType: multerFile.mimetype,
@@ -67,7 +67,7 @@ export class FileService {
 
     const fileEntities = multerFiles.map(multerFile => {
       const fileEntity = this.fileRepository.create({
-        fileId: randomUUID(),
+        fileId: nanoid(12),
         originalName: multerFile.originalname,
         storedName: multerFile.filename,
         mimeType: multerFile.mimetype,

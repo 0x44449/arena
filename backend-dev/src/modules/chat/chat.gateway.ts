@@ -8,14 +8,10 @@ import type { LeaveChatPayload } from "./payloads/leave-channel.payload";
 
 @WebSocketGateway(80, { namespace: "chat" })
 @Injectable()
-export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly authService: AuthService,
   ) {}
-
-  afterInit(server: any) {
-    console.log("ChatGateway initialized");
-  }
 
   async handleConnection(client: ArenaWsSocket, ...args: any[]) {
     const token = client.handshake.auth?.token;
@@ -53,7 +49,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     });
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(client: ArenaWsSocket) {
     console.log("Client disconnected:", client.id);
   }
 

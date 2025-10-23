@@ -1,15 +1,22 @@
 import { UserEntity } from "@/entities/user.entity";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UpdateUserDto } from "./dtos/update-user.dto";
 import { nanoid } from "nanoid";
 import { WellKnownError } from "@/exceptions/well-known-error";
+import { FileEntity } from "@/entities/file.entity";
+import * as fs from 'fs';
+import { getUploadServerPath } from "@/libs/file/arena-web-file-interceptor";
+import { join } from "path";
+import sharp from "sharp";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(FileEntity) private readonly fileRepository: Repository<FileEntity>,
   ) {}
 
   async findUserByEmail(email: string): Promise<UserEntity | null> {
@@ -52,5 +59,38 @@ export class UserService {
     }
 
     return updated;
+  }
+
+  async uploadUserAvatar(multerFile: Express.Multer.File, user: UserEntity): Promise<UserEntity> {
+    const uploadServerPath = join(getUploadServerPath(), "avatars");
+    await fs.promises.mkdir(uploadServerPath, { recursive: true });
+
+    const fileName = randomUUID();
+    const pngFile = await sharp(multerFile.buffer).png().toFile(join(uploadServerPath, fileName));
+
+    const fileEntity = this.fileRepository.create({
+      fileId: nanoid(12),
+      originalName: multerFile.originalname,
+      storedName: fileName,
+      mimeType: "image/png",
+      size: pngFile.size,
+      path: uploadServerPath,
+      uploader: user,
+      category: "avatar",
+    });
+
+    const saved = await this.fileRepository.save(fileEntity);
+    
+    user.avatarId = saved.fileId;
+    return await this.userRepository.save(user);
+  }
+
+  async getUserAvatarByUserId(userId: string): Promise<FileEntity | null> {
+    const user = await this.findUserByUserId(userId);
+    if (!user || !user.avatarId) {
+      return null;
+    }
+
+    return await this.fileRepository.findOne({ where: { fileId: user.avatarId } });
   }
 }

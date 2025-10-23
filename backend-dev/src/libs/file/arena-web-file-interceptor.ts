@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { diskStorage, memoryStorage } from "multer";
 import { join } from "path";
 
-function getUploadServerPath() {
+export function getUploadServerPath() {
   return process.env.FILE_STORAGE_LOCATION || join(__dirname, "../../uploads");
 }
 
