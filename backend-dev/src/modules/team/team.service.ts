@@ -21,11 +21,26 @@ export class TeamService {
       ownerId: param.ownerId,
     });
 
-    return await this.teamRepository.save(team);
+    await this.teamRepository.save(team);
+    const saved = await this.teamRepository.findOne({
+      where: { teamId: team.teamId },
+      relations: ["owner"],
+    });
+
+    if (!saved) {
+      throw new WellKnownError({
+        message: "Failed to create team",
+        errorCode: "TEAM_CREATION_FAILED",
+      });
+    }
+    return saved;
   }
 
   async findTeamById(teamId: string): Promise<TeamEntity | null> {
-    return await this.teamRepository.findOne({ where: { teamId } });
+    return await this.teamRepository.findOne({
+      where: { teamId },
+      relations: ["owner"],
+    });
   }
 
   async updateTeam(teamId: string, param: UpdateTeamDto, me: UserEntity): Promise<TeamEntity> {
@@ -45,7 +60,10 @@ export class TeamService {
     }
 
     await this.teamRepository.update(teamId, param);
-    const updated = await this.teamRepository.findOne({ where: { teamId } });
+    const updated = await this.teamRepository.findOne({
+      where: { teamId },
+      relations: ["owner"],
+    });
     if (!updated) {
       throw new WellKnownError({
         message: "Failed to update team",

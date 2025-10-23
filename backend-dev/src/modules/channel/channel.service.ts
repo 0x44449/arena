@@ -14,7 +14,10 @@ export class ChannelService {
   ) {}
 
   async findChannelById(channelId: string): Promise<ChannelEntity | null> {
-    return await this.channelRepository.findOne({ where: { channelId } });
+    return await this.channelRepository.findOne({
+      where: { channelId },
+      relations: ["owner"],
+    });
   }
 
   async createChannel(param: { name: string; description: string; teamId: string, ownerId: string }): Promise<ChannelEntity> {
@@ -26,7 +29,19 @@ export class ChannelService {
       ownerId: param.ownerId,
     });
 
-    return await this.channelRepository.save(channel);
+    await this.channelRepository.save(channel);
+    const saved = await this.channelRepository.findOne({
+      where: { channelId: channel.channelId },
+      relations: ["owner"],
+    });
+
+    if (!saved) {
+      throw new WellKnownError({
+        message: "Failed to create channel",
+        errorCode: "CHANNEL_CREATION_FAILED",
+      });
+    }
+    return saved;
   }
 
   async updateChannel(channelId: string, param: UpdateChannelDto, me: UserEntity): Promise<ChannelEntity> {
@@ -46,7 +61,10 @@ export class ChannelService {
     }
 
     await this.channelRepository.update(channelId, param);
-    const updated = await this.channelRepository.findOne({ where: { channelId } });
+    const updated = await this.channelRepository.findOne({
+      where: { channelId },
+      relations: ["owner"],
+    });
     if (!updated) {
       throw new WellKnownError({
         message: "Channel not found",
@@ -72,7 +90,7 @@ export class ChannelService {
         errorCode: "CHANNEL_PERMISSION_DENIED",
       });
     }
-    
+
     await this.channelRepository.delete(channelId);
   }
 }

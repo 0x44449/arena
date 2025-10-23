@@ -13,7 +13,10 @@ export class FileService {
   ) {}
 
   async findFileById(fileId: string): Promise<FileEntity | null> {
-    return await this.fileRepository.findOne({ where: { fileId } });
+    return await this.fileRepository.findOne({
+      where: { fileId },
+      relations: ["uploader"],
+    });
   }
 
   async deleteFile(fileId: string, requester: UserEntity): Promise<void> {
@@ -43,7 +46,7 @@ export class FileService {
       });
     }
 
-    const fileEntity = this.fileRepository.create({
+    const file = this.fileRepository.create({
       fileId: nanoid(12),
       originalName: multerFile.originalname,
       storedName: multerFile.filename,
@@ -54,7 +57,19 @@ export class FileService {
       category: 'file',
     });
 
-    return await this.fileRepository.save(fileEntity);
+    await this.fileRepository.save(file);
+    const updated = await this.fileRepository.findOne({
+      where: { fileId: file.fileId },
+      relations: ["uploader"],
+    });
+
+    if (!updated) {
+      throw new WellKnownError({
+        message: "Failed to upload file",
+        errorCode: "FILE_UPLOAD_FAILED",
+      });
+    }
+    return updated;
   }
 
   async uploadFiles(multerFiles: Express.Multer.File[], uploader: UserEntity): Promise<FileEntity[]> {
@@ -65,8 +80,8 @@ export class FileService {
       });
     }
 
-    const fileEntities = multerFiles.map(multerFile => {
-      const fileEntity = this.fileRepository.create({
+    const files = multerFiles.map(multerFile => {
+      const file = this.fileRepository.create({
         fileId: nanoid(12),
         originalName: multerFile.originalname,
         storedName: multerFile.filename,
@@ -76,9 +91,15 @@ export class FileService {
         uploader: uploader,
         category: 'file',
       });
-      return fileEntity;
+      return file;
     });
 
-    return await this.fileRepository.save(fileEntities);
+    await this.fileRepository.save(files);
+    const uploadeds = await this.fileRepository.find({
+      where: files.map(f => ({ fileId: f.fileId })),
+      relations: ["uploader"],
+    });
+
+    return uploadeds;
   }
 }
