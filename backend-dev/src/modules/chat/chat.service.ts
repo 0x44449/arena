@@ -7,6 +7,8 @@ import { FindOptionsOrder, FindOptionsWhere, LessThan, MoreThan, Repository } fr
 import { CreateChatMessageDto } from "./dtos/create-chat-message.dto";
 import { UserEntity } from "@/entities/user.entity";
 import { InfinityPagedDto } from "@/dtos/infinity-paged.dto";
+import { WellKnownError } from "@/exceptions/well-known-error";
+import { ChatGateway } from "./chat.gateway";
 
 interface RedisEx extends Redis {
   initMaxAndIncr(key: string, dbmax: number, doIncr: number): Promise<number>;
@@ -17,6 +19,7 @@ export class ChatService implements OnModuleInit {
   constructor(
     @InjectRepository(ChatMessageEntity) private readonly chatMessageRepository: Repository<ChatMessageEntity>,
     @InjectRedis() private readonly redis: RedisEx,
+    private readonly chatGateway: ChatGateway
   ) {}
 
   onModuleInit() {
@@ -72,7 +75,19 @@ export class ChatService implements OnModuleInit {
       sender,
     });
 
-    const created = await this.chatMessageRepository.save(message);
+    await this.chatMessageRepository.save(message);
+    const created = await this.chatMessageRepository.findOne({
+      where: { channelId, seq },
+      relations: ['sender', 'attachments', 'attachments.uploader'],
+    });
+    
+    if (!created) {
+      throw new WellKnownError({
+        message: "Failed to create chat message",
+        errorCode: "CHAT_MESSAGE_CREATION_FAILED",
+      });
+    }
+    this.chatGateway.notifyMessage(channelId, created);
     return created;
   }
 

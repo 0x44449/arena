@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { AuthService } from "../auth/auth.service";
 import type { ArenaWsSocket } from "@/auth/ws/arena-ws-socket";
 import type { JoinChannelPayload } from "./payloads/join-channel.payload";
 import type { LeaveChatPayload } from "./payloads/leave-channel.payload";
+import { ChatMessageEntity } from "@/entities/chat-message.entity";
 
 @WebSocketGateway(80, { namespace: "chat" })
 @Injectable()
@@ -12,6 +13,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly authService: AuthService,
   ) {}
+
+  @WebSocketServer()
+  server: Server;
 
   async handleConnection(client: ArenaWsSocket, ...args: any[]) {
     const token = client.handshake.auth?.token;
@@ -71,5 +75,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await client.leave(channelId);
     
     client.to(channelId).emit("system", `User ${credential.user?.userId} has left the channel ${channelId}.`);
+  }
+
+  notifyMessage(channelId: string, message: ChatMessageEntity) {
+    this.server.to(channelId).emit("channel:message", message);
   }
 }
