@@ -28,6 +28,9 @@ export class FileEntity {
   @JoinColumn({ name: "UploaderId" })
   uploader: UserEntity;
 
+  @Column({ name: "Category", nullable: true })
+  category: string;
+
   @CreateDateColumn({ name: "CreatedAt", type: "timestamptz" })
   createdAt: Date;
 }

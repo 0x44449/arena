@@ -9,6 +9,7 @@ export class FileDto extends OmitType(
     "originalName",
     "storedName",
     "path",
+    "category",
   ] as const
 ) {
   uploader: UserDto;
@@ -23,7 +24,7 @@ export class FileDto extends OmitType(
       createdAt: entity.createdAt,
       uploader: UserDto.fromEntity(entity.uploader),
       name: entity.originalName,
-      url: `${process.env.SERVER_BASE_URL}/api/v1/files/download/${entity.fileId}`,
+      url: `${process.env.SERVER_BASE_URL}/api/v1/files/contents/${entity.fileId}`,
     }
   }
 }
