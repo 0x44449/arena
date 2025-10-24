@@ -4,7 +4,8 @@ import ArenaWsCredential from "@/auth/ws/arena-ws-credential";
 import { UserEntity } from "@/entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { JWTPayload, jwtVerify, SignJWT } from "jose";
+import { jwtVerify, SignJWT } from "jose";
+import { AccessToken as LivekitAccessToken } from "livekit-server-sdk";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -55,5 +56,24 @@ export class AuthService {
 
     result.user = user;
     return result;
+  }
+
+  async issueLiveSTS(channelId: string, user: UserEntity): Promise<string> {
+    const livekitToken = new LivekitAccessToken(
+      process.env.LIVEKIT_API_KEY || "arena-dev-live-api-key",
+      process.env.LIVEKIT_API_SECRET || "arena-dev-live-secret", {
+        identity: user.userId,
+        ttl: "10m",
+      }
+    );
+
+    livekitToken.addGrant({
+      roomJoin: true,
+      room: channelId,
+      canPublish: true,
+      canSubscribe: true,
+    });
+
+    return livekitToken.toJwt();
   }
 }

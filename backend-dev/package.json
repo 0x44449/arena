@@ -30,6 +30,7 @@
     "@nestjs/websockets": "^11.1.6",
     "ioredis": "^5.8.1",
     "jose": "^6.1.0",
+    "livekit-server-sdk": "^2.14.0",
     "multer": "^2.0.2",
     "nanoid": "^5.1.6",
     "pg": "^8.16.3",
