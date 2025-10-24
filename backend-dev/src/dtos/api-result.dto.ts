@@ -1,5 +1,5 @@
 import { Type } from "@nestjs/common";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, getSchemaPath } from "@nestjs/swagger";
 
 export class ApiResultDto<T> {
   success: boolean;
@@ -25,15 +25,28 @@ export class ApiResultDto<T> {
   }
 }
 
-export function withApiResult<T>(Model: Type<T>) {
-  class ApiResultDtoWithModel extends ApiResultDto<T> {
-    @ApiProperty({
-      type: () => Model,
-    })
-    declare data?: T;
+export function withApiResult<T>(Model: Type<T>, options: { isArray?: boolean } = {}) {
+  const isArray = options.isArray || false;
+
+  if (isArray) {
+    class ApiResultDtoWithModel extends ApiResultDto<T[]> {
+      @ApiProperty({
+        type: () => [Model],
+      })
+      declare data?: T[];
+    }
+    
+    Object.defineProperty(ApiResultDtoWithModel, 'name', { value: `ApiResultDto_Array_${Model.name}` });
+    return ApiResultDtoWithModel;
+  } else {
+    class ApiResultDtoWithModel extends ApiResultDto<T> {
+      @ApiProperty({
+        type: () => Model,
+      })
+      declare data?: T;
+    }
+
+    Object.defineProperty(ApiResultDtoWithModel, 'name', { value: `ApiResultDto_${Model.name}` });
+    return ApiResultDtoWithModel;
   }
-
-  Object.defineProperty(ApiResultDtoWithModel, 'name', { value: `ApiResultDto_${Model.name}` });
-
-  return ApiResultDtoWithModel;
 }

@@ -1,6 +1,6 @@
 import { ApiResultDto, withApiResult } from "@/dtos/api-result.dto";
 import { TeamDto } from "@/dtos/team.dto";
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
 import { TeamService } from "./team.service";
 import { WellKnownError } from "@/exceptions/well-known-error";
@@ -9,6 +9,7 @@ import ReqCredential from "@/auth/web/arena-web-credential.decorator";
 import type ArenaWebCredential from "@/auth/web/arena-web-credential";
 import { UpdateTeamDto } from "./dtos/update-team.dto";
 import { ArenaWebAuthGuard } from "@/auth/web/arena-web-auth-guard";
+import { GetTeamsQueryDto } from "./dtos/get-teams-query.dto";
 
 @Controller("api/v1/teams")
 @UseGuards(ArenaWebAuthGuard)
@@ -16,6 +17,16 @@ export class TeamController {
   constructor(
     private readonly teamService: TeamService,
   ) {}
+
+  @Get()
+  @ApiOkResponse({ type: () => withApiResult(TeamDto, { isArray: true }) })
+  async getTeams(@Query() query: GetTeamsQueryDto, @ReqCredential() credential: ArenaWebCredential): Promise<ApiResultDto<TeamDto[]>> {
+    const teams = await this.teamService.findAllJoinedTeams(credential.user!);
+
+    return new ApiResultDto<TeamDto[]>({
+      data: teams.map(team => TeamDto.fromEntity(team)),
+    });
+  }
 
   @Get(":teamId")
   @ApiOkResponse({ type: () => withApiResult(TeamDto) })

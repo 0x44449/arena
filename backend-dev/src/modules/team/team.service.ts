@@ -43,6 +43,13 @@ export class TeamService {
     });
   }
 
+  async findAllJoinedTeams(user: UserEntity): Promise<TeamEntity[]> {
+    return await this.teamRepository.find({
+      where: { ownerId: user.userId },
+      relations: ["owner"],
+    });
+  }
+
   async updateTeam(teamId: string, param: UpdateTeamDto, me: UserEntity): Promise<TeamEntity> {
     const team = await this.teamRepository.findOne({ where: { teamId } });
     if (!team) {
