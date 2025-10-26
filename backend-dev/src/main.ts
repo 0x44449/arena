@@ -6,7 +6,9 @@ import { WellKnownExceptionFilter } from './exceptions/well-known-exception-filt
 import { UnauthorizedExceptionFilter } from './exceptions/unauthorized-exception-filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('ARENA')

@@ -9,6 +9,7 @@ import { RedisModule } from './libs/redis/redis.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { FileModule } from './modules/file/file.module';
 import { REDIS_PUB, REDIS_SUB } from './libs/redis/redis-provide-symbol';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { REDIS_PUB, REDIS_SUB } from './libs/redis/redis-provide-symbol';
     UserModule,
     ChatModule,
     FileModule,
+    RealtimeModule,
   ],
 })
 export class AppModule {}
