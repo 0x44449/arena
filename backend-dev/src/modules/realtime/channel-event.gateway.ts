@@ -1,16 +1,18 @@
 import { Injectable } from "@nestjs/common";
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { Server } from "socket.io";
 import { AuthService } from "../auth/auth.service";
 import type { ArenaWsSocket } from "@/auth/ws/arena-ws-socket";
 import type { JoinChannelPayload } from "./payloads/join-channel.payload";
-import type { LeaveChatPayload } from "./payloads/leave-channel.payload";
-import { ChatMessageEntity } from "@/entities/chat-message.entity";
+import type { LeaveChannelPayload } from "./payloads/leave-channel.payload";
+import { ChannelEventPublisher } from "./channel-event.publisher";
+import { UserDto } from "@/dtos/user.dto";
 
-@WebSocketGateway(80, { namespace: "chat" })
+@WebSocketGateway(80, { namespace: "channel" })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChannelEventGateway implements OnGatewayConnection {
   constructor(
+    private readonly channelPub: ChannelEventPublisher,
     private readonly authService: AuthService,
   ) {}
 
@@ -53,31 +55,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  handleDisconnect(client: ArenaWsSocket) {
-    console.log("Client disconnected:", client.id);
-  }
-
   @SubscribeMessage("channel:join")
   async handleJoin(@ConnectedSocket() client: ArenaWsSocket, @MessageBody() payload: JoinChannelPayload) {
     const { channelId } = payload;
     const credential = client.data.credential;
 
-    await client.join(channelId);
+    this.channelPub.join(channelId, UserDto.fromEntity(credential.user!));
 
-    client.to(channelId).emit("system", `User ${credential.user?.userId} has joined the channel ${channelId}.`);
+    await client.join(channelId);
   }
 
   @SubscribeMessage("channel:leave")
-  async handleLeave(@ConnectedSocket() client: ArenaWsSocket, @MessageBody() payload: LeaveChatPayload) {
+  async handleLeave(@ConnectedSocket() client: ArenaWsSocket, @MessageBody() payload: LeaveChannelPayload) {
     const { channelId } = payload;
     const credential = client.data.credential;
 
     await client.leave(channelId);
-    
-    client.to(channelId).emit("system", `User ${credential.user?.userId} has left the channel ${channelId}.`);
+
+    this.channelPub.leave(channelId, UserDto.fromEntity(credential.user!));
   }
 
-  notifyMessage(channelId: string, message: ChatMessageEntity) {
-    this.server.to(channelId).emit("channel:message", message);
+  broadcastToChannel(channelId: string, event: string, payload: any) {
+    this.server.to(channelId).emit(event, payload);
   }
 }

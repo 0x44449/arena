@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './libs/redis/redis.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { FileModule } from './modules/file/file.module';
+import { REDIS_PUB, REDIS_SUB } from './libs/redis/redis-provide-symbol';
 
 @Module({
   imports: [
@@ -27,6 +28,26 @@ import { FileModule } from './modules/file/file.module';
       inject: [ConfigService],
     }),
     RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        host: configService.get('REDIS_HOST') || 'redis',
+        port: Number(configService.get('REDIS_PORT') || 6379),
+        password: configService.get('REDIS_PASSWORD'),
+        db: 0,
+      }),
+      inject: [ConfigService],
+    }),
+    RedisModule.forRootAsync({
+      name: REDIS_PUB,
+      useFactory: (configService: ConfigService) => ({
+        host: configService.get('REDIS_HOST') || 'redis',
+        port: Number(configService.get('REDIS_PORT') || 6379),
+        password: configService.get('REDIS_PASSWORD'),
+        db: 0,
+      }),
+      inject: [ConfigService],
+    }),
+    RedisModule.forRootAsync({
+      name: REDIS_SUB,
       useFactory: (configService: ConfigService) => ({
         host: configService.get('REDIS_HOST') || 'redis',
         port: Number(configService.get('REDIS_PORT') || 6379),

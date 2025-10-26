@@ -32,7 +32,7 @@ export class AuthService {
       .setIssuer('arena-dev')
       .setAudience('ws')
       .setIssuedAt()
-      .setExpirationTime('15m')
+      .setExpirationTime('10m')
       .sign(Buffer.from(process.env.WEBSOCKET_STS_PRIVATE_KEY || "arena-dev-sts-private-key", 'utf-8'));
 
     return sts;
@@ -72,6 +72,7 @@ export class AuthService {
       room: channelId,
       canPublish: true,
       canSubscribe: true,
+      canPublishData: true,
     });
 
     return livekitToken.toJwt();
