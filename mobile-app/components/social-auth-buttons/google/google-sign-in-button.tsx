@@ -19,6 +19,7 @@ export default function GoogleSignInButton() {
     const parsedUrl = new URL(url);
     const hash = parsedUrl.hash.substring(1); // Remove the leading '#'
     const params = new URLSearchParams(hash);
+
     return {
       access_token: params.get("access_token"),
       expires_in: parseInt(params.get("expires_in") || "0"),
