@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "backend-dev",
+			"path": "backend-dev"
+		},
+		{
+			"name": "frontend-web-dev",
+			"path": "frontend-web-dev"
+		},
+		{
+			"name": "mobile-app",
+			"path": "mobile-app"
+		}
+	],
+	"settings": {
+		"typescript.preferences.includePackageJsonAutoImports": "on"
+	}
+}
