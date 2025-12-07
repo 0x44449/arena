@@ -1,5 +1,6 @@
-import * as authApi from "./funtions/auth";
+import * as authApi from "./generated/endpoints/auth/auth";
 
-export {
-  authApi
-};
+const api = {
+  ...authApi,
+}
+export default api;
