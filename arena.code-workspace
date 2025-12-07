@@ -1,19 +1,16 @@
 {
 	"folders": [
 		{
-			"name": "backend-dev",
-			"path": "backend-dev"
+			"name": "arena-backend",
+			"path": "arena-backend"
 		},
 		{
-			"name": "frontend-web-dev",
-			"path": "frontend-web-dev"
-		},
-		{
-			"name": "mobile-app",
-			"path": "mobile-app"
+			"name": "arena-app",
+			"path": "arena-app"
 		}
 	],
 	"settings": {
-		"typescript.preferences.includePackageJsonAutoImports": "on"
+		"typescript.preferences.includePackageJsonAutoImports": "on",
+		"typescript.tsdk": "arena-app\\node_modules\\typescript\\lib"
 	}
 }
