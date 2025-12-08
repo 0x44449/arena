@@ -6,8 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ApiResultDto {
-  success: boolean;
-  /** @nullable */
-  errorCode: string | null;
+export interface UpdateUserDto {
+  name?: string;
+  avatarUrl?: string;
 }

@@ -6,26 +6,17 @@
  * OpenAPI spec version: 1.0
  */
 import {
-  useMutation,
-  useQuery
+  useMutation
 } from '@tanstack/react-query';
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
+  UseMutationResult
 } from '@tanstack/react-query';
 
 import type {
-  ApiResultDto,
+  ApiErrorDto,
   RegistDto,
   UnregistDto
 } from '../../models';
@@ -43,7 +34,7 @@ export const authRegist = (
 ) => {
       
       
-      return apiClientProxy<ApiResultDto>(
+      return apiClientProxy<void>(
       {url: `/api/v1/auth/regist`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: registDto, signal
@@ -53,7 +44,7 @@ export const authRegist = (
   
 
 
-export const getAuthRegistMutationOptions = <TError = unknown,
+export const getAuthRegistMutationOptions = <TError = ApiErrorDto,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authRegist>>, TError,{data: RegistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
 ): UseMutationOptions<Awaited<ReturnType<typeof authRegist>>, TError,{data: RegistDto}, TContext> => {
 
@@ -80,9 +71,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type AuthRegistMutationResult = NonNullable<Awaited<ReturnType<typeof authRegist>>>
     export type AuthRegistMutationBody = RegistDto
-    export type AuthRegistMutationError = unknown
+    export type AuthRegistMutationError = ApiErrorDto
 
-    export const useAuthRegist = <TError = unknown,
+    export const useAuthRegist = <TError = ApiErrorDto,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authRegist>>, TError,{data: RegistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authRegist>>,
@@ -101,7 +92,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 ) => {
       
       
-      return apiClientProxy<ApiResultDto>(
+      return apiClientProxy<void>(
       {url: `/api/v1/auth/unregist`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: unregistDto, signal
@@ -153,89 +144,4 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
-    export const authStatus = (
     
- options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
-) => {
-      
-      
-      return apiClientProxy<ApiResultDto>(
-      {url: `/api/v1/auth/status`, method: 'GET', signal
-    },
-      options);
-    }
-  
-
-
-
-export const getAuthStatusQueryKey = () => {
-    return [
-    `/api/v1/auth/status`
-    ] as const;
-    }
-
-    
-export const getAuthStatusQueryOptions = <TData = Awaited<ReturnType<typeof authStatus>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authStatus>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getAuthStatusQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authStatus>>> = ({ signal }) => authStatus(requestOptions, signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authStatus>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AuthStatusQueryResult = NonNullable<Awaited<ReturnType<typeof authStatus>>>
-export type AuthStatusQueryError = unknown
-
-
-export function useAuthStatus<TData = Awaited<ReturnType<typeof authStatus>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authStatus>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof authStatus>>,
-          TError,
-          Awaited<ReturnType<typeof authStatus>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof apiClientProxy>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthStatus<TData = Awaited<ReturnType<typeof authStatus>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authStatus>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof authStatus>>,
-          TError,
-          Awaited<ReturnType<typeof authStatus>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof apiClientProxy>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthStatus<TData = Awaited<ReturnType<typeof authStatus>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authStatus>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useAuthStatus<TData = Awaited<ReturnType<typeof authStatus>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authStatus>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getAuthStatusQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
