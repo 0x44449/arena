@@ -16,7 +16,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ApiErrorDto,
+  ApiResultDto,
   RegistDto,
   UnregistDto
 } from '../../models';
@@ -28,13 +28,13 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export const authRegist = (
+export const AuthRegistMutation = (
     registDto: RegistDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
       
       
-      return apiClientProxy<void>(
+      return apiClientProxy<ApiResultDto>(
       {url: `/api/v1/auth/regist`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: registDto, signal
@@ -44,11 +44,11 @@ export const authRegist = (
   
 
 
-export const getAuthRegistMutationOptions = <TError = ApiErrorDto,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authRegist>>, TError,{data: RegistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof authRegist>>, TError,{data: RegistDto}, TContext> => {
+export const getAuthRegistMutationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof AuthRegistMutation>>, TError,{data: RegistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof AuthRegistMutation>>, TError,{data: RegistDto}, TContext> => {
 
-const mutationKey = ['authRegist'];
+const mutationKey = ['authRegistMutation'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -58,10 +58,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authRegist>>, {data: RegistDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof AuthRegistMutation>>, {data: RegistDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  authRegist(data,requestOptions)
+          return  AuthRegistMutation(data,requestOptions)
         }
 
         
@@ -69,30 +69,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AuthRegistMutationResult = NonNullable<Awaited<ReturnType<typeof authRegist>>>
-    export type AuthRegistMutationBody = RegistDto
-    export type AuthRegistMutationError = ApiErrorDto
+    export type AuthRegistMutationMutationResult = NonNullable<Awaited<ReturnType<typeof AuthRegistMutation>>>
+    export type AuthRegistMutationMutationBody = RegistDto
+    export type AuthRegistMutationMutationError = unknown
 
-    export const useAuthRegist = <TError = ApiErrorDto,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authRegist>>, TError,{data: RegistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+    export const useAuthRegistMutation = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof AuthRegistMutation>>, TError,{data: RegistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authRegist>>,
+        Awaited<ReturnType<typeof AuthRegistMutation>>,
         TError,
         {data: RegistDto},
         TContext
       > => {
 
-      const mutationOptions = getAuthRegistMutationOptions(options);
+      const mutationOptions = getAuthRegistMutationMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export const authUnregist = (
+    export const AuthUnregistMutation = (
     unregistDto: UnregistDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
       
       
-      return apiClientProxy<void>(
+      return apiClientProxy<ApiResultDto>(
       {url: `/api/v1/auth/unregist`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: unregistDto, signal
@@ -102,11 +102,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   
 
 
-export const getAuthUnregistMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authUnregist>>, TError,{data: UnregistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof authUnregist>>, TError,{data: UnregistDto}, TContext> => {
+export const getAuthUnregistMutationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof AuthUnregistMutation>>, TError,{data: UnregistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof AuthUnregistMutation>>, TError,{data: UnregistDto}, TContext> => {
 
-const mutationKey = ['authUnregist'];
+const mutationKey = ['authUnregistMutation'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -116,10 +116,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authUnregist>>, {data: UnregistDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof AuthUnregistMutation>>, {data: UnregistDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  authUnregist(data,requestOptions)
+          return  AuthUnregistMutation(data,requestOptions)
         }
 
         
@@ -127,20 +127,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AuthUnregistMutationResult = NonNullable<Awaited<ReturnType<typeof authUnregist>>>
-    export type AuthUnregistMutationBody = UnregistDto
-    export type AuthUnregistMutationError = unknown
+    export type AuthUnregistMutationMutationResult = NonNullable<Awaited<ReturnType<typeof AuthUnregistMutation>>>
+    export type AuthUnregistMutationMutationBody = UnregistDto
+    export type AuthUnregistMutationMutationError = unknown
 
-    export const useAuthUnregist = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authUnregist>>, TError,{data: UnregistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+    export const useAuthUnregistMutation = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof AuthUnregistMutation>>, TError,{data: UnregistDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authUnregist>>,
+        Awaited<ReturnType<typeof AuthUnregistMutation>>,
         TError,
         {data: UnregistDto},
         TContext
       > => {
 
-      const mutationOptions = getAuthUnregistMutationOptions(options);
+      const mutationOptions = getAuthUnregistMutationMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

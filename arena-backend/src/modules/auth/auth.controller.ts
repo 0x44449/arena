@@ -10,17 +10,18 @@ export class AuthController {
   constructor() { }
 
   @Post("regist")
-  @HttpCode(204)
-  @ApiBadRequestResponse({ type: ApiErrorDto })
-  async regist(@Body() registDto: RegistDto): Promise<void> {
-    const body = registDto;
-    console.log("Regist called with:", body);
+  async regist(@Body() registDto: RegistDto): Promise<ApiResultDto> {
+    return {
+      success: true,
+      errorCode: null,
+    }
   }
 
   @Post("unregist")
-  @HttpCode(204)
-  async unregist(@Body() registDto: UnregistDto): Promise<void> {
-    const body = registDto;
-    console.log("Unregist called with:", body);
+  async unregist(@Body() registDto: UnregistDto): Promise<ApiResultDto> {
+    return {
+      success: true,
+      errorCode: null,
+    }
   }
 }

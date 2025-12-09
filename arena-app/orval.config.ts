@@ -15,6 +15,15 @@ export default defineConfig({
         mutator: {
           path: "./api/api-client.ts",
           name: "apiClientProxy",
+        },
+        operationName: (operation, route, verb) => {
+          const originalName = operation.operationId; 
+
+          if (verb === 'get') {
+            return `${originalName}Query`; 
+          } else {
+            return `${originalName}Mutation`; 
+          }
         }
       }
     }

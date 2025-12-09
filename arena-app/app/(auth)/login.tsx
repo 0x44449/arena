@@ -1,4 +1,4 @@
-import { CC, CL } from "@/components/styles/common";
+import { CS } from "@/libs/common-style";
 import { supabase } from "@/libs/supabase";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { login } from "@react-native-seoul/kakao-login";
@@ -61,7 +61,7 @@ export default function Login() {
   }
 
   return (
-    <SafeAreaView style={[CL.flex1, CC.bgWhite]}>
+    <SafeAreaView style={[CS.flex1, CS.bgWhite]}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity onPress={handleKakaoLoginPress}>
           <View style={[styles.button, styles.kakaoBtn, { width: "60%" }]}>

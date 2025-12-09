@@ -6,4 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UserUpdateUserByTag200 = { [key: string]: unknown };
+export interface ApiResultDto {
+  success: boolean;
+  /** @nullable */
+  errorCode: string | null;
+}

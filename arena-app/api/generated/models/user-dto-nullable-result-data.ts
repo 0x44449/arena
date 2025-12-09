@@ -5,5 +5,9 @@
  * The arena API description
  * OpenAPI spec version: 1.0
  */
+import type { UserDto } from './user-dto';
 
-export type UserGetUserByTag200 = { [key: string]: unknown };
+/**
+ * @nullable
+ */
+export type UserDtoNullableResultData = UserDto | null;
