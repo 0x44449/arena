@@ -1,0 +1,46 @@
+name: arena
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: arena-postgres
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  localstack:
+    image: localstack/localstack
+    container_name: arena-localstack
+    ports:
+      - "${S3_PORT}:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      # LocalStack 내부 데이터도 영구 저장하고 싶다면 아래 경로 설정 필요
+      - DATA_DIR=/tmp/localstack/data 
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  redis:
+    image: redis:alpine
+    container_name: arena-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  adminer:
+    image: adminer
+    container_name: arena-adminer
+    ports:
+      - "${ADMINER_PORT}:8080"
+    depends_on:
+      - postgres
+      
+volumes:
+  pg_data:
+  localstack_data:
