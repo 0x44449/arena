@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const configureGoogleLogin = () => {
   GoogleSignin.configure({
-    webClientId: '665740865863-pli37193goqp872jg127ofcmpemco7hc.apps.googleusercontent.com', 
+    webClientId: '665740865863-pli37193goqp872jg127ofcmpemco7hc.apps.googleusercontent.com',
     offlineAccess: true,
   });
 };
@@ -63,8 +63,8 @@ export default function Login() {
   return (
     <SafeAreaView style={[CS.flex1, CS.bgWhite]}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity onPress={handleKakaoLoginPress}>
-          <View style={[styles.button, styles.kakaoBtn, { width: "60%" }]}>
+        <TouchableOpacity onPress={handleKakaoLoginPress} style={[{ width: "60%", maxWidth: 280 }]}>
+          <View style={[styles.button, styles.kakaoBtn]}>
             <Image
               source={require("@/assets/images/kakao-symbol.png")}
               style={{ height: 24, width: 24 }}
@@ -79,8 +79,8 @@ export default function Login() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleGoogleLoginPress}>
-          <View style={[styles.button, styles.googleBtn, { width: "60%" }]}>
+        <TouchableOpacity onPress={handleGoogleLoginPress} style={[{ width: "60%", maxWidth: 280 }]}>
+          <View style={[styles.button, styles.googleBtn]}>
             <Image
               source={require("@/assets/images/google-symbol.png")}
               style={{ height: 24, width: 24 }}

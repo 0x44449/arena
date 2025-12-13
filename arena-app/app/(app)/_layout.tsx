@@ -11,11 +11,11 @@ export default function AppLayout() {
     query: { staleTime: Infinity, gcTime: Infinity }
   });
 
-  useEffect(() => {
-    if (!isLoadingMe && !me && segments[1] !== "welcome") {
-      router.replace("/welcome");
-    }
-  }, [segments, me, isLoadingMe]);
+  // useEffect(() => {
+  //   if (!isLoadingMe && !me && segments[1] !== "welcome") {
+  //     router.replace("/welcome");
+  //   }
+  // }, [segments, me, isLoadingMe]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
