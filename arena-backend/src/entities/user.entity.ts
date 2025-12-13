@@ -1,23 +1,37 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, Unique, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity("users")
+@Entity({ name: "users" })
 export class UserEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn("uuid")
+  userId: string;
+
+  @Column({ type: "text", unique: true })
   uid: string;
 
-  @Column({ unique: true })
-  @Index()
-  tag: string;
+  @Column({ type: "varchar", length: 8, unique: true })
+  utag: string;
 
-  @Column()
-  name: string;
+  @Index("idx_users_nick")
+  @Column({ type: "varchar", length: 32 })
+  nick: string;
 
-  @Column()
-  avatarUrl: string;
+  @Column({ type: "varchar", length: 255, nullable: true })
+  email: string | null;
 
-  @CreateDateColumn()
+  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  deletedAt: Date | null;
+
+  @CreateDateColumn({ type: "timestamptz" })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: "timestamptz" })
   updatedAt: Date;
 }
