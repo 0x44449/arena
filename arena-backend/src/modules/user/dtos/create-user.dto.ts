@@ -1,5 +1,19 @@
-export class CreateUserDto {
-  name: string;
+import { IsEmail, IsOptional, IsString, IsUUID, Length, MaxLength } from "class-validator";
 
-  avatarUrl: string;
+export class CreateUserDto {
+  @IsUUID()
+  uid: string;
+
+  @IsString()
+  @Length(1, 32)
+  nick: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(140)
+  statusMessage?: string;
 }

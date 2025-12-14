@@ -26,6 +26,9 @@ export class UserEntity {
   @Column({ type: "varchar", length: 255, nullable: true })
   email: string | null;
 
+  @Column({ type: "varchar", length: 140, nullable: true })
+  statusMessage: string | null;
+
   @DeleteDateColumn({ type: "timestamptz", nullable: true })
   deletedAt: Date | null;
 
