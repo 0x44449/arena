@@ -8,6 +8,7 @@ import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-ap
 import { UserService } from "./user.service";
 import { CurrentUser } from "src/decorators/current-user.decorator";
 import { toUserDto } from "src/utils/user.mapper";
+import type { JwtPayload } from "src/types/jwt-payload.interface";
 
 @Controller("/api/v1/users")
 @UseGuards(ArenaJwtAuthGuard)
@@ -19,7 +20,7 @@ export class UserController {
 
   @Get("/me")
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto, { nullable: true }) })
-  async getMe(@CurrentUser() user: { uid: string }): Promise<SingleApiResultDto<UserDto | null>> {
+  async getMe(@CurrentUser() user: JwtPayload): Promise<SingleApiResultDto<UserDto | null>> {
     const userEntity = await this.userService.findByUid(user.uid);
     return {
       success: true,
@@ -55,8 +56,11 @@ export class UserController {
 
   @Post("")
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto) })
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<SingleApiResultDto<UserDto>> {
-    const userEntity = await this.userService.create(createUserDto);
+  async createUser(
+    @CurrentUser() user: JwtPayload,
+    @Body() createUserDto: CreateUserDto
+  ): Promise<SingleApiResultDto<UserDto>> {
+    const userEntity = await this.userService.create(user.uid, createUserDto);
     return {
       success: true,
       data: toUserDto(userEntity),

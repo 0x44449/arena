@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './modules/auth/auth.controller';
 import { UserModule } from './modules/user/user.module';
+import { DeviceModule } from './modules/device/device.module';
 import { ArenaAuthModule } from './auth/arena-auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -24,8 +24,9 @@ import { buildDataSourceOptions } from './database/typeorm.config';
     }),
     ArenaAuthModule,
     UserModule,
+    DeviceModule,
   ],
-  controllers: [AuthController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}

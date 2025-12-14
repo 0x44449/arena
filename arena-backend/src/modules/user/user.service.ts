@@ -5,6 +5,7 @@ import { UserEntity } from "src/entities/user.entity";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
 import { WellKnownException } from "src/exceptions/well-known-exception";
+import { generateId } from "src/utils/id-generator";
 
 @Injectable()
 export class UserService {
@@ -33,8 +34,8 @@ export class UserService {
     });
   }
 
-  async create(dto: CreateUserDto): Promise<UserEntity> {
-    const existing = await this.findByUid(dto.uid);
+  async create(uid: string, dto: CreateUserDto): Promise<UserEntity> {
+    const existing = await this.findByUid(uid);
     if (existing) {
       throw new WellKnownException({
         message: "User already exists",
@@ -45,7 +46,8 @@ export class UserService {
     const utag = await this.generateUniqueUtag();
 
     const user = this.userRepository.create({
-      uid: dto.uid,
+      userId: generateId(),
+      uid,
       utag,
       nick: dto.nick,
       email: dto.email ?? null,

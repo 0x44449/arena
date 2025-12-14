@@ -4,13 +4,13 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity({ name: "users" })
 export class UserEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryColumn({ type: "text" })
   userId: string;
 
   @Column({ type: "text", unique: true })

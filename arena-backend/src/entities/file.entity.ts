@@ -6,18 +6,18 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { UserEntity } from "./user.entity";
 
 @Entity({ name: "files" })
 export class FileEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryColumn({ type: "text" })
   fileId: string;
 
   @Index("idx_files_owner_id")
-  @Column({ type: "uuid" })
+  @Column({ type: "text" })
   ownerId: string;
 
   @ManyToOne(() => UserEntity, { nullable: false })

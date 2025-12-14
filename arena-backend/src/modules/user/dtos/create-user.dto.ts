@@ -1,17 +1,18 @@
-import { IsEmail, IsOptional, IsString, IsUUID, Length, MaxLength } from "class-validator";
+import { IsEmail, IsOptional, IsString, Length, MaxLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateUserDto {
-  @IsUUID()
-  uid: string;
-
+  @ApiProperty()
   @IsString()
   @Length(1, 32)
   nick: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   email?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @MaxLength(140)
