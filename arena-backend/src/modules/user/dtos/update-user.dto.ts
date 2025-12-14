@@ -13,4 +13,9 @@ export class UpdateUserDto {
   @IsString()
   @MaxLength(140)
   statusMessage?: string;
+
+  @ApiPropertyOptional({ description: 'S3 storage key for avatar' })
+  @IsOptional()
+  @IsString()
+  avatarKey?: string;
 }

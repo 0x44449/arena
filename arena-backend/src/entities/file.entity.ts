@@ -25,7 +25,10 @@ export class FileEntity {
   owner: UserEntity;
 
   @Column({ type: "varchar", length: 512 })
-  storedPath: string;
+  storageKey: string;
+
+  @Column({ type: "varchar", length: 20 })
+  bucket: string;
 
   @Column({ type: "varchar", length: 127 })
   mimeType: string;

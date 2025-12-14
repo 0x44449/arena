@@ -29,6 +29,9 @@ export class UserEntity {
   @Column({ type: "varchar", length: 140, nullable: true })
   statusMessage: string | null;
 
+  @Column({ type: "varchar", length: 512, nullable: true })
+  avatarKey: string | null;
+
   @DeleteDateColumn({ type: "timestamptz", nullable: true })
   deletedAt: Date | null;
 

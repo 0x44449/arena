@@ -52,6 +52,7 @@ export class UserService {
       nick: dto.nick,
       email: dto.email ?? null,
       statusMessage: dto.statusMessage ?? null,
+      avatarKey: null,
     });
 
     return await this.userRepository.save(user);
@@ -68,6 +69,9 @@ export class UserService {
     }
     if (dto.statusMessage !== undefined) {
       user.statusMessage = dto.statusMessage;
+    }
+    if (dto.avatarKey !== undefined) {
+      user.avatarKey = dto.avatarKey;
     }
 
     return await this.userRepository.save(user);

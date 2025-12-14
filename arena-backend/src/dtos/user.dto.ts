@@ -7,8 +7,8 @@ export class UserDto {
   @ApiProperty()
   nick: string;
 
-  @ApiProperty()
-  avatarUrl: string;
+  @ApiPropertyOptional({ type: String, nullable: true })
+  avatarUrl: string | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })
   email: string | null;
