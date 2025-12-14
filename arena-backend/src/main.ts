@@ -9,9 +9,20 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('arena example')
-    .setDescription('The arena API description')
+    .setTitle('Arena API')
+    .setDescription('Arena Messenger Backend API')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter your JWT token',
+        in: 'header',
+      },
+      'bearer',
+    )
     .addTag('arena')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config, {

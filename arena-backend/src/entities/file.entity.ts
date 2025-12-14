@@ -21,7 +21,7 @@ export class FileEntity {
   ownerId: string;
 
   @ManyToOne(() => UserEntity, { nullable: false })
-  @JoinColumn({ name: "ownerId", referencedColumnName: "id" })
+  @JoinColumn({ name: "ownerId", referencedColumnName: "userId" })
   owner: UserEntity;
 
   @Column({ type: "varchar", length: 512 })

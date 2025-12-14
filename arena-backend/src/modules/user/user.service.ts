@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, IsNull, QueryFailedError } from "typeorm";
+import { Repository, IsNull } from "typeorm";
 import { UserEntity } from "src/entities/user.entity";
 import { CreateUserDto } from "./dtos/create-user.dto";
+import { UpdateUserDto } from "./dtos/update-user.dto";
 import { WellKnownException } from "src/exceptions/well-known-exception";
 
 @Injectable()
@@ -51,26 +52,23 @@ export class UserService {
       statusMessage: dto.statusMessage ?? null,
     });
 
-    try {
-      return await this.userRepository.save(user);
-    } catch (error) {
-      if (error instanceof QueryFailedError && this.isUniqueViolation(error)) {
-        const detail = this.getErrorDetail(error);
-        if (detail.includes("(uid)")) {
-          throw new WellKnownException({
-            message: "User already exists",
-            errorCode: "ALREADY_EXISTS_USER",
-          });
-        }
-        if (detail.includes("(utag)")) {
-          throw new WellKnownException({
-            message: "Failed to generate unique utag",
-            errorCode: "UTAG_GENERATION_FAILED",
-          });
-        }
-      }
-      throw error;
+    return await this.userRepository.save(user);
+  }
+
+  async update(utag: string, dto: UpdateUserDto): Promise<UserEntity | null> {
+    const user = await this.findByUtag(utag);
+    if (!user) {
+      return null;
     }
+
+    if (dto.nick !== undefined) {
+      user.nick = dto.nick;
+    }
+    if (dto.statusMessage !== undefined) {
+      user.statusMessage = dto.statusMessage;
+    }
+
+    return await this.userRepository.save(user);
   }
 
   private normalizeUtag(utag: string): string {
@@ -80,7 +78,7 @@ export class UserService {
   private async generateUniqueUtag(): Promise<string> {
     for (let attempt = 0; attempt < UserService.MAX_UTAG_ATTEMPTS; attempt += 1) {
       const candidate = this.generateRandomUtag();
-      const exists = await this.userRepository.exist({ where: { utag: candidate } });
+      const exists = await this.userRepository.exists({ where: { utag: candidate } });
       if (!exists) {
         return candidate;
       }
@@ -98,13 +96,5 @@ export class UserService {
       result += UserService.UTAG_CHARSET.charAt(index);
     }
     return result;
-  }
-
-  private isUniqueViolation(error: QueryFailedError): boolean {
-    return (error as QueryFailedError & { driverError?: { code?: string } }).driverError?.code === "23505";
-  }
-
-  private getErrorDetail(error: QueryFailedError): string {
-    return (error as QueryFailedError & { driverError?: { detail?: string } }).driverError?.detail ?? "";
   }
 }

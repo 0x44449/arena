@@ -1,5 +1,16 @@
-export class UpdateUserDto {
-  name?: string;
+import { IsOptional, IsString, Length, MaxLength } from "class-validator";
+import { ApiPropertyOptional } from "@nestjs/swagger";
 
-  avatarUrl?: string;
+export class UpdateUserDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @Length(1, 32)
+  nick?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(140)
+  statusMessage?: string;
 }
