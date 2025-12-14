@@ -4,9 +4,12 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { FileEntity } from "./file.entity";
 
 @Entity({ name: "users" })
 export class UserEntity {
@@ -29,8 +32,12 @@ export class UserEntity {
   @Column({ type: "varchar", length: 140, nullable: true })
   statusMessage: string | null;
 
-  @Column({ type: "varchar", length: 512, nullable: true })
-  avatarKey: string | null;
+  @Column({ type: "text", nullable: true })
+  avatarFileId: string | null;
+
+  @ManyToOne(() => FileEntity, { nullable: true })
+  @JoinColumn({ name: "avatarFileId", referencedColumnName: "fileId" })
+  avatar: FileEntity | null;
 
   @DeleteDateColumn({ type: "timestamptz", nullable: true })
   deletedAt: Date | null;

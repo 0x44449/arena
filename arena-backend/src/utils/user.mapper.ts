@@ -1,17 +1,12 @@
 import { UserEntity } from "src/entities/user.entity";
 import { UserDto } from "src/dtos/user.dto";
+import { FileDto } from "src/dtos/file.dto";
 
-export function toUserDto(entity: UserEntity): UserDto {
-  const s3PublicUrl = process.env.S3_PUBLIC_URL || "http://localhost:14566/arena-files-public";
-  
-  const avatarUrl = entity.avatarKey
-    ? `${s3PublicUrl}/${entity.avatarKey}`
-    : null;
-  
+export function toUserDto(entity: UserEntity, avatar: FileDto | null): UserDto {
   return {
     utag: entity.utag,
     nick: entity.nick,
-    avatarUrl,
+    avatar,
     email: entity.email,
     statusMessage: entity.statusMessage,
     createdAt: entity.createdAt,

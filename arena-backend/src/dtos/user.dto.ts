@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { FileDto } from "./file.dto";
 
 export class UserDto {
   @ApiProperty()
@@ -7,8 +8,8 @@ export class UserDto {
   @ApiProperty()
   nick: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true })
-  avatarUrl: string | null;
+  @ApiPropertyOptional({ type: () => FileDto, nullable: true })
+  avatar: FileDto | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })
   email: string | null;

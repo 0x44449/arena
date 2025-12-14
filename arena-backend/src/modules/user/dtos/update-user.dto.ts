@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Length, MaxLength } from "class-validator";
+import { IsOptional, IsString, Length, MaxLength, ValidateIf } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 
 export class UpdateUserDto {
@@ -14,8 +14,9 @@ export class UpdateUserDto {
   @MaxLength(140)
   statusMessage?: string;
 
-  @ApiPropertyOptional({ description: 'S3 storage key for avatar' })
+  @ApiPropertyOptional({ description: '아바타 파일 ID (null이면 아바타 제거)', nullable: true })
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsString()
-  avatarKey?: string;
+  avatarFileId?: string | null;
 }

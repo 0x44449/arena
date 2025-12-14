@@ -6,6 +6,7 @@ import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
 import { WellKnownException } from "src/exceptions/well-known-exception";
 import { generateId } from "src/utils/id-generator";
+import { FileService } from "../file/file.service";
 
 @Injectable()
 export class UserService {
@@ -16,11 +17,13 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly fileService: FileService,
   ) { }
 
   async findByUid(uid: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({
       where: { uid, deletedAt: IsNull() },
+      relations: ["avatar"],
     });
   }
 
@@ -31,6 +34,7 @@ export class UserService {
     }
     return this.userRepository.findOne({
       where: { utag: normalized, deletedAt: IsNull() },
+      relations: ["avatar"],
     });
   }
 
@@ -52,10 +56,13 @@ export class UserService {
       nick: dto.nick,
       email: dto.email ?? null,
       statusMessage: dto.statusMessage ?? null,
-      avatarKey: null,
+      avatarFileId: null,
     });
 
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+    
+    // avatar relation 포함해서 조회 (null이지만 일관성 유지)
+    return (await this.findByUid(uid))!;
   }
 
   async update(utag: string, dto: UpdateUserDto): Promise<UserEntity | null> {
@@ -70,11 +77,18 @@ export class UserService {
     if (dto.statusMessage !== undefined) {
       user.statusMessage = dto.statusMessage;
     }
-    if (dto.avatarKey !== undefined) {
-      user.avatarKey = dto.avatarKey;
+    if (dto.avatarFileId !== undefined) {
+      if (dto.avatarFileId !== null) {
+        // fileId 존재 여부 검증
+        await this.fileService.getFileById(dto.avatarFileId);
+      }
+      user.avatarFileId = dto.avatarFileId;
     }
 
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+    
+    // avatar relation 포함해서 다시 조회
+    return this.findByUtag(utag);
   }
 
   private normalizeUtag(utag: string): string {

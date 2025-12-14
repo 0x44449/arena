@@ -69,7 +69,7 @@ export class FileService {
       bucket,
       mimeType: metadata.contentType,
       size: metadata.contentLength.toString(),
-      originalName: dto.originalName,
+      originalName: dto.name,
     });
 
     return await this.fileRepository.save(fileEntity);
