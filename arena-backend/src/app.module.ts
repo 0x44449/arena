@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserModule } from './modules/user/user.module';
 import { DeviceModule } from './modules/device/device.module';
 import { FileModule } from './modules/file/file.module';
+import { ChannelModule } from './modules/channel/channel.module';
 import { ArenaAuthModule } from './auth/arena-auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -27,6 +28,7 @@ import { buildDataSourceOptions } from './database/typeorm.config';
     UserModule,
     DeviceModule,
     FileModule,
+    ChannelModule,
   ],
   controllers: [],
   providers: [],
