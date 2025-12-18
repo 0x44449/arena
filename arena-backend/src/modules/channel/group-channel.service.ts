@@ -86,17 +86,46 @@ export class GroupChannelService {
     await this.groupChannelRepository.save(groupChannel);
 
     // 생성자를 owner로 추가
-    await this.addParticipant(channelId, creatorUserId, "owner");
+    const creatorParticipant = this.participantRepository.create({
+      channelId,
+      userId: creatorUserId,
+      lastReadAt: null,
+    });
+    await this.participantRepository.save(creatorParticipant);
+
+    const creatorGroupParticipant = this.groupParticipantRepository.create({
+      channelId,
+      userId: creatorUserId,
+      role: "owner",
+      nickname: null,
+    });
+    await this.groupParticipantRepository.save(creatorGroupParticipant);
 
     // 초대된 유저들을 member로 추가
     for (const userId of userIds) {
       if (userId !== creatorUserId) {
-        await this.addParticipant(channelId, userId, "member");
+        const participant = this.participantRepository.create({
+          channelId,
+          userId,
+          lastReadAt: null,
+        });
+        await this.participantRepository.save(participant);
+
+        const groupParticipant = this.groupParticipantRepository.create({
+          channelId,
+          userId,
+          role: "member",
+          nickname: null,
+        });
+        await this.groupParticipantRepository.save(groupParticipant);
       }
     }
 
     // participants 조회 (user relation 포함)
-    const participants = await this.getParticipants(channelId);
+    const participants = await this.participantRepository.find({
+      where: { channelId },
+      relations: ["user", "user.avatar"],
+    });
 
     // groupChannel에 icon relation 로드
     const groupChannelWithIcon = await this.groupChannelRepository.findOne({
@@ -109,33 +138,5 @@ export class GroupChannelService {
       groupChannel: groupChannelWithIcon!,
       participants,
     };
-  }
-
-  private async addParticipant(
-    channelId: string,
-    userId: string,
-    role: "owner" | "member",
-  ): Promise<void> {
-    const participant = this.participantRepository.create({
-      channelId,
-      userId,
-      lastReadAt: null,
-    });
-    await this.participantRepository.save(participant);
-
-    const groupParticipant = this.groupParticipantRepository.create({
-      channelId,
-      userId,
-      role,
-      nickname: null,
-    });
-    await this.groupParticipantRepository.save(groupParticipant);
-  }
-
-  private async getParticipants(channelId: string): Promise<ParticipantEntity[]> {
-    return this.participantRepository.find({
-      where: { channelId },
-      relations: ["user", "user.avatar"],
-    });
   }
 }

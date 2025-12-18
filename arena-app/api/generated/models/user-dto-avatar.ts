@@ -5,9 +5,9 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from './user-dto';
+import type { FileDto } from './file-dto';
 
 /**
  * @nullable
  */
-export type UserDtoNullableResultData = UserDto | null;
+export type UserDtoAvatar = FileDto | null;

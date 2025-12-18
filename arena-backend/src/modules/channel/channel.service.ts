@@ -37,8 +37,23 @@ export class ChannelService {
 
     for (const myParticipant of myParticipants) {
       const channel = myParticipant.channel;
-      const details = await this.getChannelDetails(channel);
-      results.push(details);
+
+      // 참여자 조회
+      const participants = await this.participantRepository.find({
+        where: { channelId: channel.channelId },
+        relations: ["user", "user.avatar"],
+      });
+
+      // 그룹 채널이면 추가 정보 조회
+      let groupChannel: GroupChannelEntity | null = null;
+      if (channel.type === "group") {
+        groupChannel = await this.groupChannelRepository.findOne({
+          where: { channelId: channel.channelId },
+          relations: ["icon"],
+        });
+      }
+
+      results.push({ channel, participants, groupChannel });
     }
 
     // lastMessageAt 기준 정렬 (최신순, null은 마지막)
@@ -56,25 +71,20 @@ export class ChannelService {
    */
   async getChannel(channelId: string, userId: string): Promise<ChannelWithDetails> {
     // 참여 여부 확인
-    const participant = await this.participantRepository.findOne({
+    const myParticipant = await this.participantRepository.findOne({
       where: { channelId, userId },
       relations: ["channel"],
     });
 
-    if (!participant) {
+    if (!myParticipant) {
       throw new WellKnownException({
         message: "Channel not found or not a participant",
         errorCode: "CHANNEL_NOT_FOUND",
       });
     }
 
-    return this.getChannelDetails(participant.channel);
-  }
+    const channel = myParticipant.channel;
 
-  /**
-   * 채널 상세 정보 조회 (participants, groupChannel 등)
-   */
-  private async getChannelDetails(channel: ChannelEntity): Promise<ChannelWithDetails> {
     // 참여자 조회
     const participants = await this.participantRepository.find({
       where: { channelId: channel.channelId },

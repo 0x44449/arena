@@ -7,10 +7,9 @@
  */
 import type { UserDto } from './user-dto';
 
-export interface UserDtoResult {
-  /** */
-  data: UserDto;
-  success: boolean;
-  /** @nullable */
-  errorCode: string | null;
+export interface ContactDto {
+  /** 연락처에 저장된 유저 정보 */
+  user: UserDto;
+  /** 추가한 시간 */
+  createdAt: string;
 }

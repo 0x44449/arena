@@ -5,9 +5,10 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from './user-dto';
+import type { FileDto } from './file-dto';
 
 /**
+ * 채널 아이콘 (DM은 null)
  * @nullable
  */
-export type UserDtoNullableResultData = UserDto | null;
+export type ChannelDtoIcon = FileDto | null;

@@ -5,9 +5,8 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from './user-dto';
 
-/**
- * @nullable
- */
-export type UserDtoNullableResultData = UserDto | null;
+export interface CreateContactDto {
+  /** 추가할 유저 ID */
+  userId: string;
+}

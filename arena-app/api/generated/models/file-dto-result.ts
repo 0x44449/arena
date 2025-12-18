@@ -5,11 +5,11 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from './user-dto';
+import type { FileDto } from './file-dto';
 
-export interface UserDtoResult {
+export interface FileDtoResult {
   /** */
-  data: UserDto;
+  data: FileDto;
   success: boolean;
   /** @nullable */
   errorCode: string | null;

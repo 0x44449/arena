@@ -55,12 +55,20 @@ export class DirectChannelService {
     }
 
     // 기존 DM 찾기
-    const existingChannel = await this.findExistingDirectChannel(
-      myUserId,
-      targetUserId,
-    );
+    const existingChannel = await this.channelRepository
+      .createQueryBuilder("channel")
+      .innerJoin("participants", "p1", "p1.channelId = channel.channelId")
+      .innerJoin("participants", "p2", "p2.channelId = channel.channelId")
+      .where("channel.type = :type", { type: "direct" })
+      .andWhere("p1.userId = :userId1", { userId1: myUserId })
+      .andWhere("p2.userId = :userId2", { userId2: targetUserId })
+      .getOne();
+
     if (existingChannel) {
-      const participants = await this.getParticipants(existingChannel.channelId);
+      const participants = await this.participantRepository.find({
+        where: { channelId: existingChannel.channelId },
+        relations: ["user", "user.avatar"],
+      });
       return { channel: existingChannel, participants };
     }
 
@@ -79,52 +87,38 @@ export class DirectChannelService {
     const directChannel = this.directChannelRepository.create({ channelId });
     await this.directChannelRepository.save(directChannel);
 
-    // 양쪽 참여자 추가
-    await this.addParticipant(channelId, myUserId);
-    await this.addParticipant(channelId, targetUserId);
-
-    const participants = await this.getParticipants(channelId);
-    return { channel, participants };
-  }
-
-  private async findExistingDirectChannel(
-    userId1: string,
-    userId2: string,
-  ): Promise<ChannelEntity | null> {
-    const result = await this.channelRepository
-      .createQueryBuilder("channel")
-      .innerJoin("participants", "p1", "p1.channelId = channel.channelId")
-      .innerJoin("participants", "p2", "p2.channelId = channel.channelId")
-      .where("channel.type = :type", { type: "direct" })
-      .andWhere("p1.userId = :userId1", { userId1 })
-      .andWhere("p2.userId = :userId2", { userId2 })
-      .getOne();
-
-    return result;
-  }
-
-  private async addParticipant(
-    channelId: string,
-    userId: string,
-  ): Promise<void> {
-    const participant = this.participantRepository.create({
+    // 참여자 추가 - myUserId
+    const myParticipant = this.participantRepository.create({
       channelId,
-      userId,
+      userId: myUserId,
       lastReadAt: null,
     });
-    await this.participantRepository.save(participant);
+    await this.participantRepository.save(myParticipant);
 
-    const directParticipant = this.directParticipantRepository.create({
+    const myDirectParticipant = this.directParticipantRepository.create({
       channelId,
-      userId,
+      userId: myUserId,
     });
-    await this.directParticipantRepository.save(directParticipant);
-  }
+    await this.directParticipantRepository.save(myDirectParticipant);
 
-  private async getParticipants(channelId: string): Promise<ParticipantEntity[]> {
-    return this.participantRepository.find({
+    // 참여자 추가 - targetUserId
+    const targetParticipant = this.participantRepository.create({
+      channelId,
+      userId: targetUserId,
+      lastReadAt: null,
+    });
+    await this.participantRepository.save(targetParticipant);
+
+    const targetDirectParticipant = this.directParticipantRepository.create({
+      channelId,
+      userId: targetUserId,
+    });
+    await this.directParticipantRepository.save(targetDirectParticipant);
+
+    const participants = await this.participantRepository.find({
       where: { channelId },
       relations: ["user", "user.avatar"],
     });
+    return { channel, participants };
   }
 }

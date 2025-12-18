@@ -5,12 +5,12 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from './user-dto';
+import type { ContactDto } from './contact-dto';
 
-export interface UserDtoResult {
-  /** */
-  data: UserDto;
+export interface ContactDtoResult {
   success: boolean;
   /** @nullable */
   errorCode: string | null;
+  /** */
+  data: ContactDto;
 }
