@@ -4,7 +4,7 @@ import { buildDataSourceOptions } from "./typeorm.config";
 
 const port = process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined;
 
-export const AppDataSource = new DataSource(
+const AppDataSource = new DataSource(
   buildDataSourceOptions({
     host: process.env.DB_HOST,
     port,

@@ -13,19 +13,16 @@ export async function seedMessages(
   const channelRepo = dataSource.getRepository(ChannelEntity);
   const messageRepo = dataSource.getRepository(MessageEntity);
 
-  // ===== DM 메시지 생성 =====
+  const [zina, tester1, tester2] = users;
+
+  // ===== DM 메시지 생성 (Zina <-> 테스터1) =====
   console.log("Creating DM messages...");
   const dmMessages = [
-    { sender: users[0], content: "안녕 Bob!" },
-    { sender: users[1], content: "안녕 Alice! 오랜만이야" },
-    { sender: users[0], content: "요즘 뭐해?" },
-    { sender: users[1], content: "그냥 코딩하고 있어 ㅋㅋ" },
-    { sender: users[0], content: "오 뭐 만들어?" },
-    { sender: users[1], content: "메신저 앱 만들고 있어" },
-    { sender: users[0], content: "대박 재밌겠다" },
-    { sender: users[1], content: "응 근데 어려워 ㅠㅠ" },
-    { sender: users[0], content: "화이팅!" },
-    { sender: users[1], content: "고마워 ㅎㅎ" },
+    { sender: zina, content: "안녕하세요!" },
+    { sender: tester1, content: "안녕하세요! 테스트 계정입니다 ㅎㅎ" },
+    { sender: zina, content: "메시지 잘 오나 테스트 중이에요" },
+    { sender: tester1, content: "네 잘 보여요!" },
+    { sender: zina, content: "좋아요 👍" },
   ];
 
   let dmSeq = 1;
@@ -42,35 +39,53 @@ export async function seedMessages(
   await channelRepo.update({ channelId: dmChannelId }, { lastMessageAt: new Date() });
   console.log(`  Created ${dmMessages.length} DM messages`);
 
-  // ===== 그룹 메시지 생성 (100개) =====
+  // ===== 그룹 메시지 생성 =====
   console.log("Creating group messages...");
-  const greetings = [
-    "안녕하세요!",
-    "ㅎㅇ",
-    "반가워요~",
-    "오늘 뭐해요?",
-    "ㅋㅋㅋㅋ",
-    "그러게요",
-    "맞아요",
-    "저도요!",
-    "뭐해요 다들",
-    "심심해요",
-    "오늘 날씨 좋네요",
-    "점심 뭐 먹었어요?",
-    "저녁 같이 먹어요",
-    "ㅎㅎㅎ",
-    "그래요?",
-    "대박",
-    "진짜요?",
-    "헐",
-    "ㅇㅇ",
+  const groupMessages = [
+    { sender: zina, content: "그룹 채팅방 만들었어요!" },
+    { sender: tester1, content: "오 반가워요~" },
+    { sender: tester2, content: "저도 왔어요!" },
+    { sender: zina, content: "다들 환영해요 ㅎㅎ" },
+    { sender: tester1, content: "여기서 테스트하면 되는거죠?" },
+    { sender: zina, content: "네 맞아요" },
+    { sender: tester2, content: "알겠습니다!" },
+    { sender: zina, content: "메시지 페이지네이션 테스트용으로 좀 더 채울게요" },
+  ];
+
+  // 추가 메시지로 20개 정도 채우기
+  const fillerMessages = [
+    "ㅎㅎ",
+    "ㅋㅋㅋ",
     "넵",
+    "확인했어요",
+    "좋아요",
+    "오키",
+    "알겠습니다",
+    "감사해요",
+    "ㅇㅇ",
+    "그렇군요",
+    "잘됐네요",
+    "대박",
   ];
 
   let groupSeq = 1;
-  for (let i = 0; i < 100; i++) {
+  
+  // 기본 메시지
+  for (const msg of groupMessages) {
+    const message = messageRepo.create({
+      messageId: generateId(),
+      channelId: groupChannelId,
+      senderId: msg.sender.userId,
+      seq: groupSeq++,
+      content: msg.content,
+    });
+    await messageRepo.save(message);
+  }
+
+  // 필러 메시지 30개 추가
+  for (let i = 0; i < 30; i++) {
     const sender = users[Math.floor(Math.random() * users.length)];
-    const content = greetings[Math.floor(Math.random() * greetings.length)];
+    const content = fillerMessages[Math.floor(Math.random() * fillerMessages.length)];
 
     const message = messageRepo.create({
       messageId: generateId(),
@@ -81,8 +96,10 @@ export async function seedMessages(
     });
     await messageRepo.save(message);
   }
-  await channelRepo.update({ channelId: groupChannelId }, { lastMessageAt: new Date() });
-  console.log(`  Created 100 group messages`);
 
-  return { dmCount: dmMessages.length, groupCount: 100 };
+  await channelRepo.update({ channelId: groupChannelId }, { lastMessageAt: new Date() });
+  const totalGroupMessages = groupMessages.length + 30;
+  console.log(`  Created ${totalGroupMessages} group messages`);
+
+  return { dmCount: dmMessages.length, groupCount: totalGroupMessages };
 }

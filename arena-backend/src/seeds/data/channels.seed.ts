@@ -24,7 +24,9 @@ export async function seedChannels(
   const groupChannelRepo = dataSource.getRepository(GroupChannelEntity);
   const groupParticipantRepo = dataSource.getRepository(GroupParticipantEntity);
 
-  // ===== DM 채널 생성 (Alice <-> Bob) =====
+  const [zina, tester1, tester2] = users;
+
+  // ===== DM 채널 생성 (Zina <-> 테스터1) =====
   console.log("Creating DM channel...");
   const dmChannelId = generateId();
 
@@ -40,44 +42,44 @@ export async function seedChannels(
   const dmDirectChannel = directChannelRepo.create({ channelId: dmChannelId });
   await directChannelRepo.save(dmDirectChannel);
 
-  // Alice 참여
-  const aliceParticipant = participantRepo.create({
+  // Zina 참여
+  const zinaParticipant = participantRepo.create({
     channelId: dmChannelId,
-    userId: users[0].userId,
+    userId: zina.userId,
     lastReadAt: null,
   });
-  await participantRepo.save(aliceParticipant);
+  await participantRepo.save(zinaParticipant);
 
-  const aliceDirectParticipant = directParticipantRepo.create({
+  const zinaDirectParticipant = directParticipantRepo.create({
     channelId: dmChannelId,
-    userId: users[0].userId,
+    userId: zina.userId,
   });
-  await directParticipantRepo.save(aliceDirectParticipant);
+  await directParticipantRepo.save(zinaDirectParticipant);
 
-  // Bob 참여
-  const bobParticipant = participantRepo.create({
+  // 테스터1 참여
+  const tester1Participant = participantRepo.create({
     channelId: dmChannelId,
-    userId: users[1].userId,
+    userId: tester1.userId,
     lastReadAt: null,
   });
-  await participantRepo.save(bobParticipant);
+  await participantRepo.save(tester1Participant);
 
-  const bobDirectParticipant = directParticipantRepo.create({
+  const tester1DirectParticipant = directParticipantRepo.create({
     channelId: dmChannelId,
-    userId: users[1].userId,
+    userId: tester1.userId,
   });
-  await directParticipantRepo.save(bobDirectParticipant);
+  await directParticipantRepo.save(tester1DirectParticipant);
 
-  console.log(`  Created DM: Alice <-> Bob`);
+  console.log(`  Created DM: ${zina.nick} <-> ${tester1.nick}`);
 
-  // ===== 그룹 채널 생성 =====
+  // ===== 그룹 채널 생성 (3명 전부) =====
   console.log("Creating group channel...");
   const groupChannelId = generateId();
 
   const groupChannel = channelRepo.create({
     channelId: groupChannelId,
     type: "group",
-    name: "Test Group",
+    name: "Arena 테스트 그룹",
     teamId: null,
     lastMessageAt: null,
   });
@@ -106,7 +108,7 @@ export async function seedChannels(
     });
     await groupParticipantRepo.save(groupParticipant);
   }
-  console.log(`  Created Group: Test Group (${users.length} members)`);
+  console.log(`  Created Group: Arena 테스트 그룹 (${users.length} members)`);
 
   return { dmChannelId, groupChannelId };
 }

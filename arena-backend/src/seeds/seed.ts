@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { DataSource } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
+import { FileEntity } from "../entities/file.entity";
 import { ChannelEntity } from "../entities/channel.entity";
 import { ParticipantEntity } from "../entities/participant.entity";
 import { DirectChannelEntity } from "../entities/direct-channel.entity";
@@ -22,6 +23,7 @@ const dataSource = new DataSource({
   database: process.env.DB_NAME,
   entities: [
     UserEntity,
+    FileEntity,
     ChannelEntity,
     ParticipantEntity,
     DirectChannelEntity,
