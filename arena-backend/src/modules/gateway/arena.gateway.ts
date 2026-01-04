@@ -9,15 +9,14 @@ import {
   MessageBody,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { Inject, Logger, UseGuards } from "@nestjs/common";
-import Redis from "ioredis";
+import { Logger, UseGuards } from "@nestjs/common";
 import { WsJwtAuthGuard } from "src/guards/ws-jwt-auth.guard";
-import { MessageDto } from "src/dtos/message.dto";
-import { REDIS_SUBSCRIBER } from "src/redis/redis.constants";
-
-const REDIS_CHANNEL_MESSAGE = "arena:message:new";
+import { SignalService } from "src/signal/signal.service";
+import { SignalChannel } from "src/signal/signal.channels";
 
 @WebSocketGateway({
+  path: "/ws",
+  namespace: "/arena",
   cors: {
     origin: "*",
   },
@@ -30,30 +29,13 @@ export class ArenaGateway
 
   private readonly logger = new Logger(ArenaGateway.name);
 
-  constructor(
-    @Inject(REDIS_SUBSCRIBER)
-    private readonly subscriber: Redis,
-  ) {}
+  constructor(private readonly signal: SignalService) {}
 
   afterInit() {
-    this.subscriber.subscribe(REDIS_CHANNEL_MESSAGE, (err) => {
-      if (err) {
-        this.logger.error(`Failed to subscribe to ${REDIS_CHANNEL_MESSAGE}`, err);
-      } else {
-        this.logger.log(`Subscribed to ${REDIS_CHANNEL_MESSAGE}`);
-      }
-    });
-
-    this.subscriber.on("message", (channel, data) => {
-      if (channel === REDIS_CHANNEL_MESSAGE) {
-        const { channelId, message } = JSON.parse(data) as {
-          channelId: string;
-          message: MessageDto;
-        };
-        const roomName = `channel:${channelId}`;
-        this.server.to(roomName).emit("message:new", message);
-        this.logger.debug(`Broadcasted message to ${roomName}`);
-      }
+    this.signal.subscribe(SignalChannel.MESSAGE_NEW, ({ channelId, message }) => {
+      const roomName = `channel:${channelId}`;
+      this.server.to(roomName).emit("message:new", message);
+      this.logger.debug(`Broadcasted message to ${roomName}`);
     });
   }
 

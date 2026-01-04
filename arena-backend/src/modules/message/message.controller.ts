@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
+import { SessionGuard } from "../session/session.guard";
 import { CurrentUser } from "src/decorators/current-user.decorator";
 import { MessageDto } from "src/dtos/message.dto";
 import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-api-result.dto";
@@ -19,21 +20,19 @@ import {
 import { CreateMessageDto } from "./dtos/create-message.dto";
 import { GetMessagesQueryDto } from "./dtos/get-messages-query.dto";
 import { MessageService } from "./message.service";
-import { UserService } from "../user/user.service";
 import { S3Service } from "../file/s3.service";
 import { toMessageDto } from "src/utils/message.mapper";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
-import type { JwtPayload } from "src/types/jwt-payload.interface";
+import type { CachedUser } from "../session/session.types";
 
 @ApiTags("messages")
 @Controller("/api/v1/messages")
-@UseGuards(ArenaJwtAuthGuard)
+@UseGuards(ArenaJwtAuthGuard, SessionGuard)
 @ApiBearerAuth()
 export class MessageController {
   constructor(
     private readonly messageService: MessageService,
-    private readonly userService: UserService,
     private readonly s3Service: S3Service,
   ) {}
 
@@ -41,12 +40,10 @@ export class MessageController {
   @ApiOperation({ summary: "메시지 보내기" })
   @ApiOkResponse({ type: () => withSingleApiResult(MessageDto) })
   async createMessage(
-    @CurrentUser() jwt: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Param("channelId") channelId: string,
     @Body() dto: CreateMessageDto,
   ): Promise<SingleApiResultDto<MessageDto>> {
-    const user = await this.userService.getByUid(jwt.uid);
-
     const message = await this.messageService.createMessage(
       user.userId,
       channelId,
@@ -69,12 +66,10 @@ export class MessageController {
   @ApiOperation({ summary: "메시지 목록 조회" })
   @ApiOkResponse({ type: () => withInfinityListApiResult(MessageDto) })
   async getMessages(
-    @CurrentUser() jwt: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Param("channelId") channelId: string,
     @Query() query: GetMessagesQueryDto,
   ): Promise<InfinityListApiResultDto<MessageDto>> {
-    const user = await this.userService.getByUid(jwt.uid);
-
     const result = await this.messageService.getMessages(user.userId, channelId, {
       before: query.before,
       after: query.after,

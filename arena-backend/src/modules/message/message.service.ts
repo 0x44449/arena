@@ -12,9 +12,10 @@ import { toMessageDto } from "src/utils/message.mapper";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
 import { S3Service } from "../file/s3.service";
+import { SignalService } from "src/signal/signal.service";
+import { SignalChannel } from "src/signal/signal.channels";
 import { REDIS_CLIENT } from "src/redis/redis.constants";
-
-const REDIS_CHANNEL_MESSAGE = "arena:message:new";
+import { MessageDto } from "src/dtos/message.dto";
 
 @Injectable()
 export class MessageService {
@@ -28,6 +29,7 @@ export class MessageService {
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
     private readonly s3Service: S3Service,
+    private readonly signal: SignalService,
   ) {}
 
   async createMessage(
@@ -85,10 +87,10 @@ export class MessageService {
       : null;
     const senderDto = toUserDto(messageWithSender!.sender, avatar);
     const messageDto = toMessageDto(messageWithSender!, senderDto);
-    await this.redis.publish(
-      REDIS_CHANNEL_MESSAGE,
-      JSON.stringify({ channelId, message: messageDto }),
-    );
+    await this.signal.publish(SignalChannel.MESSAGE_NEW, {
+      channelId,
+      message: messageDto,
+    });
 
     return messageWithSender!;
   }

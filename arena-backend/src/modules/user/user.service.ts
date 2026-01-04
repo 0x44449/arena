@@ -7,6 +7,8 @@ import { UpdateUserDto } from "./dtos/update-user.dto";
 import { WellKnownException } from "src/exceptions/well-known-exception";
 import { generateId } from "src/utils/id-generator";
 import { FileService } from "../file/file.service";
+import { SignalService } from "src/signal/signal.service";
+import { SignalChannel } from "src/signal/signal.channels";
 
 @Injectable()
 export class UserService {
@@ -18,7 +20,8 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly fileService: FileService,
-  ) { }
+    private readonly signal: SignalService,
+  ) {}
 
   async findByUid(uid: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({
@@ -71,7 +74,10 @@ export class UserService {
     });
 
     await this.userRepository.save(user);
-    
+
+    // 세션 무효화 이벤트 발행
+    await this.signal.publish(SignalChannel.USER_UPDATED, { uid });
+
     // avatar relation 포함해서 조회 (null이지만 일관성 유지)
     return (await this.findByUid(uid))!;
   }
@@ -97,7 +103,10 @@ export class UserService {
     }
 
     await this.userRepository.save(user);
-    
+
+    // 세션 무효화 이벤트 발행
+    await this.signal.publish(SignalChannel.USER_UPDATED, { uid: user.uid });
+
     // avatar relation 포함해서 다시 조회
     return this.findByUtag(utag);
   }

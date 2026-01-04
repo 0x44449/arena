@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
+import { SessionGuard } from "../session/session.guard";
 import { CurrentUser } from "src/decorators/current-user.decorator";
 import { FileService } from "./file.service";
 import { S3Service } from "./s3.service";
@@ -19,7 +20,7 @@ import { GetPresignedUrlDto } from "./dtos/get-presigned-url.dto";
 import { PresignedUrlDto } from "./dtos/presigned-url.dto";
 import { CreateFileDto } from "./dtos/create-file.dto";
 import { toFileDto } from "src/utils/file.mapper";
-import type { JwtPayload } from "src/types/jwt-payload.interface";
+import type { CachedUser } from "../session/session.types";
 
 @ApiTags("files")
 @Controller("/api/v1/files")
@@ -32,15 +33,15 @@ export class FileController {
   // ========== Public 파일 (아바타, 그룹 아이콘 등) ==========
   
   @Post("public/presigned-url")
-  @UseGuards(ArenaJwtAuthGuard)
+  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPublicPresignedUrl(
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Body() dto: GetPresignedUrlDto
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
     const result = await this.fileService.generatePresignedUrl(
-      user.uid,
+      user.userId,
       'public',
       dto.directory,
       dto.fileExtension,
@@ -50,14 +51,14 @@ export class FileController {
   }
 
   @Post("public")
-  @UseGuards(ArenaJwtAuthGuard)
+  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async createPublicFile(
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Body() dto: CreateFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.createFile(user.uid, 'public', dto);
+    const file = await this.fileService.createFile(user.userId, 'public', dto);
     const fileDto = await toFileDto(file, this.s3Service);
     return { success: true, data: fileDto, errorCode: null };
   }
@@ -65,15 +66,15 @@ export class FileController {
   // ========== Private 파일 (첨부파일 등) ==========
   
   @Post("private/presigned-url")
-  @UseGuards(ArenaJwtAuthGuard)
+  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPrivatePresignedUrl(
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Body() dto: GetPresignedUrlDto
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
     const result = await this.fileService.generatePresignedUrl(
-      user.uid,
+      user.userId,
       'private',
       dto.directory,
       dto.fileExtension,
@@ -83,14 +84,14 @@ export class FileController {
   }
 
   @Post("private")
-  @UseGuards(ArenaJwtAuthGuard)
+  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async createPrivateFile(
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Body() dto: CreateFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.createFile(user.uid, 'private', dto);
+    const file = await this.fileService.createFile(user.userId, 'private', dto);
     const fileDto = await toFileDto(file, this.s3Service);
     return { success: true, data: fileDto, errorCode: null };
   }
@@ -106,14 +107,14 @@ export class FileController {
   }
 
   @Delete(":fileId")
-  @UseGuards(ArenaJwtAuthGuard)
+  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: ApiResultDto })
   async deleteFile(
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Param("fileId") fileId: string
   ): Promise<ApiResultDto> {
-    await this.fileService.deleteFile(fileId, user.uid);
+    await this.fileService.deleteFile(fileId, user.userId);
     return { success: true, errorCode: null };
   }
 }

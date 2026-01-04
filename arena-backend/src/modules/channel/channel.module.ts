@@ -13,7 +13,6 @@ import { ChannelService } from "./channel.service";
 import { DirectChannelService } from "./direct-channel.service";
 import { GroupChannelService } from "./group-channel.service";
 import { FileModule } from "../file/file.module";
-import { UserModule } from "../user/user.module";
 
 @Module({
   imports: [
@@ -28,7 +27,6 @@ import { UserModule } from "../user/user.module";
       FileEntity,
     ]),
     FileModule,
-    UserModule,
   ],
   controllers: [ChannelController],
   providers: [ChannelService, DirectChannelService, GroupChannelService],

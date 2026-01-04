@@ -11,11 +11,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { buildDataSourceOptions } from './database/typeorm.config';
 import { RedisModule } from './redis/redis.module';
+import { SignalModule } from './signal/signal.module';
+import { SessionModule } from './modules/session/session.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     RedisModule,
+    SignalModule,
+    SessionModule,
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {

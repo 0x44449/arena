@@ -1,30 +1,26 @@
 import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
 import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
+import { SessionGuard } from "../session/session.guard";
 import { ApiResultDto } from "src/dtos/api-result.dto";
 import { RegisterDeviceDto } from "./dtos/register-device.dto";
 import { UnregisterDeviceDto } from "./dtos/unregister-device.dto";
 import { DeviceService } from "./device.service";
-import { UserService } from "../user/user.service";
 import { CurrentUser } from "src/decorators/current-user.decorator";
-import type { JwtPayload } from "src/types/jwt-payload.interface";
+import type { CachedUser } from "../session/session.types";
 
 @Controller("api/v1/devices")
-@UseGuards(ArenaJwtAuthGuard)
+@UseGuards(ArenaJwtAuthGuard, SessionGuard)
 @ApiBearerAuth()
 export class DeviceController {
-  constructor(
-    private readonly deviceService: DeviceService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly deviceService: DeviceService) {}
 
   @Post("register")
   @ApiOkResponse({ type: ApiResultDto })
   async registerDevice(
-    @CurrentUser() jwt: JwtPayload,
+    @CurrentUser() user: CachedUser,
     @Body() dto: RegisterDeviceDto
   ): Promise<ApiResultDto> {
-    const user = await this.userService.getByUid(jwt.uid);
     await this.deviceService.registerDevice(user.userId, dto);
     return {
       success: true,

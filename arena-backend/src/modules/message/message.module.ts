@@ -5,7 +5,6 @@ import { ChannelEntity } from "src/entities/channel.entity";
 import { ParticipantEntity } from "src/entities/participant.entity";
 import { MessageController } from "./message.controller";
 import { MessageService } from "./message.service";
-import { UserModule } from "../user/user.module";
 import { FileModule } from "../file/file.module";
 
 @Module({
@@ -15,7 +14,6 @@ import { FileModule } from "../file/file.module";
       ChannelEntity,
       ParticipantEntity,
     ]),
-    UserModule,
     FileModule,
   ],
   controllers: [MessageController],

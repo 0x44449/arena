@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
 import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
 import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-api-result.dto";
 import { UserService } from "./user.service";
-import { CurrentUser } from "src/decorators/current-user.decorator";
+import { JwtPayloadParam } from "src/decorators/jwt-payload.decorator";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
 import { S3Service } from "../file/s3.service";
@@ -19,12 +19,12 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly s3Service: S3Service,
-  ) { }
+  ) {}
 
   @Get("/me")
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto, { nullable: true }) })
-  async getMe(@CurrentUser() user: JwtPayload): Promise<SingleApiResultDto<UserDto | null>> {
-    const entity = await this.userService.findByUid(user.uid);
+  async getMe(@JwtPayloadParam() jwt: JwtPayload): Promise<SingleApiResultDto<UserDto | null>> {
+    const entity = await this.userService.findByUid(jwt.uid);
     if (!entity) {
       return { success: true, data: null, errorCode: null };
     }
@@ -84,10 +84,10 @@ export class UserController {
   @Post("")
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto) })
   async createUser(
-    @CurrentUser() user: JwtPayload,
+    @JwtPayloadParam() jwt: JwtPayload,
     @Body() createUserDto: CreateUserDto
   ): Promise<SingleApiResultDto<UserDto>> {
-    const entity = await this.userService.create(user.uid, createUserDto);
+    const entity = await this.userService.create(jwt.uid, createUserDto);
 
     const avatar = entity.avatar
       ? await toFileDto(entity.avatar, this.s3Service)
