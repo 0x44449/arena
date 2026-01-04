@@ -5,14 +5,17 @@ import { FileModule } from './modules/file/file.module';
 import { ChannelModule } from './modules/channel/channel.module';
 import { MessageModule } from './modules/message/message.module';
 import { ContactModule } from './modules/contact/contact.module';
+import { GatewayModule } from './modules/gateway/gateway.module';
 import { ArenaAuthModule } from './auth/arena-auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { buildDataSourceOptions } from './database/typeorm.config';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    RedisModule,
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
@@ -33,6 +36,7 @@ import { buildDataSourceOptions } from './database/typeorm.config';
     ChannelModule,
     MessageModule,
     ContactModule,
+    GatewayModule,
   ],
   controllers: [],
   providers: [],

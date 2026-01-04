@@ -27,6 +27,17 @@ export class UserService {
     });
   }
 
+  async getByUid(uid: string): Promise<UserEntity> {
+    const user = await this.findByUid(uid);
+    if (!user) {
+      throw new WellKnownException({
+        message: "User not found",
+        errorCode: "USER_NOT_FOUND",
+      });
+    }
+    return user;
+  }
+
   async findByUtag(utag: string): Promise<UserEntity | null> {
     const normalized = this.normalizeUtag(utag);
     if (!normalized) {

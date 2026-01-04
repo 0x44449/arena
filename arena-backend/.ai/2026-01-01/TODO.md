@@ -26,3 +26,9 @@
 
 ## 기타
 - [ ] participants 많아지면 Query 패턴 또는 페이지네이션 도입
+
+## 구조 개선 (나중에)
+- [ ] MessageService에서 DTO 변환 제거 (레이어 원칙 준수)
+  - 현재: Service에서 직접 ArenaGateway 호출 + DTO 변환
+  - 개선: EventEmitter로 이벤트 발행, Gateway에서 구독 후 DTO 변환
+  - 참고: src/modules/message/message.service.ts의 TODO 주석

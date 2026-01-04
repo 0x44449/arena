@@ -24,7 +24,6 @@ import { S3Service } from "../file/s3.service";
 import { toMessageDto } from "src/utils/message.mapper";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
-import { WellKnownException } from "src/exceptions/well-known-exception";
 import type { JwtPayload } from "src/types/jwt-payload.interface";
 
 @ApiTags("messages")
@@ -46,13 +45,7 @@ export class MessageController {
     @Param("channelId") channelId: string,
     @Body() dto: CreateMessageDto,
   ): Promise<SingleApiResultDto<MessageDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const message = await this.messageService.createMessage(
       user.userId,
@@ -80,13 +73,7 @@ export class MessageController {
     @Param("channelId") channelId: string,
     @Query() query: GetMessagesQueryDto,
   ): Promise<InfinityListApiResultDto<MessageDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const result = await this.messageService.getMessages(user.userId, channelId, {
       before: query.before,

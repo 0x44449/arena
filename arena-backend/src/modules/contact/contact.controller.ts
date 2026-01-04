@@ -21,7 +21,6 @@ import { S3Service } from "../file/s3.service";
 import { toContactDto } from "src/utils/contact.mapper";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
-import { WellKnownException } from "src/exceptions/well-known-exception";
 import type { JwtPayload } from "src/types/jwt-payload.interface";
 
 @ApiTags("contacts")
@@ -41,13 +40,7 @@ export class ContactController {
   async getContacts(
     @CurrentUser() jwt: JwtPayload,
   ): Promise<ListApiResultDto<ContactDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const contacts = await this.contactService.getContacts(user.userId);
 
@@ -74,13 +67,7 @@ export class ContactController {
     @CurrentUser() jwt: JwtPayload,
     @Body() dto: CreateContactDto,
   ): Promise<SingleApiResultDto<ContactDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const contact = await this.contactService.createContact(user.userId, dto.userId);
 
@@ -103,13 +90,7 @@ export class ContactController {
     @CurrentUser() jwt: JwtPayload,
     @Param("userId") userId: string,
   ): Promise<ApiResultDto> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     await this.contactService.deleteContact(user.userId, userId);
 

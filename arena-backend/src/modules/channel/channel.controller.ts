@@ -20,7 +20,6 @@ import { toChannelDto } from "src/utils/channel.mapper";
 import { toParticipantDto } from "src/utils/participant.mapper";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
-import { WellKnownException } from "src/exceptions/well-known-exception";
 import { ChannelDto } from "src/dtos/channel.dto";
 import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-api-result.dto";
 import { withListApiResult, type ListApiResultDto } from "src/dtos/list-api-result.dto";
@@ -49,13 +48,7 @@ export class ChannelController {
     @CurrentUser() jwt: JwtPayload,
     @Body() dto: CreateDirectChannelDto,
   ): Promise<SingleApiResultDto<ChannelDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const { channel, participants } = await this.directChannelService.getOrCreate(
       user.userId,
@@ -85,13 +78,7 @@ export class ChannelController {
     @CurrentUser() jwt: JwtPayload,
     @Body() dto: CreateGroupChannelDto,
   ): Promise<SingleApiResultDto<ChannelDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const { channel, groupChannel, participants } = await this.groupChannelService.create(
       user.userId,
@@ -126,13 +113,7 @@ export class ChannelController {
   @ApiOperation({ summary: "내 채널 목록" })
   @ApiOkResponse({ type: () => withListApiResult(ChannelDto) })
   async getMyChannels(@CurrentUser() jwt: JwtPayload): Promise<ListApiResultDto<ChannelDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const results = await this.channelService.getMyChannels(user.userId);
 
@@ -168,13 +149,7 @@ export class ChannelController {
     @CurrentUser() jwt: JwtPayload,
     @Param("channelId") channelId: string,
   ): Promise<SingleApiResultDto<ChannelDto>> {
-    const user = await this.userService.findByUid(jwt.uid);
-    if (!user) {
-      throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-      });
-    }
+    const user = await this.userService.getByUid(jwt.uid);
 
     const details = await this.channelService.getChannel(channelId, user.userId);
 

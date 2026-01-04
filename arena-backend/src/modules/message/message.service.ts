@@ -1,7 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
 import { MessageEntity } from "src/entities/message.entity";
 import { ChannelEntity } from "src/entities/channel.entity";
@@ -9,11 +8,16 @@ import { ParticipantEntity } from "src/entities/participant.entity";
 import { WellKnownException } from "src/exceptions/well-known-exception";
 import { generateId } from "src/utils/id-generator";
 import { GetMessagesResultDto } from "./dtos/get-messages-result.dto";
+import { toMessageDto } from "src/utils/message.mapper";
+import { toUserDto } from "src/utils/user.mapper";
+import { toFileDto } from "src/utils/file.mapper";
+import { S3Service } from "../file/s3.service";
+import { REDIS_CLIENT } from "src/redis/redis.constants";
+
+const REDIS_CHANNEL_MESSAGE = "arena:message:new";
 
 @Injectable()
 export class MessageService {
-  private readonly redis: Redis;
-
   constructor(
     @InjectRepository(MessageEntity)
     private readonly messageRepository: Repository<MessageEntity>,
@@ -21,13 +25,10 @@ export class MessageService {
     private readonly channelRepository: Repository<ChannelEntity>,
     @InjectRepository(ParticipantEntity)
     private readonly participantRepository: Repository<ParticipantEntity>,
-    private readonly configService: ConfigService,
-  ) {
-    this.redis = new Redis({
-      host: this.configService.get<string>("REDIS_HOST") || "localhost",
-      port: this.configService.get<number>("REDIS_PORT") || 16379,
-    });
-  }
+    @Inject(REDIS_CLIENT)
+    private readonly redis: Redis,
+    private readonly s3Service: S3Service,
+  ) {}
 
   async createMessage(
     userId: string,
@@ -71,6 +72,23 @@ export class MessageService {
       where: { messageId },
       relations: ["sender", "sender.avatar"],
     });
+
+    // 웹소켓으로 브로드캐스트
+    // TODO: 현재 Service에서 DTO 변환을 하고 있음 (레이어 원칙 위반)
+    // 원칙적으로는 Service는 Entity만 반환하고, DTO 변환은 전달 담당자(Controller, Gateway)가 해야 함.
+    // 개선 방향:
+    // 1. EventEmitter로 이벤트 발행 (message.created)
+    // 2. Gateway에서 이벤트 구독 후 DTO 변환 및 브로드캐스트
+    // 3. 재조회 피하려면 이벤트에 Entity 포함
+    const avatar = messageWithSender!.sender.avatar
+      ? await toFileDto(messageWithSender!.sender.avatar, this.s3Service)
+      : null;
+    const senderDto = toUserDto(messageWithSender!.sender, avatar);
+    const messageDto = toMessageDto(messageWithSender!, senderDto);
+    await this.redis.publish(
+      REDIS_CHANNEL_MESSAGE,
+      JSON.stringify({ channelId, message: messageDto }),
+    );
 
     return messageWithSender!;
   }

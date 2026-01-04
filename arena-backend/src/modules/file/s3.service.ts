@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { 
   S3Client, 
@@ -11,7 +11,8 @@ import {
   PutBucketAclCommand
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { RedisService } from "./redis.service";
+import Redis from "ioredis";
+import { REDIS_CLIENT } from "src/redis/redis.constants";
 
 @Injectable()
 export class S3Service implements OnModuleInit {
@@ -25,7 +26,8 @@ export class S3Service implements OnModuleInit {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly redisService: RedisService,
+    @Inject(REDIS_CLIENT)
+    private readonly redis: Redis,
   ) {
     this.s3Client = new S3Client({
       region: this.configService.get<string>("AWS_REGION") || "us-east-1",
@@ -118,9 +120,9 @@ export class S3Service implements OnModuleInit {
     const cacheKey = `presigned:${bucket}:${key}`;
     
     // 1. 캐시 확인
-    const cached = await this.redisService.get(cacheKey);
+    const cached = await this.redis.get(cacheKey);
     if (cached) {
-      const ttl = await this.redisService.getTTL(cacheKey);
+      const ttl = await this.redis.ttl(cacheKey);
       
       // TTL이 충분히 남았으면 재사용
       if (ttl > S3Service.CACHE_REFRESH_THRESHOLD) {
@@ -132,7 +134,7 @@ export class S3Service implements OnModuleInit {
     const url = await this.generatePresignedDownloadUrl(bucket, key);
 
     // 3. 캐싱
-    await this.redisService.set(cacheKey, url, S3Service.CACHE_TTL);
+    await this.redis.set(cacheKey, url, "EX", S3Service.CACHE_TTL);
 
     return url;
   }
@@ -167,7 +169,7 @@ export class S3Service implements OnModuleInit {
 
     // 캐시 삭제
     const cacheKey = `presigned:${bucket}:${key}`;
-    await this.redisService.del(cacheKey);
+    await this.redis.del(cacheKey);
   }
 
   async exists(bucket: 'public' | 'private', key: string): Promise<boolean> {
