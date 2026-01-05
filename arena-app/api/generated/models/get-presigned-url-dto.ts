@@ -8,9 +8,7 @@
 
 export interface GetPresignedUrlDto {
   /** 디렉토리 (예: avatars, attachments, group-icons) */
-  directory: string;
-  /** 파일 확장자 */
-  fileExtension: string;
+  directory?: string;
   /** MIME 타입 */
   mimeType: string;
 }

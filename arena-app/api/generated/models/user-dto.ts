@@ -8,14 +8,29 @@
 import type { UserDtoAvatar } from './user-dto-avatar';
 
 export interface UserDto {
+  /** 유저 ID */
+  userId: string;
+  /** 유저 태그 */
   utag: string;
+  /** 닉네임 */
   nick: string;
-  /** @nullable */
+  /**
+   * 프로필 이미지
+   * @nullable
+   */
   avatar?: UserDtoAvatar;
-  /** @nullable */
+  /**
+   * 이메일
+   * @nullable
+   */
   email?: string | null;
-  /** @nullable */
+  /**
+   * 상태 메시지
+   * @nullable
+   */
   statusMessage?: string | null;
+  /** 생성 시간 */
   createdAt: string;
+  /** 수정 시간 */
   updatedAt: string;
 }

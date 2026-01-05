@@ -16,5 +16,7 @@ export interface ParticipantDto {
    */
   lastReadAt?: string | null;
   /** 참여 시간 */
-  joinedAt: string;
+  createdAt: string;
+  /** 수정 시간 */
+  updatedAt: string;
 }

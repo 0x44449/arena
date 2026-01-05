@@ -33,4 +33,6 @@ export interface ChannelDto {
   lastMessageAt?: string | null;
   /** 생성 시간 */
   createdAt: string;
+  /** 수정 시간 */
+  updatedAt: string;
 }

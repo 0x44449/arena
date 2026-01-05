@@ -12,4 +12,6 @@ export interface ContactDto {
   user: UserDto;
   /** 추가한 시간 */
   createdAt: string;
+  /** 수정 시간 */
+  updatedAt: string;
 }

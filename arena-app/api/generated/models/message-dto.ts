@@ -14,8 +14,12 @@ export interface MessageDto {
   channelId: string;
   /** 보낸 사람 */
   sender: UserDto;
+  /** 메시지 순번 */
+  seq: number;
   /** 메시지 내용 */
   content: string;
-  /** 보낸 시간 */
+  /** 생성 시간 */
   createdAt: string;
+  /** 수정 시간 */
+  updatedAt: string;
 }

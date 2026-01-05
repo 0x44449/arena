@@ -8,15 +8,17 @@
 
 export interface FileDto {
   /** 파일 ID */
-  id: string;
+  fileId: string;
+  /** 파일 URL */
+  url: string;
   /** 파일명 */
   name: string;
-  /** 다운로드 URL */
-  url: string;
   /** MIME 타입 */
   mimeType: string;
   /** 파일 크기 (bytes) */
   size: number;
   /** 생성 시간 */
   createdAt: string;
+  /** 수정 시간 */
+  updatedAt: string;
 }

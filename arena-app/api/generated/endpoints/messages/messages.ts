@@ -28,7 +28,9 @@ import type {
   CreateMessageDto,
   MessageDtoInfinityListResult,
   MessageDtoResult,
-  MessageGetMessagesQueryParams
+  MessageGetMessagesQueryParams,
+  MessageSyncDataDtoResult,
+  MessageSyncMessagesQueryParams
 } from '../../models';
 
 import { apiClientProxy } from '../../../api-client';
@@ -192,6 +194,106 @@ export function useMessageGetMessagesQuery<TData = Awaited<ReturnType<typeof Mes
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMessageGetMessagesQueryQueryOptions(channelId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary 메시지 동기화
+ */
+export const MessageSyncMessagesQuery = (
+    channelId: string,
+    params: MessageSyncMessagesQueryParams,
+ options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
+) => {
+      
+      
+      return apiClientProxy<MessageSyncDataDtoResult>(
+      {url: `/api/v1/messages/channel/${channelId}/sync`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
+
+
+
+export const getMessageSyncMessagesQueryQueryKey = (channelId?: string,
+    params?: MessageSyncMessagesQueryParams,) => {
+    return [
+    `/api/v1/messages/channel/${channelId}/sync`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getMessageSyncMessagesQueryQueryOptions = <TData = Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError = unknown>(channelId: string,
+    params: MessageSyncMessagesQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMessageSyncMessagesQueryQueryKey(channelId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>> = ({ signal }) => MessageSyncMessagesQuery(channelId,params, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(channelId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MessageSyncMessagesQueryQueryResult = NonNullable<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>>
+export type MessageSyncMessagesQueryQueryError = unknown
+
+
+export function useMessageSyncMessagesQuery<TData = Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError = unknown>(
+ channelId: string,
+    params: MessageSyncMessagesQueryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof MessageSyncMessagesQuery>>,
+          TError,
+          Awaited<ReturnType<typeof MessageSyncMessagesQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClientProxy>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessageSyncMessagesQuery<TData = Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError = unknown>(
+ channelId: string,
+    params: MessageSyncMessagesQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof MessageSyncMessagesQuery>>,
+          TError,
+          Awaited<ReturnType<typeof MessageSyncMessagesQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClientProxy>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessageSyncMessagesQuery<TData = Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError = unknown>(
+ channelId: string,
+    params: MessageSyncMessagesQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 메시지 동기화
+ */
+
+export function useMessageSyncMessagesQuery<TData = Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError = unknown>(
+ channelId: string,
+    params: MessageSyncMessagesQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof MessageSyncMessagesQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMessageSyncMessagesQueryQueryOptions(channelId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
