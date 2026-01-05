@@ -8,40 +8,40 @@ import {
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { UserEntity } from "./user.entity";
+} from 'typeorm';
+import { UserEntity } from './user.entity';
 
-@Entity({ name: "devices" })
+@Entity({ name: 'devices' })
 export class DeviceEntity {
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   deviceId: string;
 
-  @Index("idx_devices_user_id")
-  @Column({ type: "text" })
+  @Index('idx_devices_user_id')
+  @Column({ type: 'text' })
   userId: string;
 
-  @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "userId", referencedColumnName: "userId" })
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UserEntity;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   fcmToken: string;
 
-  @Column({ type: "varchar", length: 20 })
+  @Column({ type: 'varchar', length: 20 })
   platform: string;
 
-  @Column({ type: "varchar", length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   deviceModel: string | null;
 
-  @Column({ type: "varchar", length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   osVersion: string | null;
 
-  @CreateDateColumn({ type: "timestamptz" })
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: "timestamptz" })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deletedAt: Date | null;
 }

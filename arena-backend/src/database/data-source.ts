@@ -1,6 +1,6 @@
-import "dotenv/config";
-import { DataSource } from "typeorm";
-import { buildDataSourceOptions } from "./typeorm.config";
+import 'dotenv/config';
+import { DataSource } from 'typeorm';
+import { buildDataSourceOptions } from './typeorm.config';
 
 const port = process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined;
 

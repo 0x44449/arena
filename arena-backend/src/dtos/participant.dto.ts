@@ -1,20 +1,20 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { UserDto } from "./user.dto";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { UserDto } from './user.dto';
 
 export class ParticipantDto {
-  @ApiProperty({ description: "유저 정보" })
+  @ApiProperty({ description: '유저 정보' })
   user: UserDto;
 
   @ApiPropertyOptional({
     type: Date,
     nullable: true,
-    description: "마지막 읽은 시간",
+    description: '마지막 읽은 시간',
   })
   lastReadAt: Date | null;
 
-  @ApiProperty({ description: "참여 시간" })
+  @ApiProperty({ description: '참여 시간' })
   createdAt: Date;
 
-  @ApiProperty({ description: "수정 시간" })
+  @ApiProperty({ description: '수정 시간' })
   updatedAt: Date;
 }

@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PresignedUrlDto {
   @ApiProperty({ description: 'S3 업로드 URL' })

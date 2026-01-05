@@ -1,11 +1,11 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsIn, IsOptional, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 
 export class RegisterDeviceDto {
   @ApiProperty()
   @IsString()
   deviceId: string;
-  
+
   @ApiProperty()
   @IsString()
   fcmToken: string;

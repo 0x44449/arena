@@ -1,5 +1,11 @@
-import { IsOptional, IsString, Length, MaxLength, ValidateIf } from "class-validator";
-import { ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsOptional,
+  IsString,
+  Length,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
   @ApiPropertyOptional()
@@ -14,7 +20,10 @@ export class UpdateUserDto {
   @MaxLength(140)
   statusMessage?: string;
 
-  @ApiPropertyOptional({ description: '아바타 파일 ID (null이면 아바타 제거)', nullable: true })
+  @ApiPropertyOptional({
+    description: '아바타 파일 ID (null이면 아바타 제거)',
+    nullable: true,
+  })
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
   @IsString()

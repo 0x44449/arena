@@ -1,5 +1,5 @@
-import { Global, Module } from "@nestjs/common";
-import { Signal } from "./signal";
+import { Global, Module } from '@nestjs/common';
+import { Signal } from './signal';
 
 @Global()
 @Module({

@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { DeviceEntity } from "src/entities/device.entity";
-import { RegisterDeviceDto } from "./dtos/register-device.dto";
-import { UnregisterDeviceDto } from "./dtos/unregister-device.dto";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { DeviceEntity } from 'src/entities/device.entity';
+import { RegisterDeviceDto } from './dtos/register-device.dto';
+import { UnregisterDeviceDto } from './dtos/unregister-device.dto';
 
 @Injectable()
 export class DeviceService {

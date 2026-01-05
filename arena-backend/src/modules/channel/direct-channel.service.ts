@@ -1,13 +1,13 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ChannelEntity } from "src/entities/channel.entity";
-import { ParticipantEntity } from "src/entities/participant.entity";
-import { DirectChannelEntity } from "src/entities/direct-channel.entity";
-import { DirectParticipantEntity } from "src/entities/direct-participant.entity";
-import { UserEntity } from "src/entities/user.entity";
-import { WellKnownException } from "src/exceptions/well-known-exception";
-import { generateId } from "src/utils/id-generator";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ChannelEntity } from 'src/entities/channel.entity';
+import { ParticipantEntity } from 'src/entities/participant.entity';
+import { DirectChannelEntity } from 'src/entities/direct-channel.entity';
+import { DirectParticipantEntity } from 'src/entities/direct-participant.entity';
+import { UserEntity } from 'src/entities/user.entity';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
+import { generateId } from 'src/utils/id-generator';
 
 @Injectable()
 export class DirectChannelService {
@@ -38,8 +38,8 @@ export class DirectChannelService {
     // 자기 자신에게 DM 불가
     if (myUserId === targetUserId) {
       throw new WellKnownException({
-        message: "Cannot create DM with yourself",
-        errorCode: "INVALID_DM_TARGET",
+        message: 'Cannot create DM with yourself',
+        errorCode: 'INVALID_DM_TARGET',
       });
     }
 
@@ -49,25 +49,25 @@ export class DirectChannelService {
     });
     if (!targetUser) {
       throw new WellKnownException({
-        message: "Target user not found",
-        errorCode: "USER_NOT_FOUND",
+        message: 'Target user not found',
+        errorCode: 'USER_NOT_FOUND',
       });
     }
 
     // 기존 DM 찾기
     const existingChannel = await this.channelRepository
-      .createQueryBuilder("channel")
-      .innerJoin("participants", "p1", "p1.channelId = channel.channelId")
-      .innerJoin("participants", "p2", "p2.channelId = channel.channelId")
-      .where("channel.type = :type", { type: "direct" })
-      .andWhere("p1.userId = :userId1", { userId1: myUserId })
-      .andWhere("p2.userId = :userId2", { userId2: targetUserId })
+      .createQueryBuilder('channel')
+      .innerJoin('participants', 'p1', 'p1.channelId = channel.channelId')
+      .innerJoin('participants', 'p2', 'p2.channelId = channel.channelId')
+      .where('channel.type = :type', { type: 'direct' })
+      .andWhere('p1.userId = :userId1', { userId1: myUserId })
+      .andWhere('p2.userId = :userId2', { userId2: targetUserId })
       .getOne();
 
     if (existingChannel) {
       const participants = await this.participantRepository.find({
         where: { channelId: existingChannel.channelId },
-        relations: ["user", "user.avatar"],
+        relations: ['user', 'user.avatar'],
       });
       return { channel: existingChannel, participants };
     }
@@ -77,7 +77,7 @@ export class DirectChannelService {
 
     const channel = this.channelRepository.create({
       channelId,
-      type: "direct",
+      type: 'direct',
       name: null,
       teamId: null,
       lastMessageAt: null,
@@ -117,7 +117,7 @@ export class DirectChannelService {
 
     const participants = await this.participantRepository.find({
       where: { channelId },
-      relations: ["user", "user.avatar"],
+      relations: ['user', 'user.avatar'],
     });
     return { channel, participants };
   }

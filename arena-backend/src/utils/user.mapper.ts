@@ -1,6 +1,6 @@
-import { UserEntity } from "src/entities/user.entity";
-import { UserDto } from "src/dtos/user.dto";
-import { toFileDto } from "./file.mapper";
+import { UserEntity } from 'src/entities/user.entity';
+import { UserDto } from 'src/dtos/user.dto';
+import { toFileDto } from './file.mapper';
 
 export function toUserDto(entity: UserEntity): UserDto {
   return {

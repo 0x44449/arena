@@ -1,19 +1,19 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, IsNull } from "typeorm";
-import { UserEntity } from "src/entities/user.entity";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { UpdateUserDto } from "./dtos/update-user.dto";
-import { WellKnownException } from "src/exceptions/well-known-exception";
-import { generateId } from "src/utils/id-generator";
-import { FileService } from "../file/file.service";
-import { Signal } from "src/signal/signal";
-import { SignalChannel } from "src/signal/signal.channels";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, IsNull } from 'typeorm';
+import { UserEntity } from 'src/entities/user.entity';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
+import { generateId } from 'src/utils/id-generator';
+import { FileService } from '../file/file.service';
+import { Signal } from 'src/signal/signal';
+import { SignalChannel } from 'src/signal/signal.channels';
 
 @Injectable()
 export class UserService {
   private static readonly UTAG_LENGTH = 6;
-  private static readonly UTAG_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  private static readonly UTAG_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   private static readonly MAX_UTAG_ATTEMPTS = 10;
 
   constructor(
@@ -26,7 +26,7 @@ export class UserService {
   async findByUid(uid: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({
       where: { uid, deletedAt: IsNull() },
-      relations: ["avatar"],
+      relations: ['avatar'],
     });
   }
 
@@ -34,8 +34,8 @@ export class UserService {
     const user = await this.findByUid(uid);
     if (!user) {
       throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
       });
     }
     return user;
@@ -44,7 +44,7 @@ export class UserService {
   async findByUserId(userId: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({
       where: { userId, deletedAt: IsNull() },
-      relations: ["avatar"],
+      relations: ['avatar'],
     });
   }
 
@@ -52,8 +52,8 @@ export class UserService {
     const user = await this.findByUserId(userId);
     if (!user) {
       throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
       });
     }
     return user;
@@ -63,8 +63,8 @@ export class UserService {
     const existing = await this.findByUid(uid);
     if (existing) {
       throw new WellKnownException({
-        message: "User already exists",
-        errorCode: "ALREADY_EXISTS_USER",
+        message: 'User already exists',
+        errorCode: 'ALREADY_EXISTS_USER',
       });
     }
 
@@ -116,21 +116,27 @@ export class UserService {
   }
 
   private async generateUniqueUtag(): Promise<string> {
-    for (let attempt = 0; attempt < UserService.MAX_UTAG_ATTEMPTS; attempt += 1) {
+    for (
+      let attempt = 0;
+      attempt < UserService.MAX_UTAG_ATTEMPTS;
+      attempt += 1
+    ) {
       const candidate = this.generateRandomUtag();
-      const exists = await this.userRepository.exists({ where: { utag: candidate } });
+      const exists = await this.userRepository.exists({
+        where: { utag: candidate },
+      });
       if (!exists) {
         return candidate;
       }
     }
     throw new WellKnownException({
-      message: "Failed to generate unique utag",
-      errorCode: "UTAG_GENERATION_FAILED",
+      message: 'Failed to generate unique utag',
+      errorCode: 'UTAG_GENERATION_FAILED',
     });
   }
 
   private generateRandomUtag(): string {
-    let result = "";
+    let result = '';
     for (let i = 0; i < UserService.UTAG_LENGTH; i += 1) {
       const index = Math.floor(Math.random() * UserService.UTAG_CHARSET.length);
       result += UserService.UTAG_CHARSET.charAt(index);

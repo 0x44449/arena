@@ -1,6 +1,6 @@
-import { MessageEntity } from "src/entities/message.entity";
-import { MessageDto } from "src/dtos/message.dto";
-import { toUserDto } from "./user.mapper";
+import { MessageEntity } from 'src/entities/message.entity';
+import { MessageDto } from 'src/dtos/message.dto';
+import { toUserDto } from './user.mapper';
 
 export function toMessageDto(entity: MessageEntity): MessageDto {
   return {

@@ -8,36 +8,36 @@ import {
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { ChannelEntity } from "./channel.entity";
-import { UserEntity } from "./user.entity";
+} from 'typeorm';
+import { ChannelEntity } from './channel.entity';
+import { UserEntity } from './user.entity';
 
-@Entity({ name: "participants" })
+@Entity({ name: 'participants' })
 export class ParticipantEntity {
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   channelId: string;
 
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   userId: string;
 
   @ManyToOne(() => ChannelEntity)
-  @JoinColumn({ name: "channelId", referencedColumnName: "channelId" })
+  @JoinColumn({ name: 'channelId', referencedColumnName: 'channelId' })
   channel: ChannelEntity;
 
-  @Index("idx_participants_user_id")
+  @Index('idx_participants_user_id')
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: "userId", referencedColumnName: "userId" })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UserEntity;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   lastReadAt: Date | null;
 
-  @CreateDateColumn({ type: "timestamptz" })
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: "timestamptz" })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deletedAt: Date | null;
 }

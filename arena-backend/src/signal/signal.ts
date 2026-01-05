@@ -1,7 +1,7 @@
-import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
-import Redis from "ioredis";
-import { REDIS_CLIENT, REDIS_SUBSCRIBER } from "src/redis/redis.constants";
-import { SignalChannelType, SignalPayloadMap } from "./signal.channels";
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import Redis from 'ioredis';
+import { REDIS_CLIENT, REDIS_SUBSCRIBER } from 'src/redis/redis.constants';
+import { SignalChannelType, SignalPayloadMap } from './signal.channels';
 
 type SignalHandler<T> = (data: T) => void | Promise<void>;
 
@@ -17,7 +17,7 @@ export class Signal implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.subscriber.on("message", async (channel, data) => {
+    this.subscriber.on('message', async (channel, data) => {
       const handlers = this.handlers.get(channel);
       if (handlers) {
         const parsed = JSON.parse(data);

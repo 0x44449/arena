@@ -7,18 +7,18 @@ import {
   OnGatewayInit,
   ConnectedSocket,
   MessageBody,
-} from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
-import { Logger, UseGuards } from "@nestjs/common";
-import { WsJwtAuthGuard } from "src/guards/ws-jwt-auth.guard";
-import { Signal } from "src/signal/signal";
-import { SignalChannel } from "src/signal/signal.channels";
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { Logger, UseGuards } from '@nestjs/common';
+import { WsJwtAuthGuard } from 'src/guards/ws-jwt-auth.guard';
+import { Signal } from 'src/signal/signal';
+import { SignalChannel } from 'src/signal/signal.channels';
 
 @WebSocketGateway({
-  path: "/ws",
-  namespace: "/arena",
+  path: '/ws',
+  namespace: '/arena',
   cors: {
-    origin: "*",
+    origin: '*',
   },
 })
 export class ArenaGateway
@@ -32,11 +32,14 @@ export class ArenaGateway
   constructor(private readonly signal: Signal) {}
 
   afterInit() {
-    this.signal.subscribe(SignalChannel.MESSAGE_NEW, ({ channelId, message }) => {
-      const roomName = `channel:${channelId}`;
-      this.server.to(roomName).emit("message:new", message);
-      this.logger.debug(`Broadcasted message to ${roomName}`);
-    });
+    this.signal.subscribe(
+      SignalChannel.MESSAGE_NEW,
+      ({ channelId, message }) => {
+        const roomName = `channel:${channelId}`;
+        this.server.to(roomName).emit('message:new', message);
+        this.logger.debug(`Broadcasted message to ${roomName}`);
+      },
+    );
   }
 
   async handleConnection(client: Socket) {
@@ -56,7 +59,7 @@ export class ArenaGateway
   }
 
   @UseGuards(WsJwtAuthGuard)
-  @SubscribeMessage("channel:join")
+  @SubscribeMessage('channel:join')
   handleJoinChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody() channelId: string,
@@ -68,7 +71,7 @@ export class ArenaGateway
   }
 
   @UseGuards(WsJwtAuthGuard)
-  @SubscribeMessage("channel:leave")
+  @SubscribeMessage('channel:leave')
   handleLeaveChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody() channelId: string,

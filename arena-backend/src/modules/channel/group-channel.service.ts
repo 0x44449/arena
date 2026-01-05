@@ -1,14 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ChannelEntity } from "src/entities/channel.entity";
-import { ParticipantEntity } from "src/entities/participant.entity";
-import { GroupChannelEntity } from "src/entities/group-channel.entity";
-import { GroupParticipantEntity } from "src/entities/group-participant.entity";
-import { UserEntity } from "src/entities/user.entity";
-import { FileEntity } from "src/entities/file.entity";
-import { WellKnownException } from "src/exceptions/well-known-exception";
-import { generateId } from "src/utils/id-generator";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ChannelEntity } from 'src/entities/channel.entity';
+import { ParticipantEntity } from 'src/entities/participant.entity';
+import { GroupChannelEntity } from 'src/entities/group-channel.entity';
+import { GroupParticipantEntity } from 'src/entities/group-participant.entity';
+import { UserEntity } from 'src/entities/user.entity';
+import { FileEntity } from 'src/entities/file.entity';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
+import { generateId } from 'src/utils/id-generator';
 
 @Injectable()
 export class GroupChannelService {
@@ -47,8 +47,8 @@ export class GroupChannelService {
       });
       if (!iconFile) {
         throw new WellKnownException({
-          message: "Icon file not found",
-          errorCode: "FILE_NOT_FOUND",
+          message: 'Icon file not found',
+          errorCode: 'FILE_NOT_FOUND',
         });
       }
     }
@@ -61,7 +61,7 @@ export class GroupChannelService {
       if (!user) {
         throw new WellKnownException({
           message: `User not found: ${userId}`,
-          errorCode: "USER_NOT_FOUND",
+          errorCode: 'USER_NOT_FOUND',
         });
       }
     }
@@ -71,7 +71,7 @@ export class GroupChannelService {
     // 공통 채널 생성
     const channel = this.channelRepository.create({
       channelId,
-      type: "group",
+      type: 'group',
       name,
       teamId: null,
       lastMessageAt: null,
@@ -96,7 +96,7 @@ export class GroupChannelService {
     const creatorGroupParticipant = this.groupParticipantRepository.create({
       channelId,
       userId: creatorUserId,
-      role: "owner",
+      role: 'owner',
       nickname: null,
     });
     await this.groupParticipantRepository.save(creatorGroupParticipant);
@@ -114,7 +114,7 @@ export class GroupChannelService {
         const groupParticipant = this.groupParticipantRepository.create({
           channelId,
           userId,
-          role: "member",
+          role: 'member',
           nickname: null,
         });
         await this.groupParticipantRepository.save(groupParticipant);
@@ -124,13 +124,13 @@ export class GroupChannelService {
     // participants 조회 (user relation 포함)
     const participants = await this.participantRepository.find({
       where: { channelId },
-      relations: ["user", "user.avatar"],
+      relations: ['user', 'user.avatar'],
     });
 
     // groupChannel에 icon relation 로드
     const groupChannelWithIcon = await this.groupChannelRepository.findOne({
       where: { channelId },
-      relations: ["icon"],
+      relations: ['icon'],
     });
 
     return {

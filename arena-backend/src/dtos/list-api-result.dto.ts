@@ -1,12 +1,15 @@
-import { Type } from "@nestjs/common";
-import { ApiProperty } from "@nestjs/swagger";
-import { ApiResultDto } from "./api-result.dto";
+import { Type } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultDto } from './api-result.dto';
 
 export class ListApiResultDto<T> extends ApiResultDto {
   data: T[];
 }
 
-export function withListApiResult<T>(Model: Type<T>, options?: { nullable?: boolean }) {
+export function withListApiResult<T>(
+  Model: Type<T>,
+  options?: { nullable?: boolean },
+) {
   const { nullable = false } = options || {};
 
   class ListApiResultDtoWithModel extends ListApiResultDto<T> {
@@ -17,6 +20,8 @@ export function withListApiResult<T>(Model: Type<T>, options?: { nullable?: bool
     })
     declare data: T[];
   }
-  Object.defineProperty(ListApiResultDtoWithModel, 'name', { value: `${Model.name}${nullable ? "_Nullable" : ""}_ListResult` });
+  Object.defineProperty(ListApiResultDtoWithModel, 'name', {
+    value: `${Model.name}${nullable ? '_Nullable' : ''}_ListResult`,
+  });
   return ListApiResultDtoWithModel;
 }

@@ -1,12 +1,12 @@
-import { Inject, Injectable, OnModuleInit, forwardRef } from "@nestjs/common";
-import Redis from "ioredis";
-import { REDIS_CLIENT } from "src/redis/redis.constants";
-import { Signal } from "src/signal/signal";
-import { SignalChannel } from "src/signal/signal.channels";
-import { UserService } from "../user/user.service";
-import { CachedUser } from "./session.types";
+import { Inject, Injectable, OnModuleInit, forwardRef } from '@nestjs/common';
+import Redis from 'ioredis';
+import { REDIS_CLIENT } from 'src/redis/redis.constants';
+import { Signal } from 'src/signal/signal';
+import { SignalChannel } from 'src/signal/signal.channels';
+import { UserService } from '../user/user.service';
+import { CachedUser } from './session.types';
 
-const SESSION_PREFIX = "session:";
+const SESSION_PREFIX = 'session:';
 const SESSION_TTL = 300; // 5분
 
 @Injectable()
@@ -58,7 +58,7 @@ export class SessionService implements OnModuleInit {
 
   async set(user: CachedUser): Promise<void> {
     const key = this.getKey(user.uid);
-    await this.redis.set(key, JSON.stringify(user), "EX", SESSION_TTL);
+    await this.redis.set(key, JSON.stringify(user), 'EX', SESSION_TTL);
   }
 
   async invalidate(uid: string): Promise<void> {

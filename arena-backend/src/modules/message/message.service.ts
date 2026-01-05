@@ -1,17 +1,17 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import Redis from "ioredis";
-import { MessageEntity } from "src/entities/message.entity";
-import { ChannelEntity } from "src/entities/channel.entity";
-import { ParticipantEntity } from "src/entities/participant.entity";
-import { WellKnownException } from "src/exceptions/well-known-exception";
-import { generateId } from "src/utils/id-generator";
-import { GetMessagesResultDto } from "./dtos/get-messages-result.dto";
-import { toMessageDto } from "src/utils/message.mapper";
-import { Signal } from "src/signal/signal";
-import { SignalChannel } from "src/signal/signal.channels";
-import { REDIS_CLIENT } from "src/redis/redis.constants";
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import Redis from 'ioredis';
+import { MessageEntity } from 'src/entities/message.entity';
+import { ChannelEntity } from 'src/entities/channel.entity';
+import { ParticipantEntity } from 'src/entities/participant.entity';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
+import { generateId } from 'src/utils/id-generator';
+import { GetMessagesResultDto } from './dtos/get-messages-result.dto';
+import { toMessageDto } from 'src/utils/message.mapper';
+import { Signal } from 'src/signal/signal';
+import { SignalChannel } from 'src/signal/signal.channels';
+import { REDIS_CLIENT } from 'src/redis/redis.constants';
 
 const SYNC_LIMIT = 100;
 
@@ -40,8 +40,8 @@ export class MessageService {
     });
     if (!participant) {
       throw new WellKnownException({
-        message: "Not a participant of this channel",
-        errorCode: "NOT_PARTICIPANT",
+        message: 'Not a participant of this channel',
+        errorCode: 'NOT_PARTICIPANT',
       });
     }
 
@@ -69,7 +69,7 @@ export class MessageService {
     // sender relation 로드해서 반환
     const messageWithSender = await this.messageRepository.findOne({
       where: { messageId },
-      relations: ["sender", "sender.avatar"],
+      relations: ['sender', 'sender.avatar'],
     });
 
     // 웹소켓으로 브로드캐스트
@@ -97,8 +97,8 @@ export class MessageService {
     });
     if (!participant) {
       throw new WellKnownException({
-        message: "Not a participant of this channel",
-        errorCode: "NOT_PARTICIPANT",
+        message: 'Not a participant of this channel',
+        errorCode: 'NOT_PARTICIPANT',
       });
     }
 
@@ -111,8 +111,8 @@ export class MessageService {
       });
       if (!pivotMessage) {
         throw new WellKnownException({
-          message: "Message not found",
-          errorCode: "MESSAGE_NOT_FOUND",
+          message: 'Message not found',
+          errorCode: 'MESSAGE_NOT_FOUND',
         });
       }
 
@@ -120,10 +120,10 @@ export class MessageService {
 
       // pivot 이전 메시지들 (1개 더 가져와서 hasPrev 판단)
       const beforeMessages = await this.messageRepository
-        .createQueryBuilder("message")
-        .where("message.channelId = :channelId", { channelId })
-        .andWhere("message.seq < :seq", { seq: pivotMessage.seq })
-        .orderBy("message.seq", "DESC")
+        .createQueryBuilder('message')
+        .where('message.channelId = :channelId', { channelId })
+        .andWhere('message.seq < :seq', { seq: pivotMessage.seq })
+        .orderBy('message.seq', 'DESC')
         .take(halfLimit + 1)
         .getMany();
 
@@ -132,10 +132,10 @@ export class MessageService {
 
       // pivot 이후 메시지들 (1개 더 가져와서 hasNext 판단)
       const afterMessages = await this.messageRepository
-        .createQueryBuilder("message")
-        .where("message.channelId = :channelId", { channelId })
-        .andWhere("message.seq > :seq", { seq: pivotMessage.seq })
-        .orderBy("message.seq", "ASC")
+        .createQueryBuilder('message')
+        .where('message.channelId = :channelId', { channelId })
+        .andWhere('message.seq > :seq', { seq: pivotMessage.seq })
+        .orderBy('message.seq', 'ASC')
         .take(halfLimit + 1)
         .getMany();
 
@@ -152,11 +152,11 @@ export class MessageService {
       // sender relation 로드
       const messageIds = combinedMessages.map((m) => m.messageId);
       const messages = await this.messageRepository
-        .createQueryBuilder("message")
-        .leftJoinAndSelect("message.sender", "sender")
-        .leftJoinAndSelect("sender.avatar", "avatar")
-        .where("message.messageId IN (:...messageIds)", { messageIds })
-        .orderBy("message.seq", "ASC")
+        .createQueryBuilder('message')
+        .leftJoinAndSelect('message.sender', 'sender')
+        .leftJoinAndSelect('sender.avatar', 'avatar')
+        .where('message.messageId IN (:...messageIds)', { messageIds })
+        .orderBy('message.seq', 'ASC')
         .getMany();
 
       return { messages, hasNext, hasPrev };
@@ -169,19 +169,19 @@ export class MessageService {
       });
       if (!pivotMessage) {
         throw new WellKnownException({
-          message: "Message not found",
-          errorCode: "MESSAGE_NOT_FOUND",
+          message: 'Message not found',
+          errorCode: 'MESSAGE_NOT_FOUND',
         });
       }
 
       // 1개 더 가져와서 hasPrev 판단
       const messagesWithExtra = await this.messageRepository
-        .createQueryBuilder("message")
-        .leftJoinAndSelect("message.sender", "sender")
-        .leftJoinAndSelect("sender.avatar", "avatar")
-        .where("message.channelId = :channelId", { channelId })
-        .andWhere("message.seq < :seq", { seq: pivotMessage.seq })
-        .orderBy("message.seq", "DESC")
+        .createQueryBuilder('message')
+        .leftJoinAndSelect('message.sender', 'sender')
+        .leftJoinAndSelect('sender.avatar', 'avatar')
+        .where('message.channelId = :channelId', { channelId })
+        .andWhere('message.seq < :seq', { seq: pivotMessage.seq })
+        .orderBy('message.seq', 'DESC')
         .take(limit + 1)
         .getMany();
 
@@ -201,19 +201,19 @@ export class MessageService {
       });
       if (!pivotMessage) {
         throw new WellKnownException({
-          message: "Message not found",
-          errorCode: "MESSAGE_NOT_FOUND",
+          message: 'Message not found',
+          errorCode: 'MESSAGE_NOT_FOUND',
         });
       }
 
       // 1개 더 가져와서 hasNext 판단
       const messagesWithExtra = await this.messageRepository
-        .createQueryBuilder("message")
-        .leftJoinAndSelect("message.sender", "sender")
-        .leftJoinAndSelect("sender.avatar", "avatar")
-        .where("message.channelId = :channelId", { channelId })
-        .andWhere("message.seq > :seq", { seq: pivotMessage.seq })
-        .orderBy("message.seq", "ASC")
+        .createQueryBuilder('message')
+        .leftJoinAndSelect('message.sender', 'sender')
+        .leftJoinAndSelect('sender.avatar', 'avatar')
+        .where('message.channelId = :channelId', { channelId })
+        .andWhere('message.seq > :seq', { seq: pivotMessage.seq })
+        .orderBy('message.seq', 'ASC')
         .take(limit + 1)
         .getMany();
 
@@ -229,11 +229,11 @@ export class MessageService {
     // 기본: 최신 메시지부터
     // 1개 더 가져와서 hasPrev 판단
     const messagesWithExtra = await this.messageRepository
-      .createQueryBuilder("message")
-      .leftJoinAndSelect("message.sender", "sender")
-      .leftJoinAndSelect("sender.avatar", "avatar")
-      .where("message.channelId = :channelId", { channelId })
-      .orderBy("message.seq", "DESC")
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.sender', 'sender')
+      .leftJoinAndSelect('sender.avatar', 'avatar')
+      .where('message.channelId = :channelId', { channelId })
+      .orderBy('message.seq', 'DESC')
       .take(limit + 1)
       .getMany();
 
@@ -262,20 +262,20 @@ export class MessageService {
     });
     if (!participant) {
       throw new WellKnownException({
-        message: "Not a participant of this channel",
-        errorCode: "NOT_PARTICIPANT",
+        message: 'Not a participant of this channel',
+        errorCode: 'NOT_PARTICIPANT',
       });
     }
 
     // since 이후 변경된 메시지 조회 (삭제된 것 포함)
     const messages = await this.messageRepository
-      .createQueryBuilder("message")
+      .createQueryBuilder('message')
       .withDeleted()
-      .leftJoinAndSelect("message.sender", "sender")
-      .leftJoinAndSelect("sender.avatar", "avatar")
-      .where("message.channelId = :channelId", { channelId })
-      .andWhere("message.updatedAt > :since", { since })
-      .orderBy("message.seq", "ASC")
+      .leftJoinAndSelect('message.sender', 'sender')
+      .leftJoinAndSelect('sender.avatar', 'avatar')
+      .where('message.channelId = :channelId', { channelId })
+      .andWhere('message.updatedAt > :since', { since })
+      .orderBy('message.seq', 'ASC')
       .getMany();
 
     // 변경량 체크
@@ -284,11 +284,9 @@ export class MessageService {
     }
 
     // 분류
-    const created = messages.filter(
-      (m) => m.createdAt > since && !m.deletedAt
-    );
+    const created = messages.filter((m) => m.createdAt > since && !m.deletedAt);
     const updated = messages.filter(
-      (m) => m.createdAt <= since && !m.deletedAt
+      (m) => m.createdAt <= since && !m.deletedAt,
     );
     const deleted = messages
       .filter((m) => m.deletedAt !== null)

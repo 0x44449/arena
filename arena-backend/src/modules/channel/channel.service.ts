@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ChannelEntity } from "src/entities/channel.entity";
-import { ParticipantEntity } from "src/entities/participant.entity";
-import { GroupChannelEntity } from "src/entities/group-channel.entity";
-import { WellKnownException } from "src/exceptions/well-known-exception";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ChannelEntity } from 'src/entities/channel.entity';
+import { ParticipantEntity } from 'src/entities/participant.entity';
+import { GroupChannelEntity } from 'src/entities/group-channel.entity';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
 
 export interface ChannelWithDetails {
   channel: ChannelEntity;
@@ -30,7 +30,7 @@ export class ChannelService {
     // 내가 참여한 채널 조회
     const myParticipants = await this.participantRepository.find({
       where: { userId },
-      relations: ["channel"],
+      relations: ['channel'],
     });
 
     const results: ChannelWithDetails[] = [];
@@ -41,15 +41,15 @@ export class ChannelService {
       // 참여자 조회
       const participants = await this.participantRepository.find({
         where: { channelId: channel.channelId },
-        relations: ["user", "user.avatar"],
+        relations: ['user', 'user.avatar'],
       });
 
       // 그룹 채널이면 추가 정보 조회
       let groupChannel: GroupChannelEntity | null = null;
-      if (channel.type === "group") {
+      if (channel.type === 'group') {
         groupChannel = await this.groupChannelRepository.findOne({
           where: { channelId: channel.channelId },
-          relations: ["icon"],
+          relations: ['icon'],
         });
       }
 
@@ -69,17 +69,20 @@ export class ChannelService {
   /**
    * 채널 상세 조회
    */
-  async getChannel(channelId: string, userId: string): Promise<ChannelWithDetails> {
+  async getChannel(
+    channelId: string,
+    userId: string,
+  ): Promise<ChannelWithDetails> {
     // 참여 여부 확인
     const myParticipant = await this.participantRepository.findOne({
       where: { channelId, userId },
-      relations: ["channel"],
+      relations: ['channel'],
     });
 
     if (!myParticipant) {
       throw new WellKnownException({
-        message: "Channel not found or not a participant",
-        errorCode: "CHANNEL_NOT_FOUND",
+        message: 'Channel not found or not a participant',
+        errorCode: 'CHANNEL_NOT_FOUND',
       });
     }
 
@@ -88,15 +91,15 @@ export class ChannelService {
     // 참여자 조회
     const participants = await this.participantRepository.find({
       where: { channelId: channel.channelId },
-      relations: ["user", "user.avatar"],
+      relations: ['user', 'user.avatar'],
     });
 
     // 그룹 채널이면 추가 정보 조회
     let groupChannel: GroupChannelEntity | null = null;
-    if (channel.type === "group") {
+    if (channel.type === 'group') {
       groupChannel = await this.groupChannelRepository.findOne({
         where: { channelId: channel.channelId },
-        relations: ["icon"],
+        relations: ['icon'],
       });
     }
 

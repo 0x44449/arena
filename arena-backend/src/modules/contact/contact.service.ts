@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ContactEntity } from "src/entities/contact.entity";
-import { UserEntity } from "src/entities/user.entity";
-import { WellKnownException } from "src/exceptions/well-known-exception";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ContactEntity } from 'src/entities/contact.entity';
+import { UserEntity } from 'src/entities/user.entity';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
 
 @Injectable()
 export class ContactService {
@@ -17,8 +17,8 @@ export class ContactService {
   async getContacts(ownerId: string): Promise<ContactEntity[]> {
     return this.contactRepository.find({
       where: { ownerId },
-      relations: ["user", "user.avatar"],
-      order: { createdAt: "DESC" },
+      relations: ['user', 'user.avatar'],
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -26,8 +26,8 @@ export class ContactService {
     // 자기 자신 추가 불가
     if (ownerId === userId) {
       throw new WellKnownException({
-        message: "Cannot add yourself as contact",
-        errorCode: "INVALID_CONTACT",
+        message: 'Cannot add yourself as contact',
+        errorCode: 'INVALID_CONTACT',
       });
     }
 
@@ -37,8 +37,8 @@ export class ContactService {
     });
     if (!targetUser) {
       throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
       });
     }
 
@@ -48,8 +48,8 @@ export class ContactService {
     });
     if (existing) {
       throw new WellKnownException({
-        message: "Contact already exists",
-        errorCode: "CONTACT_ALREADY_EXISTS",
+        message: 'Contact already exists',
+        errorCode: 'CONTACT_ALREADY_EXISTS',
       });
     }
 
@@ -62,7 +62,7 @@ export class ContactService {
     // user relation 로드해서 반환
     const contactWithUser = await this.contactRepository.findOne({
       where: { ownerId, userId },
-      relations: ["user", "user.avatar"],
+      relations: ['user', 'user.avatar'],
     });
 
     return contactWithUser!;
@@ -74,8 +74,8 @@ export class ContactService {
     });
     if (!contact) {
       throw new WellKnownException({
-        message: "Contact not found",
-        errorCode: "CONTACT_NOT_FOUND",
+        message: 'Contact not found',
+        errorCode: 'CONTACT_NOT_FOUND',
       });
     }
 

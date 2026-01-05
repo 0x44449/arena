@@ -6,31 +6,31 @@ import {
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { UserEntity } from "./user.entity";
+} from 'typeorm';
+import { UserEntity } from './user.entity';
 
-@Entity({ name: "contacts" })
+@Entity({ name: 'contacts' })
 export class ContactEntity {
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   ownerId: string;
 
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   userId: string;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: "ownerId", referencedColumnName: "userId" })
+  @JoinColumn({ name: 'ownerId', referencedColumnName: 'userId' })
   owner: UserEntity;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: "userId", referencedColumnName: "userId" })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UserEntity;
 
-  @CreateDateColumn({ type: "timestamptz" })
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: "timestamptz" })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deletedAt: Date | null;
 }

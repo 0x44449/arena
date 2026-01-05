@@ -6,96 +6,114 @@ import {
   Param,
   Body,
   UseGuards,
-} from "@nestjs/common";
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
-import { SessionGuard } from "../session/session.guard";
-import { CurrentUser } from "src/decorators/current-user.decorator";
-import { FileService } from "./file.service";
-import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-api-result.dto";
-import { FileDto } from "src/dtos/file.dto";
-import { ApiResultDto } from "src/dtos/api-result.dto";
-import { GetPresignedUrlDto } from "./dtos/get-presigned-url.dto";
-import { PresignedUrlDto } from "./dtos/presigned-url.dto";
-import { RegisterFileDto } from "./dtos/register-file.dto";
-import { toFileDto } from "src/utils/file.mapper";
-import type { CachedUser } from "../session/session.types";
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ArenaJwtAuthGuard } from 'src/guards/arena-jwt-auth-guard';
+import { SessionGuard } from '../session/session.guard';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { FileService } from './file.service';
+import {
+  withSingleApiResult,
+  type SingleApiResultDto,
+} from 'src/dtos/single-api-result.dto';
+import { FileDto } from 'src/dtos/file.dto';
+import { ApiResultDto } from 'src/dtos/api-result.dto';
+import { GetPresignedUrlDto } from './dtos/get-presigned-url.dto';
+import { PresignedUrlDto } from './dtos/presigned-url.dto';
+import { RegisterFileDto } from './dtos/register-file.dto';
+import { toFileDto } from 'src/utils/file.mapper';
+import type { CachedUser } from '../session/session.types';
 
-@ApiTags("files")
-@Controller("/api/v1/files")
+@ApiTags('files')
+@Controller('/api/v1/files')
 @UseGuards(ArenaJwtAuthGuard, SessionGuard)
 @ApiBearerAuth()
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Post("presigned-url")
-  @ApiOperation({ summary: "파일 업로드 URL 발급" })
+  @Post('presigned-url')
+  @ApiOperation({ summary: '파일 업로드 URL 발급' })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPresignedUrl(
     @CurrentUser() user: CachedUser,
-    @Body() dto: GetPresignedUrlDto
+    @Body() dto: GetPresignedUrlDto,
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
     const result = await this.fileService.generatePresignedUrl(
       user.userId,
-      "public",
+      'public',
       dto.directory,
-      dto.mimeType
+      dto.mimeType,
     );
     return { success: true, data: result, errorCode: null };
   }
 
-  @Post("register")
-  @ApiOperation({ summary: "파일 등록" })
+  @Post('register')
+  @ApiOperation({ summary: '파일 등록' })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async registerFile(
     @CurrentUser() user: CachedUser,
-    @Body() dto: RegisterFileDto
+    @Body() dto: RegisterFileDto,
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.registerFile(user.userId, "public", dto);
+    const file = await this.fileService.registerFile(
+      user.userId,
+      'public',
+      dto,
+    );
     return { success: true, data: toFileDto(file), errorCode: null };
   }
 
-  @Post("private/presigned-url")
-  @ApiOperation({ summary: "Private 파일 업로드 URL 발급" })
+  @Post('private/presigned-url')
+  @ApiOperation({ summary: 'Private 파일 업로드 URL 발급' })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPrivatePresignedUrl(
     @CurrentUser() user: CachedUser,
-    @Body() dto: GetPresignedUrlDto
+    @Body() dto: GetPresignedUrlDto,
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
     const result = await this.fileService.generatePresignedUrl(
       user.userId,
-      "private",
+      'private',
       dto.directory,
-      dto.mimeType
+      dto.mimeType,
     );
     return { success: true, data: result, errorCode: null };
   }
 
-  @Post("private/register")
-  @ApiOperation({ summary: "Private 파일 등록" })
+  @Post('private/register')
+  @ApiOperation({ summary: 'Private 파일 등록' })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async registerPrivateFile(
     @CurrentUser() user: CachedUser,
-    @Body() dto: RegisterFileDto
+    @Body() dto: RegisterFileDto,
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.registerFile(user.userId, "private", dto);
+    const file = await this.fileService.registerFile(
+      user.userId,
+      'private',
+      dto,
+    );
     return { success: true, data: toFileDto(file), errorCode: null };
   }
 
-  @Get(":fileId")
-  @ApiOperation({ summary: "파일 조회" })
+  @Get(':fileId')
+  @ApiOperation({ summary: '파일 조회' })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
-  async getFile(@Param("fileId") fileId: string): Promise<SingleApiResultDto<FileDto>> {
+  async getFile(
+    @Param('fileId') fileId: string,
+  ): Promise<SingleApiResultDto<FileDto>> {
     const file = await this.fileService.getFileById(fileId);
     return { success: true, data: toFileDto(file), errorCode: null };
   }
 
-  @Delete(":fileId")
-  @ApiOperation({ summary: "파일 삭제" })
+  @Delete(':fileId')
+  @ApiOperation({ summary: '파일 삭제' })
   @ApiOkResponse({ type: ApiResultDto })
   async deleteFile(
     @CurrentUser() user: CachedUser,
-    @Param("fileId") fileId: string
+    @Param('fileId') fileId: string,
   ): Promise<ApiResultDto> {
     await this.fileService.deleteFile(fileId, user.userId);
     return { success: true, errorCode: null };

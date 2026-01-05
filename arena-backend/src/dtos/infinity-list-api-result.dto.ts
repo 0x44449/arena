@@ -1,6 +1,6 @@
-import { Type } from "@nestjs/common";
-import { ApiProperty } from "@nestjs/swagger";
-import { ApiResultDto } from "./api-result.dto";
+import { Type } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultDto } from './api-result.dto';
 
 export class InfinityListApiResultDto<T> extends ApiResultDto {
   data: T[];
@@ -16,13 +16,13 @@ export function withInfinityListApiResult<T>(Model: Type<T>) {
     })
     declare data: T[];
 
-    @ApiProperty({ description: "다음 데이터 존재 여부" })
+    @ApiProperty({ description: '다음 데이터 존재 여부' })
     declare hasNext: boolean;
 
-    @ApiProperty({ description: "이전 데이터 존재 여부" })
+    @ApiProperty({ description: '이전 데이터 존재 여부' })
     declare hasPrev: boolean;
   }
-  Object.defineProperty(InfinityListApiResultDtoWithModel, "name", {
+  Object.defineProperty(InfinityListApiResultDtoWithModel, 'name', {
     value: `${Model.name}_InfinityListResult`,
   });
   return InfinityListApiResultDtoWithModel;

@@ -1,15 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { Socket } from "socket.io";
-import * as jwt from "jsonwebtoken";
-import jwksClient from "jwks-rsa";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Socket } from 'socket.io';
+import * as jwt from 'jsonwebtoken';
+import jwksClient from 'jwks-rsa';
 
 @Injectable()
 export class WsJwtAuthGuard implements CanActivate {
   private readonly jwksClient: jwksClient.JwksClient;
 
   constructor(private readonly configService: ConfigService) {
-    const jwksUri = this.configService.getOrThrow<string>("SUPABASE_JWKS_URI");
+    const jwksUri = this.configService.getOrThrow<string>('SUPABASE_JWKS_URI');
     this.jwksClient = jwksClient({
       jwksUri,
       cache: true,
@@ -38,7 +38,7 @@ export class WsJwtAuthGuard implements CanActivate {
       const signingKey = key.getPublicKey();
 
       const payload = jwt.verify(token, signingKey, {
-        algorithms: ["ES256"],
+        algorithms: ['ES256'],
       }) as jwt.JwtPayload;
 
       client.data.user = {

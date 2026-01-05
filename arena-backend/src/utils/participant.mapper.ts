@@ -1,6 +1,6 @@
-import { ParticipantEntity } from "src/entities/participant.entity";
-import { ParticipantDto } from "src/dtos/participant.dto";
-import { toUserDto } from "./user.mapper";
+import { ParticipantEntity } from 'src/entities/participant.entity';
+import { ParticipantDto } from 'src/dtos/participant.dto';
+import { toUserDto } from './user.mapper';
 
 export function toParticipantDto(entity: ParticipantEntity): ParticipantDto {
   return {

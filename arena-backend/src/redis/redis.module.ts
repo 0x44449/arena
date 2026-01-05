@@ -1,7 +1,7 @@
-import { Global, Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import Redis from "ioredis";
-import { REDIS_CLIENT, REDIS_SUBSCRIBER } from "./redis.constants";
+import { Global, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import Redis from 'ioredis';
+import { REDIS_CLIENT, REDIS_SUBSCRIBER } from './redis.constants';
 
 @Global()
 @Module({
@@ -10,8 +10,8 @@ import { REDIS_CLIENT, REDIS_SUBSCRIBER } from "./redis.constants";
       provide: REDIS_CLIENT,
       useFactory: (configService: ConfigService) => {
         return new Redis({
-          host: configService.get<string>("REDIS_HOST") || "localhost",
-          port: configService.get<number>("REDIS_PORT") || 16379,
+          host: configService.get<string>('REDIS_HOST') || 'localhost',
+          port: configService.get<number>('REDIS_PORT') || 16379,
         });
       },
       inject: [ConfigService],
@@ -20,8 +20,8 @@ import { REDIS_CLIENT, REDIS_SUBSCRIBER } from "./redis.constants";
       provide: REDIS_SUBSCRIBER,
       useFactory: (configService: ConfigService) => {
         return new Redis({
-          host: configService.get<string>("REDIS_HOST") || "localhost",
-          port: configService.get<number>("REDIS_PORT") || 16379,
+          host: configService.get<string>('REDIS_HOST') || 'localhost',
+          port: configService.get<number>('REDIS_PORT') || 16379,
         });
       },
       inject: [ConfigService],

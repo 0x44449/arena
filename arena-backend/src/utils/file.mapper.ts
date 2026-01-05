@@ -1,6 +1,6 @@
-import { FileEntity } from "src/entities/file.entity";
-import { FileDto } from "src/dtos/file.dto";
-import { S3Service } from "src/modules/file/s3.service";
+import { FileEntity } from 'src/entities/file.entity';
+import { FileDto } from 'src/dtos/file.dto';
+import { S3Service } from 'src/modules/file/s3.service';
 
 export function toFileDto(entity: FileEntity): FileDto {
   return {

@@ -1,17 +1,12 @@
-import {
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryColumn,
-} from "typeorm";
-import { ChannelEntity } from "./channel.entity";
+import { Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { ChannelEntity } from './channel.entity';
 
-@Entity({ name: "direct_channels" })
+@Entity({ name: 'direct_channels' })
 export class DirectChannelEntity {
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   channelId: string;
 
   @OneToOne(() => ChannelEntity)
-  @JoinColumn({ name: "channelId", referencedColumnName: "channelId" })
+  @JoinColumn({ name: 'channelId', referencedColumnName: 'channelId' })
   channel: ChannelEntity;
 }

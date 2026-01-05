@@ -5,23 +5,23 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryColumn,
-} from "typeorm";
-import { ChannelEntity } from "./channel.entity";
-import { FileEntity } from "./file.entity";
+} from 'typeorm';
+import { ChannelEntity } from './channel.entity';
+import { FileEntity } from './file.entity';
 
-@Entity({ name: "group_channels" })
+@Entity({ name: 'group_channels' })
 export class GroupChannelEntity {
-  @PrimaryColumn({ type: "text" })
+  @PrimaryColumn({ type: 'text' })
   channelId: string;
 
   @OneToOne(() => ChannelEntity)
-  @JoinColumn({ name: "channelId", referencedColumnName: "channelId" })
+  @JoinColumn({ name: 'channelId', referencedColumnName: 'channelId' })
   channel: ChannelEntity;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   iconFileId: string | null;
 
   @ManyToOne(() => FileEntity, { nullable: true })
-  @JoinColumn({ name: "iconFileId", referencedColumnName: "fileId" })
+  @JoinColumn({ name: 'iconFileId', referencedColumnName: 'fileId' })
   icon: FileEntity | null;
 }

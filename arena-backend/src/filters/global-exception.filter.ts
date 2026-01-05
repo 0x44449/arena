@@ -5,10 +5,10 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from "@nestjs/common";
-import type { Response } from "express";
-import { ApiResultDto } from "src/dtos/api-result.dto";
-import { WellKnownException } from "src/exceptions/well-known-exception";
+} from '@nestjs/common';
+import type { Response } from 'express';
+import { ApiResultDto } from 'src/dtos/api-result.dto';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -19,16 +19,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     let statusCode = HttpStatus.OK;
-    let errorCode = "INTERNAL_ERROR";
+    let errorCode = 'INTERNAL_ERROR';
 
     if (exception instanceof WellKnownException) {
-      errorCode = exception.errorCode ?? "UNKNOWN_ERROR";
+      errorCode = exception.errorCode ?? 'UNKNOWN_ERROR';
       this.logger.warn(exception.message);
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
       errorCode = this.httpStatusToErrorCode(statusCode);
       this.logger.warn(`HttpException: ${exception.message}`);
-      this.logger.warn(`HttpException cause:`, exception.cause, " stack:", exception.stack);
+      this.logger.warn(
+        `HttpException cause:`,
+        exception.cause,
+        ' stack:',
+        exception.stack,
+      );
     } else {
       statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       this.logUnknownException(exception);
@@ -45,17 +50,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private httpStatusToErrorCode(status: number): string {
     switch (status) {
       case HttpStatus.UNAUTHORIZED:
-        return "UNAUTHORIZED";
+        return 'UNAUTHORIZED';
       case HttpStatus.FORBIDDEN:
-        return "FORBIDDEN";
+        return 'FORBIDDEN';
       case HttpStatus.NOT_FOUND:
-        return "NOT_FOUND";
+        return 'NOT_FOUND';
       case HttpStatus.BAD_REQUEST:
-        return "BAD_REQUEST";
+        return 'BAD_REQUEST';
       case HttpStatus.CONFLICT:
-        return "CONFLICT";
+        return 'CONFLICT';
       default:
-        return "HTTP_ERROR";
+        return 'HTTP_ERROR';
     }
   }
 

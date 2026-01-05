@@ -1,6 +1,6 @@
-import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import { CachedUser } from "src/modules/session/session.types";
-import { WellKnownException } from "src/exceptions/well-known-exception";
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { CachedUser } from 'src/modules/session/session.types';
+import { WellKnownException } from 'src/exceptions/well-known-exception';
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): CachedUser => {
@@ -9,8 +9,8 @@ export const CurrentUser = createParamDecorator(
 
     if (!cachedUser) {
       throw new WellKnownException({
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
       });
     }
 
