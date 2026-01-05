@@ -41,15 +41,22 @@ export class UserService {
     return user;
   }
 
-  async findByUtag(utag: string): Promise<UserEntity | null> {
-    const normalized = this.normalizeUtag(utag);
-    if (!normalized) {
-      return null;
-    }
+  async findByUserId(userId: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({
-      where: { utag: normalized, deletedAt: IsNull() },
+      where: { userId, deletedAt: IsNull() },
       relations: ["avatar"],
     });
+  }
+
+  async getByUserId(userId: string): Promise<UserEntity> {
+    const user = await this.findByUserId(userId);
+    if (!user) {
+      throw new WellKnownException({
+        message: "User not found",
+        errorCode: "USER_NOT_FOUND",
+      });
+    }
+    return user;
   }
 
   async create(uid: string, dto: CreateUserDto): Promise<UserEntity> {
@@ -82,11 +89,8 @@ export class UserService {
     return (await this.findByUid(uid))!;
   }
 
-  async update(utag: string, dto: UpdateUserDto): Promise<UserEntity | null> {
-    const user = await this.findByUtag(utag);
-    if (!user) {
-      return null;
-    }
+  async update(userId: string, dto: UpdateUserDto): Promise<UserEntity> {
+    const user = await this.getByUserId(userId);
 
     if (dto.nick !== undefined) {
       user.nick = dto.nick;
@@ -108,11 +112,7 @@ export class UserService {
     await this.signal.publish(SignalChannel.USER_UPDATED, { uid: user.uid });
 
     // avatar relation 포함해서 다시 조회
-    return this.findByUtag(utag);
-  }
-
-  private normalizeUtag(utag: string): string {
-    return utag.trim().toUpperCase();
+    return (await this.findByUserId(userId))!;
   }
 
   private async generateUniqueUtag(): Promise<string> {
