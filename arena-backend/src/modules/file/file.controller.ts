@@ -17,21 +17,21 @@ import { FileDto } from "src/dtos/file.dto";
 import { ApiResultDto } from "src/dtos/api-result.dto";
 import { GetPresignedUrlDto } from "./dtos/get-presigned-url.dto";
 import { PresignedUrlDto } from "./dtos/presigned-url.dto";
-import { CreateFileDto } from "./dtos/create-file.dto";
+import { RegisterFileDto } from "./dtos/register-file.dto";
 import { toFileDto } from "src/utils/file.mapper";
 import type { CachedUser } from "../session/session.types";
 
 @ApiTags("files")
 @Controller("/api/v1/files")
+@UseGuards(ArenaJwtAuthGuard, SessionGuard)
+@ApiBearerAuth()
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post("presigned-url")
-  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "파일 업로드 URL 발급" })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
-  async getPublicPresignedUrl(
+  async getPresignedUrl(
     @CurrentUser() user: CachedUser,
     @Body() dto: GetPresignedUrlDto
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
@@ -39,28 +39,23 @@ export class FileController {
       user.userId,
       "public",
       dto.directory,
-      dto.fileExtension,
       dto.mimeType
     );
     return { success: true, data: result, errorCode: null };
   }
 
-  @Post("")
-  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "파일 생성" })
+  @Post("register")
+  @ApiOperation({ summary: "파일 등록" })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
-  async createPublicFile(
+  async registerFile(
     @CurrentUser() user: CachedUser,
-    @Body() dto: CreateFileDto
+    @Body() dto: RegisterFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.createFile(user.userId, "public", dto);
+    const file = await this.fileService.registerFile(user.userId, "public", dto);
     return { success: true, data: toFileDto(file), errorCode: null };
   }
 
   @Post("private/presigned-url")
-  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Private 파일 업로드 URL 발급" })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPrivatePresignedUrl(
@@ -71,22 +66,19 @@ export class FileController {
       user.userId,
       "private",
       dto.directory,
-      dto.fileExtension,
       dto.mimeType
     );
     return { success: true, data: result, errorCode: null };
   }
 
-  @Post("private")
-  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Private 파일 생성" })
+  @Post("private/register")
+  @ApiOperation({ summary: "Private 파일 등록" })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
-  async createPrivateFile(
+  async registerPrivateFile(
     @CurrentUser() user: CachedUser,
-    @Body() dto: CreateFileDto
+    @Body() dto: RegisterFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.createFile(user.userId, "private", dto);
+    const file = await this.fileService.registerFile(user.userId, "private", dto);
     return { success: true, data: toFileDto(file), errorCode: null };
   }
 
@@ -99,8 +91,6 @@ export class FileController {
   }
 
   @Delete(":fileId")
-  @UseGuards(ArenaJwtAuthGuard, SessionGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "파일 삭제" })
   @ApiOkResponse({ type: ApiResultDto })
   async deleteFile(

@@ -6,7 +6,7 @@ import { S3Service } from "./s3.service";
 import { generateId } from "src/utils/id-generator";
 import { WellKnownException } from "src/exceptions/well-known-exception";
 import { PresignedUrlDto } from "./dtos/presigned-url.dto";
-import { CreateFileDto } from "./dtos/create-file.dto";
+import { RegisterFileDto } from "./dtos/register-file.dto";
 
 @Injectable()
 export class FileService {
@@ -20,15 +20,16 @@ export class FileService {
 
   async generatePresignedUrl(
     userId: string,
-    bucket: 'public' | 'private',
-    directory: string,
-    fileExtension: string,
+    bucket: "public" | "private",
+    directory: string | undefined,
     mimeType: string
   ): Promise<PresignedUrlDto> {
-    const timestamp = Date.now();
-    const key = `${directory}/${userId}/${timestamp}.${fileExtension}`;
+    const fileId = generateId();
+    const key = directory
+      ? `${userId}/${directory}/${fileId}`
+      : `${userId}/${fileId}`;
     
-    const uploadUrl = bucket === 'public'
+    const uploadUrl = bucket === "public"
       ? await this.s3Service.getPresignedUploadUrlPublic(key, mimeType, FileService.PRESIGNED_URL_EXPIRES_IN)
       : await this.s3Service.getPresignedUploadUrlPrivate(key, mimeType, FileService.PRESIGNED_URL_EXPIRES_IN);
     
@@ -39,16 +40,16 @@ export class FileService {
     };
   }
 
-  async createFile(
+  async registerFile(
     userId: string,
-    bucket: 'public' | 'private',
-    dto: CreateFileDto
+    bucket: "public" | "private",
+    dto: RegisterFileDto
   ): Promise<FileEntity> {
-    // 권한 검증
-    if (!dto.key.includes(`/${userId}/`)) {
+    // 권한 검증: 키가 userId로 시작하는지 확인
+    if (!dto.key.startsWith(`${userId}/`)) {
       throw new WellKnownException({
-        message: 'Invalid key for this user',
-        errorCode: 'INVALID_KEY',
+        message: "Invalid key for this user",
+        errorCode: "INVALID_KEY",
       });
     }
 
@@ -56,8 +57,8 @@ export class FileService {
     const metadata = await this.s3Service.getMetadata(bucket, dto.key);
     if (!metadata) {
       throw new WellKnownException({
-        message: 'File not found in S3',
-        errorCode: 'FILE_NOT_FOUND',
+        message: "File not found in S3",
+        errorCode: "FILE_NOT_FOUND",
       });
     }
 
@@ -81,7 +82,7 @@ export class FileService {
     });
 
     if (!file) {
-      throw new NotFoundException('File not found');
+      throw new NotFoundException("File not found");
     }
 
     return file;
@@ -92,13 +93,13 @@ export class FileService {
 
     if (file.ownerId !== userId) {
       throw new WellKnownException({
-        message: 'Not authorized to delete this file',
-        errorCode: 'UNAUTHORIZED',
+        message: "Not authorized to delete this file",
+        errorCode: "UNAUTHORIZED",
       });
     }
 
     await this.s3Service.delete(
-      file.bucket as 'public' | 'private',
+      file.bucket as "public" | "private",
       file.storageKey
     );
     
