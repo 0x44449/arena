@@ -7,4 +7,7 @@ export class ContactDto {
 
   @ApiProperty({ description: "추가한 시간" })
   createdAt: Date;
+
+  @ApiProperty({ description: "수정 시간" })
+  updatedAt: Date;
 }

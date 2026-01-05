@@ -41,4 +41,7 @@ export class ChannelDto {
 
   @ApiProperty({ description: "생성 시간" })
   createdAt: Date;
+
+  @ApiProperty({ description: "수정 시간" })
+  updatedAt: Date;
 }

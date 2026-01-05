@@ -16,5 +16,6 @@ export function toChannelDto(
     participants,
     lastMessageAt: channel.lastMessageAt,
     createdAt: channel.createdAt,
+    updatedAt: channel.updatedAt,
   };
 }

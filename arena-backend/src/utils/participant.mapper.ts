@@ -9,6 +9,7 @@ export function toParticipantDto(
   return {
     user: userDto,
     lastReadAt: entity.lastReadAt,
-    joinedAt: entity.joinedAt,
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
   };
 }

@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryColumn,
   UpdateDateColumn,
@@ -30,4 +31,7 @@ export class ChannelEntity {
 
   @UpdateDateColumn({ type: "timestamptz" })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  deletedAt: Date | null;
 }

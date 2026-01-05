@@ -13,5 +13,8 @@ export class ParticipantDto {
   lastReadAt: Date | null;
 
   @ApiProperty({ description: "참여 시간" })
-  joinedAt: Date;
+  createdAt: Date;
+
+  @ApiProperty({ description: "수정 시간" })
+  updatedAt: Date;
 }

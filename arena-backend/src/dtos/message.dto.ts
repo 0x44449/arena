@@ -11,9 +11,15 @@ export class MessageDto {
   @ApiProperty({ description: "보낸 사람" })
   sender: UserDto;
 
+  @ApiProperty({ description: "메시지 순번" })
+  seq: number;
+
   @ApiProperty({ description: "메시지 내용" })
   content: string;
 
-  @ApiProperty({ description: "보낸 시간" })
+  @ApiProperty({ description: "생성 시간" })
   createdAt: Date;
+
+  @ApiProperty({ description: "수정 시간" })
+  updatedAt: Date;
 }

@@ -1,11 +1,13 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { ChannelEntity } from "./channel.entity";
 import { UserEntity } from "./user.entity";
@@ -31,5 +33,11 @@ export class ParticipantEntity {
   lastReadAt: Date | null;
 
   @CreateDateColumn({ type: "timestamptz" })
-  joinedAt: Date;
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: "timestamptz" })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  deletedAt: Date | null;
 }

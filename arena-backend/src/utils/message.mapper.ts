@@ -10,7 +10,9 @@ export function toMessageDto(
     messageId: entity.messageId,
     channelId: entity.channelId,
     sender: senderDto,
+    seq: Number(entity.seq),
     content: entity.content,
     createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
   };
 }

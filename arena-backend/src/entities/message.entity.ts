@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -34,6 +35,9 @@ export class MessageEntity {
 
   @UpdateDateColumn({ type: "timestamptz" })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: "timestamptz", nullable: true })
+  deletedAt: Date | null;
 
   @ManyToOne(() => ChannelEntity)
   @JoinColumn({ name: "channelId", referencedColumnName: "channelId" })

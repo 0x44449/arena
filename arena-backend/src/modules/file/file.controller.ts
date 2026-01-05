@@ -7,7 +7,7 @@ import {
   Body,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
 import { SessionGuard } from "../session/session.guard";
 import { CurrentUser } from "src/decorators/current-user.decorator";
@@ -30,11 +30,10 @@ export class FileController {
     private readonly s3Service: S3Service,
   ) {}
 
-  // ========== Public 파일 (아바타, 그룹 아이콘 등) ==========
-  
   @Post("public/presigned-url")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: "Public 파일 업로드 URL 발급" })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPublicPresignedUrl(
     @CurrentUser() user: CachedUser,
@@ -42,7 +41,7 @@ export class FileController {
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
     const result = await this.fileService.generatePresignedUrl(
       user.userId,
-      'public',
+      "public",
       dto.directory,
       dto.fileExtension,
       dto.mimeType
@@ -53,21 +52,21 @@ export class FileController {
   @Post("public")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: "Public 파일 생성" })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async createPublicFile(
     @CurrentUser() user: CachedUser,
     @Body() dto: CreateFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.createFile(user.userId, 'public', dto);
+    const file = await this.fileService.createFile(user.userId, "public", dto);
     const fileDto = await toFileDto(file, this.s3Service);
     return { success: true, data: fileDto, errorCode: null };
   }
 
-  // ========== Private 파일 (첨부파일 등) ==========
-  
   @Post("private/presigned-url")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: "Private 파일 업로드 URL 발급" })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPrivatePresignedUrl(
     @CurrentUser() user: CachedUser,
@@ -75,7 +74,7 @@ export class FileController {
   ): Promise<SingleApiResultDto<PresignedUrlDto>> {
     const result = await this.fileService.generatePresignedUrl(
       user.userId,
-      'private',
+      "private",
       dto.directory,
       dto.fileExtension,
       dto.mimeType
@@ -86,19 +85,19 @@ export class FileController {
   @Post("private")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: "Private 파일 생성" })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async createPrivateFile(
     @CurrentUser() user: CachedUser,
     @Body() dto: CreateFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
-    const file = await this.fileService.createFile(user.userId, 'private', dto);
+    const file = await this.fileService.createFile(user.userId, "private", dto);
     const fileDto = await toFileDto(file, this.s3Service);
     return { success: true, data: fileDto, errorCode: null };
   }
 
-  // ========== 공통 (조회/삭제) ==========
-  
   @Get(":fileId")
+  @ApiOperation({ summary: "파일 조회" })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async getFile(@Param("fileId") fileId: string): Promise<SingleApiResultDto<FileDto>> {
     const file = await this.fileService.getFileById(fileId);
@@ -109,6 +108,7 @@ export class FileController {
   @Delete(":fileId")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: "파일 삭제" })
   @ApiOkResponse({ type: ApiResultDto })
   async deleteFile(
     @CurrentUser() user: CachedUser,

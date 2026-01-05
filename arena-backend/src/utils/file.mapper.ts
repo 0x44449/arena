@@ -7,16 +7,17 @@ export async function toFileDto(
   s3Service: S3Service
 ): Promise<FileDto> {
   const url = await s3Service.getPresignedDownloadUrl(
-    entity.bucket as 'public' | 'private',
+    entity.bucket as "public" | "private",
     entity.storageKey
   );
 
   return {
-    id: entity.fileId,
+    fileId: entity.fileId,
     name: entity.originalName,
     url,
     mimeType: entity.mimeType,
     size: Number(entity.size),
     createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
   };
 }

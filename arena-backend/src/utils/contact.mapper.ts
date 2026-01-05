@@ -9,5 +9,6 @@ export function toContactDto(
   return {
     user: userDto,
     createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
   };
 }
