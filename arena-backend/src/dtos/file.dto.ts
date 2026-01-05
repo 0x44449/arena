@@ -4,11 +4,11 @@ export class FileDto {
   @ApiProperty({ description: "파일 ID" })
   fileId: string;
 
+  @ApiProperty({ description: "파일 URL" })
+  url: string;
+
   @ApiProperty({ description: "파일명" })
   name: string;
-
-  @ApiProperty({ description: "다운로드 URL" })
-  url: string;
 
   @ApiProperty({ description: "MIME 타입" })
   mimeType: string;

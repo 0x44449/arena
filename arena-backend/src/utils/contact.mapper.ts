@@ -1,13 +1,10 @@
 import { ContactEntity } from "src/entities/contact.entity";
 import { ContactDto } from "src/dtos/contact.dto";
-import { UserDto } from "src/dtos/user.dto";
+import { toUserDto } from "./user.mapper";
 
-export function toContactDto(
-  entity: ContactEntity,
-  userDto: UserDto,
-): ContactDto {
+export function toContactDto(entity: ContactEntity): ContactDto {
   return {
-    user: userDto,
+    user: toUserDto(entity.user),
     createdAt: entity.createdAt,
     updatedAt: entity.updatedAt,
   };

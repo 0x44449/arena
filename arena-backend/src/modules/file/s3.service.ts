@@ -19,6 +19,11 @@ export class S3Service implements OnModuleInit {
   private static readonly PRESIGNED_URL_EXPIRES_IN = 86400; // 24시간
   private static readonly CACHE_TTL = 82800; // 23시간
   private static readonly CACHE_REFRESH_THRESHOLD = 3600; // 1시간
+  private static readonly S3_BASE_URL = process.env.S3_BASE_URL || "http://localhost:14566";
+
+  static getFileUrl(bucket: string, storageKey: string): string {
+    return `${S3Service.S3_BASE_URL}/${bucket}/${storageKey}`;
+  }
 
   private readonly s3Client: S3Client;
   private readonly publicBucket: string;
@@ -111,9 +116,7 @@ export class S3Service implements OnModuleInit {
   ): Promise<string> {
     // Public은 캐싱 불필요 (static URL)
     if (bucket === 'public') {
-      const s3PublicUrl = this.configService.get<string>("S3_PUBLIC_URL") || 
-                          "http://localhost:14566/arena-files-public";
-      return `${s3PublicUrl}/${key}`;
+      return S3Service.getFileUrl(this.publicBucket, key);
     }
 
     // Private는 캐싱

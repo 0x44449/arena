@@ -1,13 +1,13 @@
 import { UserEntity } from "src/entities/user.entity";
 import { UserDto } from "src/dtos/user.dto";
-import { FileDto } from "src/dtos/file.dto";
+import { toFileDto } from "./file.mapper";
 
-export function toUserDto(entity: UserEntity, avatar: FileDto | null): UserDto {
+export function toUserDto(entity: UserEntity): UserDto {
   return {
     userId: entity.userId,
     utag: entity.utag,
     nick: entity.nick,
-    avatar,
+    avatar: entity.avatar ? toFileDto(entity.avatar) : null,
     email: entity.email,
     statusMessage: entity.statusMessage,
     createdAt: entity.createdAt,

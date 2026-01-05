@@ -12,7 +12,6 @@ import { ArenaJwtAuthGuard } from "src/guards/arena-jwt-auth-guard";
 import { SessionGuard } from "../session/session.guard";
 import { CurrentUser } from "src/decorators/current-user.decorator";
 import { FileService } from "./file.service";
-import { S3Service } from "./s3.service";
 import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-api-result.dto";
 import { FileDto } from "src/dtos/file.dto";
 import { ApiResultDto } from "src/dtos/api-result.dto";
@@ -25,15 +24,12 @@ import type { CachedUser } from "../session/session.types";
 @ApiTags("files")
 @Controller("/api/v1/files")
 export class FileController {
-  constructor(
-    private readonly fileService: FileService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly fileService: FileService) {}
 
-  @Post("public/presigned-url")
+  @Post("presigned-url")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Public 파일 업로드 URL 발급" })
+  @ApiOperation({ summary: "파일 업로드 URL 발급" })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPublicPresignedUrl(
     @CurrentUser() user: CachedUser,
@@ -49,18 +45,17 @@ export class FileController {
     return { success: true, data: result, errorCode: null };
   }
 
-  @Post("public")
+  @Post("")
   @UseGuards(ArenaJwtAuthGuard, SessionGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Public 파일 생성" })
+  @ApiOperation({ summary: "파일 생성" })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async createPublicFile(
     @CurrentUser() user: CachedUser,
     @Body() dto: CreateFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
     const file = await this.fileService.createFile(user.userId, "public", dto);
-    const fileDto = await toFileDto(file, this.s3Service);
-    return { success: true, data: fileDto, errorCode: null };
+    return { success: true, data: toFileDto(file), errorCode: null };
   }
 
   @Post("private/presigned-url")
@@ -92,8 +87,7 @@ export class FileController {
     @Body() dto: CreateFileDto
   ): Promise<SingleApiResultDto<FileDto>> {
     const file = await this.fileService.createFile(user.userId, "private", dto);
-    const fileDto = await toFileDto(file, this.s3Service);
-    return { success: true, data: fileDto, errorCode: null };
+    return { success: true, data: toFileDto(file), errorCode: null };
   }
 
   @Get(":fileId")
@@ -101,8 +95,7 @@ export class FileController {
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async getFile(@Param("fileId") fileId: string): Promise<SingleApiResultDto<FileDto>> {
     const file = await this.fileService.getFileById(fileId);
-    const fileDto = await toFileDto(file, this.s3Service);
-    return { success: true, data: fileDto, errorCode: null };
+    return { success: true, data: toFileDto(file), errorCode: null };
   }
 
   @Delete(":fileId")

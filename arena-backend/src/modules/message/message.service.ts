@@ -9,13 +9,11 @@ import { WellKnownException } from "src/exceptions/well-known-exception";
 import { generateId } from "src/utils/id-generator";
 import { GetMessagesResultDto } from "./dtos/get-messages-result.dto";
 import { toMessageDto } from "src/utils/message.mapper";
-import { toUserDto } from "src/utils/user.mapper";
-import { toFileDto } from "src/utils/file.mapper";
-import { S3Service } from "../file/s3.service";
 import { Signal } from "src/signal/signal";
 import { SignalChannel } from "src/signal/signal.channels";
 import { REDIS_CLIENT } from "src/redis/redis.constants";
-import { MessageDto } from "src/dtos/message.dto";
+
+const SYNC_LIMIT = 100;
 
 @Injectable()
 export class MessageService {
@@ -28,7 +26,6 @@ export class MessageService {
     private readonly participantRepository: Repository<ParticipantEntity>,
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
-    private readonly s3Service: S3Service,
     private readonly signal: Signal,
   ) {}
 
@@ -76,20 +73,9 @@ export class MessageService {
     });
 
     // 웹소켓으로 브로드캐스트
-    // TODO: 현재 Service에서 DTO 변환을 하고 있음 (레이어 원칙 위반)
-    // 원칙적으로는 Service는 Entity만 반환하고, DTO 변환은 전달 담당자(Controller, Gateway)가 해야 함.
-    // 개선 방향:
-    // 1. EventEmitter로 이벤트 발행 (message.created)
-    // 2. Gateway에서 이벤트 구독 후 DTO 변환 및 브로드캐스트
-    // 3. 재조회 피하려면 이벤트에 Entity 포함
-    const avatar = messageWithSender!.sender.avatar
-      ? await toFileDto(messageWithSender!.sender.avatar, this.s3Service)
-      : null;
-    const senderDto = toUserDto(messageWithSender!.sender, avatar);
-    const messageDto = toMessageDto(messageWithSender!, senderDto);
     await this.signal.publish(SignalChannel.MESSAGE_NEW, {
       channelId,
-      message: messageDto,
+      message: toMessageDto(messageWithSender!),
     });
 
     return messageWithSender!;
@@ -258,5 +244,56 @@ export class MessageService {
     const hasNext = false;
 
     return { messages, hasNext, hasPrev };
+  }
+
+  async syncMessages(
+    userId: string,
+    channelId: string,
+    since: Date,
+  ): Promise<{
+    created: MessageEntity[];
+    updated: MessageEntity[];
+    deleted: string[];
+    requireFullSync: boolean;
+  }> {
+    // 채널 참여자인지 확인
+    const participant = await this.participantRepository.findOne({
+      where: { channelId, userId },
+    });
+    if (!participant) {
+      throw new WellKnownException({
+        message: "Not a participant of this channel",
+        errorCode: "NOT_PARTICIPANT",
+      });
+    }
+
+    // since 이후 변경된 메시지 조회 (삭제된 것 포함)
+    const messages = await this.messageRepository
+      .createQueryBuilder("message")
+      .withDeleted()
+      .leftJoinAndSelect("message.sender", "sender")
+      .leftJoinAndSelect("sender.avatar", "avatar")
+      .where("message.channelId = :channelId", { channelId })
+      .andWhere("message.updatedAt > :since", { since })
+      .orderBy("message.seq", "ASC")
+      .getMany();
+
+    // 변경량 체크
+    if (messages.length > SYNC_LIMIT) {
+      return { created: [], updated: [], deleted: [], requireFullSync: true };
+    }
+
+    // 분류
+    const created = messages.filter(
+      (m) => m.createdAt > since && !m.deletedAt
+    );
+    const updated = messages.filter(
+      (m) => m.createdAt <= since && !m.deletedAt
+    );
+    const deleted = messages
+      .filter((m) => m.deletedAt !== null)
+      .map((m) => m.messageId);
+
+    return { created, updated, deleted, requireFullSync: false };
   }
 }

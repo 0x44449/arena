@@ -17,10 +17,7 @@ import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-ap
 import { withListApiResult, type ListApiResultDto } from "src/dtos/list-api-result.dto";
 import { CreateContactDto } from "./dtos/create-contact.dto";
 import { ContactService } from "./contact.service";
-import { S3Service } from "../file/s3.service";
 import { toContactDto } from "src/utils/contact.mapper";
-import { toUserDto } from "src/utils/user.mapper";
-import { toFileDto } from "src/utils/file.mapper";
 import type { CachedUser } from "../session/session.types";
 
 @ApiTags("contacts")
@@ -28,10 +25,7 @@ import type { CachedUser } from "../session/session.types";
 @UseGuards(ArenaJwtAuthGuard, SessionGuard)
 @ApiBearerAuth()
 export class ContactController {
-  constructor(
-    private readonly contactService: ContactService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly contactService: ContactService) {}
 
   @Get()
   @ApiOperation({ summary: "내 연락처 목록 조회" })
@@ -41,18 +35,9 @@ export class ContactController {
   ): Promise<ListApiResultDto<ContactDto>> {
     const contacts = await this.contactService.getContacts(user.userId);
 
-    const contactDtos: ContactDto[] = [];
-    for (const contact of contacts) {
-      const avatar = contact.user.avatar
-        ? await toFileDto(contact.user.avatar, this.s3Service)
-        : null;
-      const userDto = toUserDto(contact.user, avatar);
-      contactDtos.push(toContactDto(contact, userDto));
-    }
-
     return {
       success: true,
-      data: contactDtos,
+      data: contacts.map(toContactDto),
       errorCode: null,
     };
   }
@@ -66,14 +51,9 @@ export class ContactController {
   ): Promise<SingleApiResultDto<ContactDto>> {
     const contact = await this.contactService.createContact(user.userId, dto.userId);
 
-    const avatar = contact.user.avatar
-      ? await toFileDto(contact.user.avatar, this.s3Service)
-      : null;
-    const userDto = toUserDto(contact.user, avatar);
-
     return {
       success: true,
-      data: toContactDto(contact, userDto),
+      data: toContactDto(contact),
       errorCode: null,
     };
   }

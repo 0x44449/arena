@@ -1,15 +1,12 @@
 import { MessageEntity } from "src/entities/message.entity";
 import { MessageDto } from "src/dtos/message.dto";
-import { UserDto } from "src/dtos/user.dto";
+import { toUserDto } from "./user.mapper";
 
-export function toMessageDto(
-  entity: MessageEntity,
-  senderDto: UserDto,
-): MessageDto {
+export function toMessageDto(entity: MessageEntity): MessageDto {
   return {
     messageId: entity.messageId,
     channelId: entity.channelId,
-    sender: senderDto,
+    sender: toUserDto(entity.sender),
     seq: Number(entity.seq),
     content: entity.content,
     createdAt: entity.createdAt,

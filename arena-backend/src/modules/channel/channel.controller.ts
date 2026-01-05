@@ -15,16 +15,11 @@ import { CreateGroupChannelDto } from "./dtos/create-group-channel.dto";
 import { ChannelService } from "./channel.service";
 import { DirectChannelService } from "./direct-channel.service";
 import { GroupChannelService } from "./group-channel.service";
-import { S3Service } from "../file/s3.service";
 import { toChannelDto } from "src/utils/channel.mapper";
-import { toParticipantDto } from "src/utils/participant.mapper";
-import { toUserDto } from "src/utils/user.mapper";
-import { toFileDto } from "src/utils/file.mapper";
 import { ChannelDto } from "src/dtos/channel.dto";
 import { withSingleApiResult, type SingleApiResultDto } from "src/dtos/single-api-result.dto";
 import { withListApiResult, type ListApiResultDto } from "src/dtos/list-api-result.dto";
 import type { CachedUser } from "../session/session.types";
-import type { ParticipantDto } from "src/dtos/participant.dto";
 
 @ApiTags("channels")
 @Controller("/api/v1/channels")
@@ -35,10 +30,7 @@ export class ChannelController {
     private readonly channelService: ChannelService,
     private readonly directChannelService: DirectChannelService,
     private readonly groupChannelService: GroupChannelService,
-    private readonly s3Service: S3Service,
   ) {}
-
-  // ===== 생성 (타입별 분리) =====
 
   @Post("direct")
   @ApiOperation({ summary: "DM 생성 (이미 있으면 기존 반환)" })
@@ -52,18 +44,9 @@ export class ChannelController {
       dto.userId,
     );
 
-    const participantDtos: ParticipantDto[] = [];
-    for (const p of participants) {
-      const avatar = p.user.avatar
-        ? await toFileDto(p.user.avatar, this.s3Service)
-        : null;
-      const userDto = toUserDto(p.user, avatar);
-      participantDtos.push(toParticipantDto(p, userDto));
-    }
-
     return {
       success: true,
-      data: toChannelDto(channel, null, participantDtos),
+      data: toChannelDto(channel, null, participants),
       errorCode: null,
     };
   }
@@ -82,27 +65,12 @@ export class ChannelController {
       dto.iconFileId ?? null,
     );
 
-    const participantDtos: ParticipantDto[] = [];
-    for (const p of participants) {
-      const avatar = p.user.avatar
-        ? await toFileDto(p.user.avatar, this.s3Service)
-        : null;
-      const userDto = toUserDto(p.user, avatar);
-      participantDtos.push(toParticipantDto(p, userDto));
-    }
-
-    const icon = groupChannel.icon
-      ? await toFileDto(groupChannel.icon, this.s3Service)
-      : null;
-
     return {
       success: true,
-      data: toChannelDto(channel, icon, participantDtos),
+      data: toChannelDto(channel, groupChannel, participants),
       errorCode: null,
     };
   }
-
-  // ===== 조회 (통합) =====
 
   @Get()
   @ApiOperation({ summary: "내 채널 목록" })
@@ -110,27 +78,9 @@ export class ChannelController {
   async getMyChannels(@CurrentUser() user: CachedUser): Promise<ListApiResultDto<ChannelDto>> {
     const results = await this.channelService.getMyChannels(user.userId);
 
-    const dtos: ChannelDto[] = [];
-    for (const details of results) {
-      const participantDtos: ParticipantDto[] = [];
-      for (const p of details.participants) {
-        const avatar = p.user.avatar
-          ? await toFileDto(p.user.avatar, this.s3Service)
-          : null;
-        const userDto = toUserDto(p.user, avatar);
-        participantDtos.push(toParticipantDto(p, userDto));
-      }
-
-      const icon = details.groupChannel?.icon
-        ? await toFileDto(details.groupChannel.icon, this.s3Service)
-        : null;
-
-      dtos.push(toChannelDto(details.channel, icon, participantDtos));
-    }
-
     return {
       success: true,
-      data: dtos,
+      data: results.map((r) => toChannelDto(r.channel, r.groupChannel, r.participants)),
       errorCode: null,
     };
   }
@@ -144,22 +94,9 @@ export class ChannelController {
   ): Promise<SingleApiResultDto<ChannelDto>> {
     const details = await this.channelService.getChannel(channelId, user.userId);
 
-    const participantDtos: ParticipantDto[] = [];
-    for (const p of details.participants) {
-      const avatar = p.user.avatar
-        ? await toFileDto(p.user.avatar, this.s3Service)
-        : null;
-      const userDto = toUserDto(p.user, avatar);
-      participantDtos.push(toParticipantDto(p, userDto));
-    }
-
-    const icon = details.groupChannel?.icon
-      ? await toFileDto(details.groupChannel.icon, this.s3Service)
-      : null;
-
     return {
       success: true,
-      data: toChannelDto(details.channel, icon, participantDtos),
+      data: toChannelDto(details.channel, details.groupChannel, details.participants),
       errorCode: null,
     };
   }

@@ -19,11 +19,10 @@ import {
 } from "src/dtos/infinity-list-api-result.dto";
 import { CreateMessageDto } from "./dtos/create-message.dto";
 import { GetMessagesQueryDto } from "./dtos/get-messages-query.dto";
+import { SyncMessagesQueryDto } from "./dtos/sync-messages-query.dto";
+import { MessageSyncDataDto } from "./dtos/sync-messages-result.dto";
 import { MessageService } from "./message.service";
-import { S3Service } from "../file/s3.service";
 import { toMessageDto } from "src/utils/message.mapper";
-import { toUserDto } from "src/utils/user.mapper";
-import { toFileDto } from "src/utils/file.mapper";
 import type { CachedUser } from "../session/session.types";
 
 @ApiTags("messages")
@@ -31,10 +30,7 @@ import type { CachedUser } from "../session/session.types";
 @UseGuards(ArenaJwtAuthGuard, SessionGuard)
 @ApiBearerAuth()
 export class MessageController {
-  constructor(
-    private readonly messageService: MessageService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly messageService: MessageService) {}
 
   @Post("channel/:channelId")
   @ApiOperation({ summary: "메시지 보내기" })
@@ -50,14 +46,9 @@ export class MessageController {
       dto.content,
     );
 
-    const avatar = message.sender.avatar
-      ? await toFileDto(message.sender.avatar, this.s3Service)
-      : null;
-    const senderDto = toUserDto(message.sender, avatar);
-
     return {
       success: true,
-      data: toMessageDto(message, senderDto),
+      data: toMessageDto(message),
       errorCode: null,
     };
   }
@@ -77,20 +68,38 @@ export class MessageController {
       limit: query.limit,
     });
 
-    const messageDtos: MessageDto[] = [];
-    for (const message of result.messages) {
-      const avatar = message.sender.avatar
-        ? await toFileDto(message.sender.avatar, this.s3Service)
-        : null;
-      const senderDto = toUserDto(message.sender, avatar);
-      messageDtos.push(toMessageDto(message, senderDto));
-    }
+    return {
+      success: true,
+      data: result.messages.map(toMessageDto),
+      hasNext: result.hasNext,
+      hasPrev: result.hasPrev,
+      errorCode: null,
+    };
+  }
+
+  @Get("channel/:channelId/sync")
+  @ApiOperation({ summary: "메시지 동기화" })
+  @ApiOkResponse({ type: () => withSingleApiResult(MessageSyncDataDto) })
+  async syncMessages(
+    @CurrentUser() user: CachedUser,
+    @Param("channelId") channelId: string,
+    @Query() query: SyncMessagesQueryDto,
+  ): Promise<SingleApiResultDto<MessageSyncDataDto>> {
+    const since = new Date(query.since);
+    const result = await this.messageService.syncMessages(
+      user.userId,
+      channelId,
+      since,
+    );
 
     return {
       success: true,
-      data: messageDtos,
-      hasNext: result.hasNext,
-      hasPrev: result.hasPrev,
+      data: {
+        created: result.created.map(toMessageDto),
+        updated: result.updated.map(toMessageDto),
+        deleted: result.deleted,
+        requireFullSync: result.requireFullSync,
+      },
       errorCode: null,
     };
   }
