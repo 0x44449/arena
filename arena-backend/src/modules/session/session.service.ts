@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleInit, forwardRef } from "@nestjs/common";
 import Redis from "ioredis";
 import { REDIS_CLIENT } from "src/redis/redis.constants";
-import { SignalService } from "src/signal/signal.service";
+import { Signal } from "src/signal/signal";
 import { SignalChannel } from "src/signal/signal.channels";
 import { UserService } from "../user/user.service";
 import { CachedUser } from "./session.types";
@@ -14,7 +14,7 @@ export class SessionService implements OnModuleInit {
   constructor(
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
-    private readonly signal: SignalService,
+    private readonly signal: Signal,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}

@@ -6,7 +6,7 @@ import { SignalChannelType, SignalPayloadMap } from "./signal.channels";
 type SignalHandler<T> = (data: T) => void | Promise<void>;
 
 @Injectable()
-export class SignalService implements OnModuleInit {
+export class Signal implements OnModuleInit {
   private handlers = new Map<string, SignalHandler<unknown>[]>();
 
   constructor(

@@ -11,7 +11,7 @@ import {
 import { Server, Socket } from "socket.io";
 import { Logger, UseGuards } from "@nestjs/common";
 import { WsJwtAuthGuard } from "src/guards/ws-jwt-auth.guard";
-import { SignalService } from "src/signal/signal.service";
+import { Signal } from "src/signal/signal";
 import { SignalChannel } from "src/signal/signal.channels";
 
 @WebSocketGateway({
@@ -29,7 +29,7 @@ export class ArenaGateway
 
   private readonly logger = new Logger(ArenaGateway.name);
 
-  constructor(private readonly signal: SignalService) {}
+  constructor(private readonly signal: Signal) {}
 
   afterInit() {
     this.signal.subscribe(SignalChannel.MESSAGE_NEW, ({ channelId, message }) => {

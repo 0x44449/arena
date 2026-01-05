@@ -7,7 +7,7 @@ import { UpdateUserDto } from "./dtos/update-user.dto";
 import { WellKnownException } from "src/exceptions/well-known-exception";
 import { generateId } from "src/utils/id-generator";
 import { FileService } from "../file/file.service";
-import { SignalService } from "src/signal/signal.service";
+import { Signal } from "src/signal/signal";
 import { SignalChannel } from "src/signal/signal.channels";
 
 @Injectable()
@@ -20,7 +20,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly fileService: FileService,
-    private readonly signal: SignalService,
+    private readonly signal: Signal,
   ) {}
 
   async findByUid(uid: string): Promise<UserEntity | null> {

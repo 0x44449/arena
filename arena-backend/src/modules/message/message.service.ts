@@ -12,7 +12,7 @@ import { toMessageDto } from "src/utils/message.mapper";
 import { toUserDto } from "src/utils/user.mapper";
 import { toFileDto } from "src/utils/file.mapper";
 import { S3Service } from "../file/s3.service";
-import { SignalService } from "src/signal/signal.service";
+import { Signal } from "src/signal/signal";
 import { SignalChannel } from "src/signal/signal.channels";
 import { REDIS_CLIENT } from "src/redis/redis.constants";
 import { MessageDto } from "src/dtos/message.dto";
@@ -29,7 +29,7 @@ export class MessageService {
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
     private readonly s3Service: S3Service,
-    private readonly signal: SignalService,
+    private readonly signal: Signal,
   ) {}
 
   async createMessage(

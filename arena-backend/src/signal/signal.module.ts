@@ -1,9 +1,9 @@
 import { Global, Module } from "@nestjs/common";
-import { SignalService } from "./signal.service";
+import { Signal } from "./signal";
 
 @Global()
 @Module({
-  providers: [SignalService],
-  exports: [SignalService],
+  providers: [Signal],
+  exports: [Signal],
 })
 export class SignalModule {}
