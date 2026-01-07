@@ -1,6 +1,9 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { getDatabase } from '../database';
 
+// 테이블명
+const tableName = 'sync_state';
+
 // 컬럼 정의
 const cols = {
   key: 'key',
@@ -18,21 +21,30 @@ const resolveDb = async (db?: SQLiteDatabase) => db ?? await getDatabase();
 
 // CRUD
 export const syncStateTable = {
+  tableName,
   cols,
 
-  get: async (key: string, db?: SQLiteDatabase): Promise<string | null> => {
+  get: async (
+    params: { key: string },
+    db?: SQLiteDatabase
+  ): Promise<string | null> => {
+    const { key } = params;
     const conn = await resolveDb(db);
     const row = await conn.getFirstAsync<SyncStateRow>(
-      `SELECT * FROM sync_state WHERE ${cols.key} = ?`,
+      `SELECT * FROM ${tableName} WHERE ${cols.key} = ?`,
       key
     );
     return row?.lastSyncedAt ?? null;
   },
 
-  set: async (key: string, lastSyncedAt: string, db?: SQLiteDatabase): Promise<void> => {
+  set: async (
+    params: { key: string; lastSyncedAt: string },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { key, lastSyncedAt } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `INSERT INTO sync_state (${cols.key}, ${cols.lastSyncedAt})
+      `INSERT INTO ${tableName} (${cols.key}, ${cols.lastSyncedAt})
        VALUES (?, ?)
        ON CONFLICT(${cols.key}) DO UPDATE SET
          ${cols.lastSyncedAt} = excluded.${cols.lastSyncedAt}`,
@@ -41,16 +53,20 @@ export const syncStateTable = {
     );
   },
 
-  delete: async (key: string, db?: SQLiteDatabase): Promise<void> => {
+  delete: async (
+    params: { key: string },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { key } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `DELETE FROM sync_state WHERE ${cols.key} = ?`,
+      `DELETE FROM ${tableName} WHERE ${cols.key} = ?`,
       key
     );
   },
 
   clear: async (db?: SQLiteDatabase): Promise<void> => {
     const conn = await resolveDb(db);
-    await conn.runAsync(`DELETE FROM sync_state`);
+    await conn.runAsync(`DELETE FROM ${tableName}`);
   },
 };

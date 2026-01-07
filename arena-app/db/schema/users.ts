@@ -2,6 +2,9 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import type { UserDto } from '@/api/generated/models';
 import { getDatabase } from '../database';
 
+// 테이블명
+const tableName = 'users';
+
 // 컬럼 정의
 const cols = {
   userId: 'user_id',
@@ -22,32 +25,45 @@ const resolveDb = async (db?: SQLiteDatabase) => db ?? await getDatabase();
 
 // CRUD
 export const usersTable = {
+  tableName,
   cols,
 
-  findById: async (userId: string, db?: SQLiteDatabase): Promise<UserDto | null> => {
+  findById: async (
+    params: { userId: string },
+    db?: SQLiteDatabase
+  ): Promise<UserDto | null> => {
+    const { userId } = params;
     const conn = await resolveDb(db);
     const row = await conn.getFirstAsync<UserRow>(
-      `SELECT * FROM users WHERE ${cols.userId} = ?`,
+      `SELECT * FROM ${tableName} WHERE ${cols.userId} = ?`,
       userId
     );
     return row ? parseRow(row) : null;
   },
 
-  findByIds: async (userIds: string[], db?: SQLiteDatabase): Promise<UserDto[]> => {
+  findByIds: async (
+    params: { userIds: string[] },
+    db?: SQLiteDatabase
+  ): Promise<UserDto[]> => {
+    const { userIds } = params;
     if (userIds.length === 0) return [];
     const conn = await resolveDb(db);
     const placeholders = userIds.map(() => '?').join(', ');
     const rows = await conn.getAllAsync<UserRow>(
-      `SELECT * FROM users WHERE ${cols.userId} IN (${placeholders})`,
+      `SELECT * FROM ${tableName} WHERE ${cols.userId} IN (${placeholders})`,
       ...userIds
     );
     return rows.map(parseRow);
   },
 
-  upsert: async (user: UserDto, db?: SQLiteDatabase): Promise<void> => {
+  upsert: async (
+    params: { user: UserDto },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { user } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `INSERT INTO users (${cols.userId}, ${cols.data})
+      `INSERT INTO ${tableName} (${cols.userId}, ${cols.data})
        VALUES (?, ?)
        ON CONFLICT(${cols.userId}) DO UPDATE SET
          ${cols.data} = excluded.${cols.data}`,
@@ -56,12 +72,16 @@ export const usersTable = {
     );
   },
 
-  upsertMany: async (users: UserDto[], db?: SQLiteDatabase): Promise<void> => {
+  upsertMany: async (
+    params: { users: UserDto[] },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { users } = params;
     const conn = await resolveDb(db);
     const run = async () => {
       for (const user of users) {
         await conn.runAsync(
-          `INSERT INTO users (${cols.userId}, ${cols.data})
+          `INSERT INTO ${tableName} (${cols.userId}, ${cols.data})
            VALUES (?, ?)
            ON CONFLICT(${cols.userId}) DO UPDATE SET
              ${cols.data} = excluded.${cols.data}`,
@@ -71,8 +91,6 @@ export const usersTable = {
       }
     };
     
-    // 외부에서 db를 넘겼으면 이미 트랜잭션 안에 있을 수 있으니 그냥 실행
-    // 아니면 자체 트랜잭션으로 묶기
     if (db) {
       await run();
     } else {
@@ -80,10 +98,14 @@ export const usersTable = {
     }
   },
 
-  delete: async (userId: string, db?: SQLiteDatabase): Promise<void> => {
+  delete: async (
+    params: { userId: string },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { userId } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `DELETE FROM users WHERE ${cols.userId} = ?`,
+      `DELETE FROM ${tableName} WHERE ${cols.userId} = ?`,
       userId
     );
   },

@@ -2,6 +2,9 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import type { ContactDto } from '@/api/generated/models';
 import { getDatabase } from '../database';
 
+// 테이블명
+const tableName = 'contacts';
+
 // 컬럼 정의
 const cols = {
   userId: 'user_id',
@@ -22,29 +25,38 @@ const resolveDb = async (db?: SQLiteDatabase) => db ?? await getDatabase();
 
 // CRUD
 export const contactsTable = {
+  tableName,
   cols,
 
   findAll: async (db?: SQLiteDatabase): Promise<ContactDto[]> => {
     const conn = await resolveDb(db);
     const rows = await conn.getAllAsync<ContactRow>(
-      `SELECT * FROM contacts`
+      `SELECT * FROM ${tableName}`
     );
     return rows.map(parseRow);
   },
 
-  findByUserId: async (userId: string, db?: SQLiteDatabase): Promise<ContactDto | null> => {
+  findByUserId: async (
+    params: { userId: string },
+    db?: SQLiteDatabase
+  ): Promise<ContactDto | null> => {
+    const { userId } = params;
     const conn = await resolveDb(db);
     const row = await conn.getFirstAsync<ContactRow>(
-      `SELECT * FROM contacts WHERE ${cols.userId} = ?`,
+      `SELECT * FROM ${tableName} WHERE ${cols.userId} = ?`,
       userId
     );
     return row ? parseRow(row) : null;
   },
 
-  upsert: async (contact: ContactDto, db?: SQLiteDatabase): Promise<void> => {
+  upsert: async (
+    params: { contact: ContactDto },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { contact } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `INSERT INTO contacts (${cols.userId}, ${cols.data})
+      `INSERT INTO ${tableName} (${cols.userId}, ${cols.data})
        VALUES (?, ?)
        ON CONFLICT(${cols.userId}) DO UPDATE SET
          ${cols.data} = excluded.${cols.data}`,
@@ -53,12 +65,16 @@ export const contactsTable = {
     );
   },
 
-  upsertMany: async (contacts: ContactDto[], db?: SQLiteDatabase): Promise<void> => {
+  upsertMany: async (
+    params: { contacts: ContactDto[] },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { contacts } = params;
     const conn = await resolveDb(db);
     const run = async () => {
       for (const contact of contacts) {
         await conn.runAsync(
-          `INSERT INTO contacts (${cols.userId}, ${cols.data})
+          `INSERT INTO ${tableName} (${cols.userId}, ${cols.data})
            VALUES (?, ?)
            ON CONFLICT(${cols.userId}) DO UPDATE SET
              ${cols.data} = excluded.${cols.data}`,
@@ -75,16 +91,20 @@ export const contactsTable = {
     }
   },
 
-  delete: async (userId: string, db?: SQLiteDatabase): Promise<void> => {
+  delete: async (
+    params: { userId: string },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { userId } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `DELETE FROM contacts WHERE ${cols.userId} = ?`,
+      `DELETE FROM ${tableName} WHERE ${cols.userId} = ?`,
       userId
     );
   },
 
   clear: async (db?: SQLiteDatabase): Promise<void> => {
     const conn = await resolveDb(db);
-    await conn.runAsync(`DELETE FROM contacts`);
+    await conn.runAsync(`DELETE FROM ${tableName}`);
   },
 };

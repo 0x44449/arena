@@ -1,6 +1,9 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { getDatabase } from '../database';
 
+// 테이블명
+const tableName = 'sync_queue';
+
 // 컬럼 정의
 const cols = {
   id: 'id',
@@ -27,19 +30,24 @@ const resolveDb = async (db?: SQLiteDatabase) => db ?? await getDatabase();
 
 // CRUD
 export const syncQueueTable = {
+  tableName,
   cols,
 
   findAll: async (db?: SQLiteDatabase): Promise<SyncQueueRow[]> => {
     const conn = await resolveDb(db);
     return await conn.getAllAsync<SyncQueueRow>(
-      `SELECT * FROM sync_queue ORDER BY ${cols.id} ASC`
+      `SELECT * FROM ${tableName} ORDER BY ${cols.id} ASC`
     );
   },
 
-  add: async <T>(type: SyncQueueType, payload: T, db?: SQLiteDatabase): Promise<number> => {
+  add: async <T>(
+    params: { type: SyncQueueType; payload: T },
+    db?: SQLiteDatabase
+  ): Promise<number> => {
+    const { type, payload } = params;
     const conn = await resolveDb(db);
     const result = await conn.runAsync(
-      `INSERT INTO sync_queue (${cols.type}, ${cols.payload}, ${cols.createdAt}, ${cols.retryCount})
+      `INSERT INTO ${tableName} (${cols.type}, ${cols.payload}, ${cols.createdAt}, ${cols.retryCount})
        VALUES (?, ?, ?, 0)`,
       type,
       JSON.stringify(payload),
@@ -48,24 +56,32 @@ export const syncQueueTable = {
     return result.lastInsertRowId;
   },
 
-  incrementRetry: async (id: number, db?: SQLiteDatabase): Promise<void> => {
+  incrementRetry: async (
+    params: { id: number },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { id } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `UPDATE sync_queue SET ${cols.retryCount} = ${cols.retryCount} + 1 WHERE ${cols.id} = ?`,
+      `UPDATE ${tableName} SET ${cols.retryCount} = ${cols.retryCount} + 1 WHERE ${cols.id} = ?`,
       id
     );
   },
 
-  remove: async (id: number, db?: SQLiteDatabase): Promise<void> => {
+  remove: async (
+    params: { id: number },
+    db?: SQLiteDatabase
+  ): Promise<void> => {
+    const { id } = params;
     const conn = await resolveDb(db);
     await conn.runAsync(
-      `DELETE FROM sync_queue WHERE ${cols.id} = ?`,
+      `DELETE FROM ${tableName} WHERE ${cols.id} = ?`,
       id
     );
   },
 
   clear: async (db?: SQLiteDatabase): Promise<void> => {
     const conn = await resolveDb(db);
-    await conn.runAsync(`DELETE FROM sync_queue`);
+    await conn.runAsync(`DELETE FROM ${tableName}`);
   },
 };
