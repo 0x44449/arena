@@ -17,34 +17,43 @@
 ```typescript
 // db/schema/테이블명.ts
 
-// 1. 컬럼 상수
+// 1. 테이블명
+const tableName = 'users';
+
+// 2. 컬럼 상수
 const cols = {
   userId: 'user_id',
   data: 'data',
 } as const;
 
-// 2. Row 타입
+// 3. Row 타입
 export type UserRow = { ... };
 
-// 3. 파싱 헬퍼
+// 4. 파싱 헬퍼
 const parseRow = (row: UserRow): UserDto => JSON.parse(row.data);
 
-// 4. DB 헬퍼
+// 5. DB 헬퍼
 const resolveDb = async (db?: SQLiteDatabase) => db ?? await getDatabase();
 
-// 5. CRUD 객체
+// 6. CRUD 객체
 export const usersTable = {
+  tableName,
   cols,
-  findById: async (id, db?) => { ... },
-  upsert: async (data, db?) => { ... },
-  // ...
+  findById: async (params, db?) => { ... },
+  upsert: async (params, db?) => { ... },
 };
 ```
 
-### db 파라미터 규칙
-- 모든 CRUD 함수는 `db?: SQLiteDatabase`를 마지막 파라미터로 받음
-- 일반 사용: 생략 → 내부에서 `getDatabase()` 호출
-- 트랜잭션: 전달 → 같은 연결 사용
+### 함수 파라미터 규칙
+- 쿼리 파라미터: 첫 번째 인자 (객체 형태)
+- db 파라미터: 두 번째 인자 (옵셔널, 트랜잭션용)
+
+```typescript
+// 예시
+await usersTable.findById({ userId }, db);
+await channelsTable.findAll(db);
+await messagesTable.findByChannel({ channelId, before, limit }, db);
+```
 
 ### upsertMany 트랜잭션 규칙
 - 외부에서 db 전달 시: 자체 트랜잭션 안 만듦
@@ -60,28 +69,45 @@ export const usersTable = {
 
 ---
 
-## 4. 이벤트 기반 UI 갱신
+## 4. 스크린 폴더 구조
 
-```typescript
-// Sync/쓰기 레이어
-await messagesTable.upsertMany(messages);
-dbEvents.emit('messages:changed', { channelId, created, updated, deleted });
-
-// UI 훅
-const handler = (event) => {
-  if (event.channelId !== channelId) return;
-  // 변경된 것만 DB에서 다시 쿼리
-};
-dbEvents.on('messages:changed', handler);
+### 구조
+```
+screens/
+  chat-tab/
+    Header.tsx           # 1레벨 - 외부에서 import
+    ChannelList.tsx      # 1레벨 - 외부에서 import
+    controls/            # 2레벨 - 내부 전용
+      ChannelItem.tsx
+      ChannelAvatar.tsx
 ```
 
-- UI는 DB만 바라봄
-- 이벤트로 "뭐가 바뀌었는지"만 알려줌
-- UI가 직접 DB 쿼리해서 상태 갱신
+### 원칙
+- `app/`은 라우팅만, 실제 로직은 `screens/`
+- 1레벨: 외부에서 직접 import 가능
+- 2레벨 (`controls/`): 해당 스크린 내부에서만 사용
+- `components/`는 여러 스크린에서 공유하는 진짜 공통만
 
 ---
 
-## 5. 마이그레이션 규칙
+## 5. 컴포넌트 규칙
+
+### Export 방식
+- 파일당 1개 컴포넌트
+- `export default function ComponentName()` 스타일
+- index.ts로 re-export 하지 않음
+
+```typescript
+// 컴포넌트 파일
+export default function Header() { ... }
+
+// 사용처
+import Header from "@/screens/chat-tab/Header";
+```
+
+---
+
+## 6. 마이그레이션 규칙
 
 ### 파일명
 - `XXX_설명.ts` 형식 (예: `001_init.ts`, `002_add_xxx.ts`)
@@ -98,3 +124,12 @@ export default {
 - 기존 마이그레이션 수정 금지
 - 새 마이그레이션 추가만 허용
 - 개발 중에는 `resetDatabase()` 후 재생성 가능
+
+---
+
+## 7. 상태 관리 (현재 방침)
+
+- 일단 `useState`로 시작
+- 각 스크린에서 필요한 데이터만 로컬로 관리
+- zustand: 여러 화면에서 같은 데이터 공유 필요 시 도입 검토
+- ReactQuery: 메신저 특성상 사용 안 함 (캐싱 모델 안 맞음)
