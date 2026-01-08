@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
-import { StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Participant = {
   id: string;
@@ -7,6 +8,7 @@ type Participant = {
 };
 
 type ChannelItemProps = {
+  id: string;
   title: string;
   participants: Participant[];
   lastMessage: string;
@@ -102,6 +104,7 @@ const ChannelAvatar = ({
 };
 
 export default function ChannelItem({
+  id,
   title,
   participants,
   lastMessage,
@@ -109,8 +112,14 @@ export default function ChannelItem({
   unreadCount,
   isGroup,
 }: ChannelItemProps) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push(`/chat/${id}`);
+  };
+
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={handlePress}>
       <ChannelAvatar participants={participants} isGroup={isGroup} />
       <View style={styles.textArea}>
         <View style={styles.titleRow}>
@@ -133,7 +142,7 @@ export default function ChannelItem({
           </View>
         ) : null}
       </View>
-    </View>
+    </Pressable>
   );
 }
 

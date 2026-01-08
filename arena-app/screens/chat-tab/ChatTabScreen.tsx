@@ -209,6 +209,7 @@ export default function ChatTabScreen() {
         keyExtractor={(room) => room.id}
         renderItem={({ item }) => (
           <ChannelItem
+            id={item.id}
             title={item.title}
             participants={item.participants}
             lastMessage={item.lastMessage}

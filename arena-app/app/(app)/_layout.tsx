@@ -35,6 +35,7 @@ export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="chat/[channelId]" />
       <Stack.Screen name="welcome" />
     </Stack>
   )
