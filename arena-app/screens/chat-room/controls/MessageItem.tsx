@@ -9,8 +9,9 @@ type MessageItemProps = {
   senderAvatar: string;
   timestamp: string;
   isMine: boolean;
-  showAvatar: boolean; // 연속 메시지면 false
-  showName: boolean; // 그룹채팅 + 연속 메시지 아닐 때 true
+  showAvatar: boolean;
+  showName: boolean;
+  isNewSender: boolean; // 발신자가 바뀌면 true
 };
 
 export default function MessageItem({
@@ -21,10 +22,11 @@ export default function MessageItem({
   isMine,
   showAvatar,
   showName,
+  isNewSender,
 }: MessageItemProps) {
   if (isMine) {
     return (
-      <View style={styles.myMessageRow}>
+      <View style={[styles.myMessageRow, isNewSender && styles.newSenderGap]}>
         <Text style={styles.timestamp}>{timestamp}</Text>
         <View style={styles.myBubble}>
           <Text style={styles.myMessageText}>{content}</Text>
@@ -34,7 +36,7 @@ export default function MessageItem({
   }
 
   return (
-    <View style={styles.otherMessageRow}>
+    <View style={[styles.otherMessageRow, isNewSender && styles.newSenderGap]}>
       {showAvatar ? (
         <Image source={{ uri: senderAvatar }} style={styles.avatar} contentFit="cover" />
       ) : (
@@ -54,6 +56,9 @@ export default function MessageItem({
 }
 
 const styles = StyleSheet.create({
+  newSenderGap: {
+    marginTop: 12,
+  },
   myMessageRow: {
     flexDirection: "row",
     justifyContent: "flex-end",

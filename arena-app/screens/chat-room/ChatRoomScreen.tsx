@@ -1,5 +1,6 @@
 import { CS } from "@/libs/common-style";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "./controls/Header";
 import MessageInput from "./controls/MessageInput";
@@ -220,13 +221,14 @@ const mockMessages = [
 ];
 
 const HEADER_HEIGHT = 56;
+const INPUT_HEIGHT = 52;
 
 export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
   const insets = useSafeAreaInsets();
   const isGroup = mockChannel.memberCount > 2;
 
   return (
-    <View style={[CS.flex1, CS.bgWhite]}>
+    <KeyboardAvoidingView behavior="padding" style={[CS.flex1, CS.bgWhite]}>
       <FlatList
         data={mockMessages}
         keyExtractor={(item) => item.id}
@@ -234,6 +236,7 @@ export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
           const isMine = item.senderId === MY_USER_ID;
           const prevMessage = index > 0 ? mockMessages[index - 1] : null;
           const isConsecutive = prevMessage?.senderId === item.senderId;
+          const isNewSender = !isConsecutive && index > 0;
 
           return (
             <MessageItem
@@ -246,23 +249,22 @@ export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
               isMine={isMine}
               showAvatar={!isMine && !isConsecutive}
               showName={!isMine && isGroup && !isConsecutive}
+              isNewSender={isNewSender}
             />
           );
         }}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingTop: insets.top + HEADER_HEIGHT + 8 },
-        ]}
+        style={{ flex: 1 }}
+        contentContainerStyle={[{
+          paddingTop: insets.top + HEADER_HEIGHT + 8,
+          paddingBottom: insets.bottom + INPUT_HEIGHT + 8,
+        }]}
         showsVerticalScrollIndicator={false}
       />
       <Header title={mockChannel.title} memberCount={mockChannel.memberCount} />
       <MessageInput />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  listContent: {
-    paddingBottom: 100,
-  },
 });
