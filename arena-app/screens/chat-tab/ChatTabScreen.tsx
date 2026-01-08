@@ -1,8 +1,9 @@
 import { CS } from "@/libs/common-style";
-import { Feather } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ChannelItem from "./controls/ChannelItem";
+import EmptyState from "./controls/EmptyState";
+import Header from "./controls/Header";
 
 type ChatRoom = {
   id: string;
@@ -196,139 +197,25 @@ const mockRooms: ChatRoom[] = [
   },
 ];
 
-const AVATAR_SIZE = 56;
-
-const ChatAvatar = ({ participants, isGroup }: Pick<ChatRoom, "participants" | "isGroup">) => {
-  if (!isGroup) {
-    return (
-      <Image
-        source={{ uri: participants[0]?.avatar }}
-        style={styles.avatarSingle}
-        contentFit="cover"
-      />
-    );
-  }
-
-  const sliced = participants.slice(0, 4);
-
-  // 2명: 대각선 겹침 배치
-  if (sliced.length === 2) {
-    return (
-      <View style={styles.avatarContainer}>
-        <Image
-          source={{ uri: sliced[0].avatar }}
-          style={[styles.avatar2Item, styles.avatar2Back]}
-          contentFit="cover"
-        />
-        <Image
-          source={{ uri: sliced[1].avatar }}
-          style={[styles.avatar2Item, styles.avatar2Front]}
-          contentFit="cover"
-        />
-      </View>
-    );
-  }
-
-  // 3명: 위 1개 중앙, 아래 2개
-  if (sliced.length === 3) {
-    return (
-      <View style={styles.avatarContainer}>
-        <Image
-          source={{ uri: sliced[0].avatar }}
-          style={[styles.avatar3Item, styles.avatar3Top]}
-          contentFit="cover"
-        />
-        <Image
-          source={{ uri: sliced[1].avatar }}
-          style={[styles.avatar3Item, styles.avatar3BottomLeft]}
-          contentFit="cover"
-        />
-        <Image
-          source={{ uri: sliced[2].avatar }}
-          style={[styles.avatar3Item, styles.avatar3BottomRight]}
-          contentFit="cover"
-        />
-      </View>
-    );
-  }
-
-  // 4명: 2x2 그리드, 원형
-  return (
-    <View style={styles.avatarContainer}>
-      <Image
-        source={{ uri: sliced[0].avatar }}
-        style={[styles.avatar4Item, styles.avatar4TopLeft]}
-        contentFit="cover"
-      />
-      <Image
-        source={{ uri: sliced[1].avatar }}
-        style={[styles.avatar4Item, styles.avatar4TopRight]}
-        contentFit="cover"
-      />
-      <Image
-        source={{ uri: sliced[2].avatar }}
-        style={[styles.avatar4Item, styles.avatar4BottomLeft]}
-        contentFit="cover"
-      />
-      <Image
-        source={{ uri: sliced[3].avatar }}
-        style={[styles.avatar4Item, styles.avatar4BottomRight]}
-        contentFit="cover"
-      />
-    </View>
-  );
-};
-
 export default function ChatTabScreen() {
   return (
     <SafeAreaView style={[CS.flex1, CS.bgWhite]} edges={["top", "left", "right"]}>
-      <View style={styles.header}>
-        <View style={styles.headerSpacer} />
-        <View style={styles.headerActions}>
-          <View style={styles.headerIconButton}>
-            <Feather name="search" size={20} color="#3C3F4B" />
-          </View>
-          <View style={styles.headerIconButton}>
-            <Feather name="edit-3" size={20} color="#3C3F4B" />
-          </View>
-        </View>
-      </View>
+      <Header />
 
       <FlatList
         data={mockRooms}
         keyExtractor={(room) => room.id}
         renderItem={({ item }) => (
-          <View style={styles.chatItem}>
-            <ChatAvatar participants={item.participants} isGroup={item.isGroup} />
-            <View style={styles.chatTextArea}>
-              <View style={styles.chatTitleRow}>
-                <Text style={styles.chatTitle} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                {item.isGroup ? (
-                  <Text style={styles.chatTitleCount}>{item.participants.length}</Text>
-                ) : null}
-              </View>
-              <Text style={styles.chatPreview} numberOfLines={1}>
-                {item.lastMessage}
-              </Text>
-            </View>
-            <View style={styles.chatMetaArea}>
-              <Text style={styles.chatTime}>{item.lastMessageTime}</Text>
-              {item.unreadCount > 0 ? (
-                <View style={styles.unreadBadge}>
-                  <Text style={styles.unreadText}>{item.unreadCount}</Text>
-                </View>
-              ) : null}
-            </View>
-          </View>
+          <ChannelItem
+            title={item.title}
+            participants={item.participants}
+            lastMessage={item.lastMessage}
+            lastMessageTime={item.lastMessageTime}
+            unreadCount={item.unreadCount}
+            isGroup={item.isGroup}
+          />
         )}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>아직 대화가 없습니다</Text>
-            <Text style={styles.emptySubtitle}>친구를 선택해 대화를 시작해보세요</Text>
-          </View>
-        )}
+        ListEmptyComponent={EmptyState}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
@@ -337,173 +224,7 @@ export default function ChatTabScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  headerSpacer: {
-    width: 32,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  headerIconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#EEF0F4",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   listContent: {
     paddingBottom: 24,
-  },
-  chatItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    gap: 12,
-  },
-  avatarSingle: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: AVATAR_SIZE / 2,
-    backgroundColor: "#E0E2E9",
-  },
-  avatarContainer: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    position: "relative",
-  },
-  // 2명 스타일
-  avatar2Item: {
-    width: 33,
-    height: 33,
-    borderRadius: 18,
-    backgroundColor: "#E0E2E9",
-    position: "absolute",
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-  },
-  avatar2Back: {
-    top: 2,
-    left: 2,
-  },
-  avatar2Front: {
-    bottom: 2,
-    right: 2,
-  },
-  // 3명 스타일
-  avatar3Item: {
-    width: 29.5,
-    height: 29.5,
-    borderRadius: 17,
-    backgroundColor: "#E0E2E9",
-    position: "absolute",
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-  },
-  avatar3Top: {
-    top: 1,
-    left: 11,
-  },
-  avatar3BottomLeft: {
-    bottom: 1,
-    left: 1,
-  },
-  avatar3BottomRight: {
-    bottom: 1,
-    right: 1,
-  },
-  // 4명 스타일 (2x2 그리드, 원형, 겹침)
-  avatar4Item: {
-    width: 29,
-    height: 29,
-    borderRadius: 15,
-    backgroundColor: "#E0E2E9",
-    position: "absolute",
-    borderWidth: 1.5,
-    borderColor: "#FFFFFF",
-  },
-  avatar4TopLeft: {
-    top: 1,
-    left: 1,
-  },
-  avatar4TopRight: {
-    top: 1,
-    right: 1,
-  },
-  avatar4BottomLeft: {
-    bottom: 1,
-    left: 1,
-  },
-  avatar4BottomRight: {
-    bottom: 1,
-    right: 1,
-  },
-  chatTextArea: {
-    flex: 1,
-    gap: 4,
-  },
-  chatTitleRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 6,
-  },
-  chatTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#1E2128",
-    flexShrink: 1,
-  },
-  chatTitleCount: {
-    fontSize: 12,
-    color: "#9CA3AF",
-    fontWeight: "600",
-  },
-  chatPreview: {
-    fontSize: 13,
-    color: "#6B7280",
-  },
-  chatMetaArea: {
-    alignItems: "flex-end",
-    gap: 6,
-  },
-  chatTime: {
-    fontSize: 12,
-    color: "#A0A4AF",
-  },
-  unreadBadge: {
-    backgroundColor: "#3C6DF0",
-    borderRadius: 999,
-    minWidth: 22,
-    height: 22,
-    paddingHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  unreadText: {
-    fontSize: 13,
-    color: "white",
-    fontWeight: "700",
-  },
-  emptyState: {
-    paddingVertical: 60,
-    alignItems: "center",
-    gap: 6,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    color: "#434756",
-    fontWeight: "600",
-  },
-  emptySubtitle: {
-    fontSize: 15,
-    color: "#6B707C",
   },
 });
