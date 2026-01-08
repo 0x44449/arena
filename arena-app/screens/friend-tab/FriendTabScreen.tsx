@@ -1,6 +1,6 @@
 import { CS } from "@/libs/common-style";
-import { FlatList, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import EmptyState from "./controls/EmptyState";
 import FriendItem from "./controls/FriendItem";
 import Header from "./controls/Header";
@@ -137,15 +137,20 @@ const mockFriends = [
   },
 ];
 
-export default function FriendTabScreen() {
-  return (
-    <SafeAreaView style={[CS.flex1, CS.bgWhite]} edges={["top", "left", "right"]}>
-      <Header />
+const HEADER_HEIGHT = 58;
 
+export default function FriendTabScreen() {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={[CS.flex1, CS.bgWhite]}>
       <FlatList
         data={mockFriends}
         keyExtractor={(item) => item.tag}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingTop: insets.top + HEADER_HEIGHT },
+        ]}
         ListHeaderComponent={() => (
           <MyProfile
             avatar={myProfile.avatar}
@@ -165,12 +170,13 @@ export default function FriendTabScreen() {
         ListEmptyComponent={EmptyState}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+      <Header />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   listContent: {
-    paddingBottom: 24,
+    paddingBottom: 100,
   },
 });

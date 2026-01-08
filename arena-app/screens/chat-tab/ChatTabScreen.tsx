@@ -1,6 +1,6 @@
 import { CS } from "@/libs/common-style";
-import { FlatList, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ChannelItem from "./controls/ChannelItem";
 import EmptyState from "./controls/EmptyState";
 import Header from "./controls/Header";
@@ -197,11 +197,13 @@ const mockRooms: ChatRoom[] = [
   },
 ];
 
-export default function ChatTabScreen() {
-  return (
-    <SafeAreaView style={[CS.flex1, CS.bgWhite]} edges={["top", "left", "right"]}>
-      <Header />
+const HEADER_HEIGHT = 58;
 
+export default function ChatTabScreen() {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={[CS.flex1, CS.bgWhite]}>
       <FlatList
         data={mockRooms}
         keyExtractor={(room) => room.id}
@@ -216,15 +218,19 @@ export default function ChatTabScreen() {
           />
         )}
         ListEmptyComponent={EmptyState}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingTop: insets.top + HEADER_HEIGHT },
+        ]}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+      <Header />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   listContent: {
-    paddingBottom: 24,
+    paddingBottom: 100,
   },
 });
