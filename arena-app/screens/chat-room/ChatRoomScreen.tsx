@@ -1,5 +1,6 @@
 import { CS } from "@/libs/common-style";
-import { FlatList, StyleSheet } from "react-native";
+import { LegendList } from "@legendapp/list/keyboard-controller";
+import { View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "./controls/Header";
@@ -220,16 +221,13 @@ const mockMessages = [
   },
 ];
 
-const HEADER_HEIGHT = 56;
-const INPUT_HEIGHT = 52;
-
 export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
-  const insets = useSafeAreaInsets();
   const isGroup = mockChannel.memberCount > 2;
+  const insets = useSafeAreaInsets();
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={[CS.flex1, CS.bgWhite]}>
-      <FlatList
+    <KeyboardAvoidingView behavior="position" style={[CS.flex1, CS.bgWhite]}>
+      <LegendList
         data={mockMessages}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => {
@@ -253,18 +251,17 @@ export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
             />
           );
         }}
-        style={{ flex: 1 }}
-        contentContainerStyle={[{
-          paddingTop: insets.top + HEADER_HEIGHT + 8,
-          paddingBottom: insets.bottom + INPUT_HEIGHT + 8,
-        }]}
         showsVerticalScrollIndicator={false}
+        estimatedItemSize={320}
+        alignItemsAtEnd={true}
+        recycleItems={true}
+        initialScrollOffset={99999}
+        maintainVisibleContentPosition={true}
+        ListFooterComponent={<View style={{ height: 60 + insets.bottom }} />}
+        ListHeaderComponent={<View style={{ height: 60 + insets.top }} />}
       />
       <Header title={mockChannel.title} memberCount={mockChannel.memberCount} />
       <MessageInput />
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-});

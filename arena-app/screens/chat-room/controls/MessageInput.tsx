@@ -1,17 +1,13 @@
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
-import { KeyboardStickyView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MessageInput() {
   const insets = useSafeAreaInsets();
 
   return (
-    <KeyboardStickyView
-      style={[styles.sticky, { bottom: insets.bottom }]}
-      offset={{ closed: 0, opened: insets.bottom - 8 }}
-    >
+    <View style={[styles.sticky, { bottom: insets.bottom }]}>
       <View style={styles.container}>
         <BlurView intensity={20} tint="light" style={styles.blurContainer}>
           <View style={styles.inputRow}>
@@ -30,7 +26,7 @@ export default function MessageInput() {
           </View>
         </BlurView>
       </View>
-    </KeyboardStickyView>
+    </View>
   );
 }
 
@@ -39,9 +35,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
+    paddingHorizontal: 20
   },
   container: {
-    marginHorizontal: 16,
+
   },
   blurContainer: {
     borderRadius: 24,
