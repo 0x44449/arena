@@ -1,7 +1,8 @@
 import { CS } from "@/libs/common-style";
-import { LegendList } from "@legendapp/list/keyboard-controller";
+import { LegendList } from "@legendapp/list";
 import { View } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "./controls/Header";
 import MessageInput from "./controls/MessageInput";
@@ -225,43 +226,64 @@ export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
   const isGroup = mockChannel.memberCount > 2;
   const insets = useSafeAreaInsets();
 
-  return (
-    <KeyboardAvoidingView behavior="position" style={[CS.flex1, CS.bgWhite]}>
-      <LegendList
-        data={mockMessages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => {
-          const isMine = item.senderId === MY_USER_ID;
-          const prevMessage = index > 0 ? mockMessages[index - 1] : null;
-          const isConsecutive = prevMessage?.senderId === item.senderId;
-          const isNewSender = !isConsecutive && index > 0;
+  const { height: keyboardHeight, progress: keyboardProgress } = useReanimatedKeyboardAnimation();
 
-          return (
-            <MessageItem
-              id={item.id}
-              content={item.content}
-              senderId={item.senderId}
-              senderName={item.senderName}
-              senderAvatar={item.senderAvatar}
-              timestamp={item.timestamp}
-              isMine={isMine}
-              showAvatar={!isMine && !isConsecutive}
-              showName={!isMine && isGroup && !isConsecutive}
-              isNewSender={isNewSender}
-            />
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={320}
-        alignItemsAtEnd={true}
-        recycleItems={true}
-        initialScrollOffset={99999}
-        maintainVisibleContentPosition={true}
-        ListFooterComponent={<View style={{ height: 60 + insets.bottom }} />}
-        ListHeaderComponent={<View style={{ height: 60 + insets.top }} />}
-      />
-      <Header title={mockChannel.title} memberCount={mockChannel.memberCount} />
+  // const animatedStyle = useAnimatedStyle(() => {
+  //   return {
+  //     height: (80 + insets.bottom) - (keyboardProgress.value * insets.bottom),
+  //     paddingBottom: -insets.bottom * keyboardProgress.value,
+  //   }
+  // })
+  const animatedFooterStyle = useAnimatedStyle(() => {
+    return {
+      height: 80 + insets.bottom - (keyboardProgress.value * insets.bottom) + (keyboardHeight.value),
+    }
+  })
+
+  return (
+    <View style={[CS.flex1, CS.bgWhite]}>
+      {/* <KeyboardAvoidingView behavior="position" style={[CS.flex1, CS.bgWhite]}> */}
+        <LegendList
+          data={mockMessages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => {
+            const isMine = item.senderId === MY_USER_ID;
+            const prevMessage = index > 0 ? mockMessages[index - 1] : null;
+            const isConsecutive = prevMessage?.senderId === item.senderId;
+            const isNewSender = !isConsecutive && index > 0;
+
+            return (
+              <MessageItem
+                id={item.id}
+                content={item.content}
+                senderId={item.senderId}
+                senderName={item.senderName}
+                senderAvatar={item.senderAvatar}
+                timestamp={item.timestamp}
+                isMine={isMine}
+                showAvatar={!isMine && !isConsecutive}
+                showName={!isMine && isGroup && !isConsecutive}
+                isNewSender={isNewSender}
+              />
+            );
+          }}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={320}
+          alignItemsAtEnd={true}
+          recycleItems={true}
+          initialScrollOffset={99999}
+          maintainVisibleContentPosition={true}
+          ListFooterComponent={<Animated.View style={animatedFooterStyle} />}
+          ListHeaderComponent={<View style={{ height: 60 + insets.top }} />}
+          // ListFooterComponent={<Animated.View style={{ height: 80 + insets.bottom }} />}
+          // contentContainerStyle={{ paddingBottom: 80 + insets.bottom }}
+          // contentContainerStyle={{ marginBottom: -80 }}
+          // style={animatedStyle}
+          style={{ flex: 1 }}
+        />
+      {/* </KeyboardAvoidingView> */}
       <MessageInput />
-    </KeyboardAvoidingView>
+      <Header title={mockChannel.title} memberCount={mockChannel.memberCount} />
+    </View>
   );
 }

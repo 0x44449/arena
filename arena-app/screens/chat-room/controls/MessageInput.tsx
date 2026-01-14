@@ -1,13 +1,24 @@
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { KeyboardStickyView, useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MessageInput() {
   const insets = useSafeAreaInsets();
 
+  const { progress: keyboardProgress } = useReanimatedKeyboardAnimation();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      paddingBottom: insets.bottom - (keyboardProgress.value * insets.bottom)
+    }
+  })
+
   return (
-    <View style={[styles.sticky, { bottom: insets.bottom }]}>
+    <KeyboardStickyView style={[styles.sticky, { paddingBottom: insets.bottom }]} offset={{ opened: insets.bottom }}>
+      {/* <Animated.View style={animatedStyle}> */}
       <View style={styles.container}>
         <BlurView intensity={20} tint="light" style={styles.blurContainer}>
           <View style={styles.inputRow}>
@@ -26,8 +37,9 @@ export default function MessageInput() {
           </View>
         </BlurView>
       </View>
-    </View>
-  );
+      {/* </Animated.View> */}
+    </KeyboardStickyView>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -35,10 +47,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    paddingHorizontal: 20
+    bottom: 0,
+    paddingHorizontal: 20,
+    // backgroundColor: 'rgba(255, 0, 0, 0.5)',
   },
   container: {
-
+    paddingVertical: 10,
   },
   blurContainer: {
     borderRadius: 24,

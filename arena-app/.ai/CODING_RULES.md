@@ -12,48 +12,77 @@
 
 ## 2. DB 레이어 패턴
 
-### 스키마 파일 구조
+### 폴더 구조
+```
+db/
+├── schema/              # 스키마 정의 (테이블명, 컬럼, 타입)
+│   ├── users.ts
+│   ├── channels.ts
+│   └── ...
+└── queries/             # 쿼리 함수 (CRUD)
+    ├── users.ts
+    ├── channels.ts
+    └── ...
+```
+
+### 스키마 파일 구조 (db/schema/테이블명.ts)
 
 ```typescript
-// db/schema/테이블명.ts
-
 // 1. 테이블명
-const tableName = 'users';
+export const tableName = 'users';
 
 // 2. 컬럼 상수
-const cols = {
+export const cols = {
   userId: 'user_id',
   data: 'data',
 } as const;
 
 // 3. Row 타입
-export type UserRow = { ... };
+export type UserRow = {
+  userId: string;
+  data: string;
+};
 
 // 4. 파싱 헬퍼
-const parseRow = (row: UserRow): UserDto => JSON.parse(row.data);
+export const parseRow = (row: UserRow): UserDto => JSON.parse(row.data);
+```
 
-// 5. DB 헬퍼
+### 쿼리 파일 구조 (db/queries/테이블명.ts)
+
+```typescript
+import { tableName, cols, parseRow, type UserRow } from '../schema/users';
+import { getDatabase } from '../database';
+
 const resolveDb = async (db?: SQLiteDatabase) => db ?? await getDatabase();
 
-// 6. CRUD 객체
-export const usersTable = {
-  tableName,
-  cols,
-  findById: async (params, db?) => { ... },
-  upsert: async (params, db?) => { ... },
+export const usersQuery = {
+  findById: async (params: { userId: string }, db?: SQLiteDatabase) => {
+    const { userId } = params;
+    const conn = await resolveDb(db);
+    const row = await conn.getFirstAsync<UserRow>(
+      `SELECT * FROM ${tableName} WHERE ${cols.userId} = ?`,
+      userId
+    );
+    return row ? parseRow(row) : null;
+  },
+  // ... 다른 쿼리들
 };
+```
+
+### 사용 방법
+```typescript
+// Import
+import { usersQuery, channelsQuery } from '@/db';
+
+// 사용
+const user = await usersQuery.findById({ userId });
+const channels = await channelsQuery.findAll();
+const messages = await messagesQuery.findByChannel({ channelId, limit: 50 }, db);
 ```
 
 ### 함수 파라미터 규칙
 - 쿼리 파라미터: 첫 번째 인자 (객체 형태)
 - db 파라미터: 두 번째 인자 (옵셔널, 트랜잭션용)
-
-```typescript
-// 예시
-await usersTable.findById({ userId }, db);
-await channelsTable.findAll(db);
-await messagesTable.findByChannel({ channelId, before, limit }, db);
-```
 
 ### upsertMany 트랜잭션 규칙
 - 외부에서 db 전달 시: 자체 트랜잭션 안 만듦
