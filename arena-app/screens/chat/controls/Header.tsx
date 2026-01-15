@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,7 +13,7 @@ export default function Header({ title, memberCount }: HeaderProps) {
   const router = useRouter();
 
   return (
-    <BlurView intensity={20} tint="light" style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Feather name="chevron-left" size={24} color="#3C3F4B" />
@@ -36,18 +35,15 @@ export default function Header({ title, memberCount }: HeaderProps) {
           </Pressable>
         </View>
       </View>
-    </BlurView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
   },
   header: {
     flexDirection: "row",

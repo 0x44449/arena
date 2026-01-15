@@ -1,8 +1,8 @@
-import ChatRoomScreen from "@/screens/chat-room/ChatRoomScreen";
+import ChatScreen from "@/screens/chat/ChatScreen";
 import { useLocalSearchParams } from "expo-router";
 
-export default function ChatRoom() {
+export default function Chat() {
   const { channelId } = useLocalSearchParams<{ channelId: string }>();
 
-  return <ChatRoomScreen channelId={channelId!} />;
+  return <ChatScreen channelId={channelId!} />;
 }

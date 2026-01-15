@@ -3,16 +3,12 @@ import { useGetMessages } from "@/api/generated/endpoints/messages/messages";
 import { useGetMe } from "@/api/generated/endpoints/users/users";
 import type { MessageDto } from "@/api/generated/models";
 import { CS } from "@/libs/common-style";
-import { LegendList } from "@legendapp/list";
-import { ActivityIndicator, Text, View } from "react-native";
-import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, View } from "react-native";
 import Header from "./controls/Header";
 import MessageInput from "./controls/MessageInput";
 import MessageItem from "./controls/MessageItem";
 
-type ChatRoomScreenProps = {
+type ChatScreenProps = {
   channelId: string;
 };
 
@@ -21,27 +17,21 @@ const formatTime = (dateStr: string): string => {
   return date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
 };
 
-export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
-  const insets = useSafeAreaInsets();
-  const { height: keyboardHeight, progress: keyboardProgress } = useReanimatedKeyboardAnimation();
-
+export default function ChatScreen({ channelId }: ChatScreenProps) {
   const { data: meData } = useGetMe();
   const { data: channelData, isLoading: isLoadingChannel } = useGetChannel(channelId);
-  const { data: messagesData, isLoading: isLoadingMessages } = useGetMessages(channelId);
+  const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessages(channelId, undefined, {
+    query: { staleTime: 0, gcTime: 0 }
+  });
 
   const myUserId = meData?.data?.userId;
   const channel = channelData?.data;
   const messages = messagesData?.data ?? [];
+  console.log('messages', messages);
 
   const isGroup = channel ? channel.participants.length > 2 : false;
   const channelTitle = channel?.name ?? channel?.participants[0]?.user.nick ?? "";
   const memberCount = channel?.participants.length ?? 0;
-
-  const animatedFooterStyle = useAnimatedStyle(() => {
-    return {
-      height: 80 + insets.bottom - (keyboardProgress.value * insets.bottom) + keyboardHeight.value,
-    };
-  });
 
   if (isLoadingChannel || isLoadingMessages) {
     return (
@@ -51,11 +41,16 @@ export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
     );
   }
 
+  // API는 오래된순(ASC)으로 반환 [오래된, ..., 최신]
+  // inverted FlatList는 데이터를 뒤집어서 보여주므로, 최신이 아래로 가려면 역순 필요
+  const reversedMessages = [...messages].reverse();
+
   const renderItem = ({ item, index }: { item: MessageDto; index: number }) => {
     const isMine = item.sender.userId === myUserId;
-    const prevMessage = index > 0 ? messages[index - 1] : null;
-    const isConsecutive = prevMessage?.sender.userId === item.sender.userId;
-    const isNewSender = !isConsecutive && index > 0;
+    // inverted + 역순 데이터이므로 index+1이 화면상 이전 메시지
+    const nextMessage = index < reversedMessages.length - 1 ? reversedMessages[index + 1] : null;
+    const isConsecutive = nextMessage?.sender.userId === item.sender.userId;
+    const isNewSender = !isConsecutive && index < reversedMessages.length - 1;
 
     return (
       <MessageItem
@@ -75,22 +70,21 @@ export default function ChatRoomScreen({ channelId }: ChatRoomScreenProps) {
 
   return (
     <View style={[CS.flex1, CS.bgWhite]}>
-      <LegendList
-        data={messages}
-        keyExtractor={(item) => item.messageId}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={320}
-        alignItemsAtEnd={true}
-        recycleItems={true}
-        initialScrollOffset={99999}
-        maintainVisibleContentPosition={true}
-        ListFooterComponent={<Animated.View style={animatedFooterStyle} />}
-        ListHeaderComponent={<View style={{ height: 60 + insets.top }} />}
-        style={{ flex: 1 }}
-      />
-      <MessageInput />
       <Header title={channelTitle} memberCount={memberCount} />
+      <KeyboardAvoidingView
+        style={CS.flex1}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <FlatList
+          data={reversedMessages}
+          keyExtractor={(item) => item.messageId}
+          renderItem={renderItem}
+          inverted
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: 8 }}
+        />
+        <MessageInput channelId={channelId} onMessageSent={refetchMessages} />
+      </KeyboardAvoidingView>
     </View>
   );
 }
