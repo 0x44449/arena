@@ -1,7 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import Redis from 'ioredis';
 import { MessageEntity } from 'src/entities/message.entity';
 import { ChannelEntity } from 'src/entities/channel.entity';
 import { ParticipantEntity } from 'src/entities/participant.entity';
@@ -11,7 +10,6 @@ import { GetMessagesResultDto } from './dtos/get-messages-result.dto';
 import { toMessageDto } from 'src/utils/message.mapper';
 import { Signal } from 'src/signal/signal';
 import { SignalChannel } from 'src/signal/signal.channels';
-import { REDIS_CLIENT } from 'src/redis/redis.constants';
 
 const SYNC_LIMIT = 100;
 
@@ -24,8 +22,6 @@ export class MessageService {
     private readonly channelRepository: Repository<ChannelEntity>,
     @InjectRepository(ParticipantEntity)
     private readonly participantRepository: Repository<ParticipantEntity>,
-    @Inject(REDIS_CLIENT)
-    private readonly redis: Redis,
     private readonly signal: Signal,
   ) {}
 
@@ -45,20 +41,21 @@ export class MessageService {
       });
     }
 
-    // Redis로 seq 채번
-    const seqKey = `channel:${channelId}:seq`;
-    const seq = await this.redis.incr(seqKey);
-
-    // 메시지 생성
+    // 메시지 생성 (seq는 DB에서 계산)
     const messageId = generateId();
-    const message = this.messageRepository.create({
-      messageId,
-      channelId,
-      senderId: userId,
-      seq,
-      content,
-    });
-    await this.messageRepository.save(message);
+    await this.messageRepository.query(
+      `INSERT INTO messages ("messageId", "channelId", "senderId", seq, content, "createdAt", "updatedAt")
+       VALUES (
+         $1, 
+         $2, 
+         $3, 
+         (SELECT COALESCE(MAX(seq), 0) + 1 FROM messages WHERE "channelId" = $2),
+         $4,
+         NOW(),
+         NOW()
+       )`,
+      [messageId, channelId, userId, content]
+    );
 
     // channel.lastMessageAt 업데이트
     await this.channelRepository.update(
