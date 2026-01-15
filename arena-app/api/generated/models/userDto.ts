@@ -5,7 +5,7 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDtoAvatar } from './user-dto-avatar';
+import type { UserDtoAvatar } from './userDtoAvatar';
 
 export interface UserDto {
   /** 유저 ID */

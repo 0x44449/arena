@@ -37,7 +37,7 @@ export class ChannelController {
   ) {}
 
   @Post('direct')
-  @ApiOperation({ summary: 'DM 생성 (이미 있으면 기존 반환)' })
+  @ApiOperation({ summary: 'DM 생성 (이미 있으면 기존 반환)', operationId: 'createDirectChannel' })
   @ApiOkResponse({ type: () => withSingleApiResult(ChannelDto) })
   async createDirectChannel(
     @CurrentUser() user: CachedUser,
@@ -54,7 +54,7 @@ export class ChannelController {
   }
 
   @Post('group')
-  @ApiOperation({ summary: '그룹 채널 생성' })
+  @ApiOperation({ summary: '그룹 채널 생성', operationId: 'createGroupChannel' })
   @ApiOkResponse({ type: () => withSingleApiResult(ChannelDto) })
   async createGroupChannel(
     @CurrentUser() user: CachedUser,
@@ -76,7 +76,7 @@ export class ChannelController {
   }
 
   @Get()
-  @ApiOperation({ summary: '내 채널 목록' })
+  @ApiOperation({ summary: '내 채널 목록', operationId: 'getMyChannels' })
   @ApiOkResponse({ type: () => withListApiResult(ChannelDto) })
   async getMyChannels(
     @CurrentUser() user: CachedUser,
@@ -93,7 +93,7 @@ export class ChannelController {
   }
 
   @Get(':channelId')
-  @ApiOperation({ summary: '채널 상세 조회' })
+  @ApiOperation({ summary: '채널 상세 조회', operationId: 'getChannel' })
   @ApiOkResponse({ type: () => withSingleApiResult(ChannelDto) })
   async getChannel(
     @CurrentUser() user: CachedUser,

@@ -5,7 +5,7 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { FileDto } from './file-dto';
+import type { FileDto } from './fileDto';
 
 /**
  * 프로필 이미지

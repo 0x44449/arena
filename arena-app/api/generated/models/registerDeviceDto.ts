@@ -5,7 +5,7 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { RegisterDeviceDtoPlatform } from './register-device-dto-platform';
+import type { RegisterDeviceDtoPlatform } from './registerDeviceDtoPlatform';
 
 export interface RegisterDeviceDto {
   deviceId: string;

@@ -5,7 +5,7 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from './user-dto';
+import type { UserDto } from './userDto';
 
 export interface ParticipantDto {
   /** 유저 정보 */

@@ -22,7 +22,7 @@ export class DeviceController {
   constructor(private readonly deviceService: DeviceService) {}
 
   @Post('register')
-  @ApiOperation({ summary: '디바이스 등록' })
+  @ApiOperation({ summary: '디바이스 등록', operationId: 'registerDevice' })
   @ApiOkResponse({ type: ApiResultDto })
   async registerDevice(
     @CurrentUser() user: CachedUser,
@@ -36,7 +36,7 @@ export class DeviceController {
   }
 
   @Post('unregister')
-  @ApiOperation({ summary: '디바이스 해제' })
+  @ApiOperation({ summary: '디바이스 해제', operationId: 'unregisterDevice' })
   @ApiOkResponse({ type: ApiResultDto })
   async unregisterDevice(
     @Body() dto: UnregisterDeviceDto,

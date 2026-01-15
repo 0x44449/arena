@@ -39,7 +39,7 @@ export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
   @Get()
-  @ApiOperation({ summary: '내 연락처 목록 조회' })
+  @ApiOperation({ summary: '내 연락처 목록 조회', operationId: 'getContacts' })
   @ApiOkResponse({ type: () => withListApiResult(ContactDto) })
   async getContacts(
     @CurrentUser() user: CachedUser,
@@ -54,7 +54,7 @@ export class ContactController {
   }
 
   @Post()
-  @ApiOperation({ summary: '연락처 추가' })
+  @ApiOperation({ summary: '연락처 추가', operationId: 'createContact' })
   @ApiOkResponse({ type: () => withSingleApiResult(ContactDto) })
   async createContact(
     @CurrentUser() user: CachedUser,
@@ -73,7 +73,7 @@ export class ContactController {
   }
 
   @Delete(':userId')
-  @ApiOperation({ summary: '연락처 삭제' })
+  @ApiOperation({ summary: '연락처 삭제', operationId: 'deleteContact' })
   @ApiOkResponse({ type: ApiResultDto })
   async deleteContact(
     @CurrentUser() user: CachedUser,

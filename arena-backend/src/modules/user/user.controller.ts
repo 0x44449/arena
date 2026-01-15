@@ -37,7 +37,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/me')
-  @ApiOperation({ summary: '내 정보 조회' })
+  @ApiOperation({ summary: '내 정보 조회', operationId: 'getMe' })
   @ApiOkResponse({
     type: () => withSingleApiResult(UserDto, { nullable: true }),
   })
@@ -58,7 +58,7 @@ export class UserController {
 
   @Get('/:userId')
   @UseGuards(SessionGuard)
-  @ApiOperation({ summary: '유저 조회' })
+  @ApiOperation({ summary: '유저 조회', operationId: 'getUser' })
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto) })
   async getUser(
     @Param('userId') userId: string,
@@ -74,7 +74,7 @@ export class UserController {
 
   @Patch('/me')
   @UseGuards(SessionGuard)
-  @ApiOperation({ summary: '내 정보 수정' })
+  @ApiOperation({ summary: '내 정보 수정', operationId: 'updateMe' })
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto) })
   async updateMe(
     @CurrentUser() user: CachedUser,
@@ -90,7 +90,7 @@ export class UserController {
   }
 
   @Post('')
-  @ApiOperation({ summary: '회원가입' })
+  @ApiOperation({ summary: '회원가입', operationId: 'createUser' })
   @ApiOkResponse({ type: () => withSingleApiResult(UserDto) })
   async createUser(
     @JwtPayloadParam() jwt: JwtPayload,

@@ -5,7 +5,7 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { PresignedUrlDto } from './presigned-url-dto';
+import type { PresignedUrlDto } from './presignedUrlDto';
 
 export interface PresignedUrlDtoResult {
   /** */

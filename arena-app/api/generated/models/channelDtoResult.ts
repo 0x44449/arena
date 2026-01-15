@@ -5,12 +5,12 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { UserDtoNullableResultData } from './user-dto-nullable-result-data';
+import type { ChannelDto } from './channelDto';
 
-export interface UserDtoNullableResult {
-  /** @nullable */
-  data: UserDtoNullableResultData;
+export interface ChannelDtoResult {
   success: boolean;
   /** @nullable */
   errorCode: string | null;
+  /** */
+  data: ChannelDto;
 }

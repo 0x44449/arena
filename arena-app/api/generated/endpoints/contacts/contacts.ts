@@ -41,7 +41,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 내 연락처 목록 조회
  */
-export const ContactGetContactsQuery = (
+export const getContacts = (
     
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -56,69 +56,69 @@ export const ContactGetContactsQuery = (
 
 
 
-export const getContactGetContactsQueryQueryKey = () => {
+export const getGetContactsQueryKey = () => {
     return [
     `/api/v1/contacts`
     ] as const;
     }
 
     
-export const getContactGetContactsQueryQueryOptions = <TData = Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export const getGetContactsQueryOptions = <TData = Awaited<ReturnType<typeof getContacts>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getContactGetContactsQueryQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetContactsQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof ContactGetContactsQuery>>> = ({ signal }) => ContactGetContactsQuery(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContacts>>> = ({ signal }) => getContacts(requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ContactGetContactsQueryQueryResult = NonNullable<Awaited<ReturnType<typeof ContactGetContactsQuery>>>
-export type ContactGetContactsQueryQueryError = unknown
+export type GetContactsQueryResult = NonNullable<Awaited<ReturnType<typeof getContacts>>>
+export type GetContactsQueryError = unknown
 
 
-export function useContactGetContactsQuery<TData = Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError, TData>> & Pick<
+export function useGetContacts<TData = Awaited<ReturnType<typeof getContacts>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof ContactGetContactsQuery>>,
+          Awaited<ReturnType<typeof getContacts>>,
           TError,
-          Awaited<ReturnType<typeof ContactGetContactsQuery>>
+          Awaited<ReturnType<typeof getContacts>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactGetContactsQuery<TData = Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError, TData>> & Pick<
+export function useGetContacts<TData = Awaited<ReturnType<typeof getContacts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof ContactGetContactsQuery>>,
+          Awaited<ReturnType<typeof getContacts>>,
           TError,
-          Awaited<ReturnType<typeof ContactGetContactsQuery>>
+          Awaited<ReturnType<typeof getContacts>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactGetContactsQuery<TData = Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetContacts<TData = Awaited<ReturnType<typeof getContacts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 내 연락처 목록 조회
  */
 
-export function useContactGetContactsQuery<TData = Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ContactGetContactsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetContacts<TData = Awaited<ReturnType<typeof getContacts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getContactGetContactsQueryQueryOptions(options)
+  const queryOptions = getGetContactsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -133,7 +133,7 @@ export function useContactGetContactsQuery<TData = Awaited<ReturnType<typeof Con
 /**
  * @summary 연락처 추가
  */
-export const ContactCreateContactMutation = (
+export const createContact = (
     createContactDto: CreateContactDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -149,11 +149,11 @@ export const ContactCreateContactMutation = (
   
 
 
-export const getContactCreateContactMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ContactCreateContactMutation>>, TError,{data: CreateContactDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof ContactCreateContactMutation>>, TError,{data: CreateContactDto}, TContext> => {
+export const getCreateContactMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createContact>>, TError,{data: CreateContactDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof createContact>>, TError,{data: CreateContactDto}, TContext> => {
 
-const mutationKey = ['contactCreateContactMutation'];
+const mutationKey = ['createContact'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -163,10 +163,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ContactCreateContactMutation>>, {data: CreateContactDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createContact>>, {data: CreateContactDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  ContactCreateContactMutation(data,requestOptions)
+          return  createContact(data,requestOptions)
         }
 
         
@@ -174,30 +174,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ContactCreateContactMutationMutationResult = NonNullable<Awaited<ReturnType<typeof ContactCreateContactMutation>>>
-    export type ContactCreateContactMutationMutationBody = CreateContactDto
-    export type ContactCreateContactMutationMutationError = unknown
+    export type CreateContactMutationResult = NonNullable<Awaited<ReturnType<typeof createContact>>>
+    export type CreateContactMutationBody = CreateContactDto
+    export type CreateContactMutationError = unknown
 
     /**
  * @summary 연락처 추가
  */
-export const useContactCreateContactMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ContactCreateContactMutation>>, TError,{data: CreateContactDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useCreateContact = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createContact>>, TError,{data: CreateContactDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ContactCreateContactMutation>>,
+        Awaited<ReturnType<typeof createContact>>,
         TError,
         {data: CreateContactDto},
         TContext
       > => {
 
-      const mutationOptions = getContactCreateContactMutationMutationOptions(options);
+      const mutationOptions = getCreateContactMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 연락처 삭제
  */
-export const ContactDeleteContactMutation = (
+export const deleteContact = (
     userId: string,
  options?: SecondParameter<typeof apiClientProxy>,) => {
       
@@ -210,11 +210,11 @@ export const ContactDeleteContactMutation = (
   
 
 
-export const getContactDeleteContactMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ContactDeleteContactMutation>>, TError,{userId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof ContactDeleteContactMutation>>, TError,{userId: string}, TContext> => {
+export const getDeleteContactMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteContact>>, TError,{userId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteContact>>, TError,{userId: string}, TContext> => {
 
-const mutationKey = ['contactDeleteContactMutation'];
+const mutationKey = ['deleteContact'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -224,10 +224,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ContactDeleteContactMutation>>, {userId: string}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteContact>>, {userId: string}> = (props) => {
           const {userId} = props ?? {};
 
-          return  ContactDeleteContactMutation(userId,requestOptions)
+          return  deleteContact(userId,requestOptions)
         }
 
         
@@ -235,23 +235,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ContactDeleteContactMutationMutationResult = NonNullable<Awaited<ReturnType<typeof ContactDeleteContactMutation>>>
+    export type DeleteContactMutationResult = NonNullable<Awaited<ReturnType<typeof deleteContact>>>
     
-    export type ContactDeleteContactMutationMutationError = unknown
+    export type DeleteContactMutationError = unknown
 
     /**
  * @summary 연락처 삭제
  */
-export const useContactDeleteContactMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ContactDeleteContactMutation>>, TError,{userId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useDeleteContact = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteContact>>, TError,{userId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ContactDeleteContactMutation>>,
+        Awaited<ReturnType<typeof deleteContact>>,
         TError,
         {userId: string},
         TContext
       > => {
 
-      const mutationOptions = getContactDeleteContactMutationMutationOptions(options);
+      const mutationOptions = getDeleteContactMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

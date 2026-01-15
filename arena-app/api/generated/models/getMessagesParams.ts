@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export type MessageGetMessagesQueryParams = {
+export type GetMessagesParams = {
 /**
  * 이 메시지 이전 (이 메시지 미포함)
  */

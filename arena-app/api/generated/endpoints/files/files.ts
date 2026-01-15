@@ -42,7 +42,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 파일 업로드 URL 발급
  */
-export const FileGetPresignedUrlMutation = (
+export const getPresignedUrl = (
     getPresignedUrlDto: GetPresignedUrlDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -58,11 +58,11 @@ export const FileGetPresignedUrlMutation = (
   
 
 
-export const getFileGetPresignedUrlMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileGetPresignedUrlMutation>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof FileGetPresignedUrlMutation>>, TError,{data: GetPresignedUrlDto}, TContext> => {
+export const getGetPresignedUrlMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPresignedUrl>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof getPresignedUrl>>, TError,{data: GetPresignedUrlDto}, TContext> => {
 
-const mutationKey = ['fileGetPresignedUrlMutation'];
+const mutationKey = ['getPresignedUrl'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -72,10 +72,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof FileGetPresignedUrlMutation>>, {data: GetPresignedUrlDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getPresignedUrl>>, {data: GetPresignedUrlDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  FileGetPresignedUrlMutation(data,requestOptions)
+          return  getPresignedUrl(data,requestOptions)
         }
 
         
@@ -83,30 +83,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type FileGetPresignedUrlMutationMutationResult = NonNullable<Awaited<ReturnType<typeof FileGetPresignedUrlMutation>>>
-    export type FileGetPresignedUrlMutationMutationBody = GetPresignedUrlDto
-    export type FileGetPresignedUrlMutationMutationError = unknown
+    export type GetPresignedUrlMutationResult = NonNullable<Awaited<ReturnType<typeof getPresignedUrl>>>
+    export type GetPresignedUrlMutationBody = GetPresignedUrlDto
+    export type GetPresignedUrlMutationError = unknown
 
     /**
  * @summary 파일 업로드 URL 발급
  */
-export const useFileGetPresignedUrlMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileGetPresignedUrlMutation>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useGetPresignedUrl = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPresignedUrl>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof FileGetPresignedUrlMutation>>,
+        Awaited<ReturnType<typeof getPresignedUrl>>,
         TError,
         {data: GetPresignedUrlDto},
         TContext
       > => {
 
-      const mutationOptions = getFileGetPresignedUrlMutationMutationOptions(options);
+      const mutationOptions = getGetPresignedUrlMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 파일 등록
  */
-export const FileRegisterFileMutation = (
+export const registerFile = (
     registerFileDto: RegisterFileDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -122,11 +122,11 @@ export const FileRegisterFileMutation = (
   
 
 
-export const getFileRegisterFileMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileRegisterFileMutation>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof FileRegisterFileMutation>>, TError,{data: RegisterFileDto}, TContext> => {
+export const getRegisterFileMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerFile>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerFile>>, TError,{data: RegisterFileDto}, TContext> => {
 
-const mutationKey = ['fileRegisterFileMutation'];
+const mutationKey = ['registerFile'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -136,10 +136,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof FileRegisterFileMutation>>, {data: RegisterFileDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerFile>>, {data: RegisterFileDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  FileRegisterFileMutation(data,requestOptions)
+          return  registerFile(data,requestOptions)
         }
 
         
@@ -147,30 +147,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type FileRegisterFileMutationMutationResult = NonNullable<Awaited<ReturnType<typeof FileRegisterFileMutation>>>
-    export type FileRegisterFileMutationMutationBody = RegisterFileDto
-    export type FileRegisterFileMutationMutationError = unknown
+    export type RegisterFileMutationResult = NonNullable<Awaited<ReturnType<typeof registerFile>>>
+    export type RegisterFileMutationBody = RegisterFileDto
+    export type RegisterFileMutationError = unknown
 
     /**
  * @summary 파일 등록
  */
-export const useFileRegisterFileMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileRegisterFileMutation>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useRegisterFile = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerFile>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof FileRegisterFileMutation>>,
+        Awaited<ReturnType<typeof registerFile>>,
         TError,
         {data: RegisterFileDto},
         TContext
       > => {
 
-      const mutationOptions = getFileRegisterFileMutationMutationOptions(options);
+      const mutationOptions = getRegisterFileMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary Private 파일 업로드 URL 발급
  */
-export const FileGetPrivatePresignedUrlMutation = (
+export const getPrivatePresignedUrl = (
     getPresignedUrlDto: GetPresignedUrlDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -186,11 +186,11 @@ export const FileGetPrivatePresignedUrlMutation = (
   
 
 
-export const getFileGetPrivatePresignedUrlMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileGetPrivatePresignedUrlMutation>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof FileGetPrivatePresignedUrlMutation>>, TError,{data: GetPresignedUrlDto}, TContext> => {
+export const getGetPrivatePresignedUrlMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPrivatePresignedUrl>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof getPrivatePresignedUrl>>, TError,{data: GetPresignedUrlDto}, TContext> => {
 
-const mutationKey = ['fileGetPrivatePresignedUrlMutation'];
+const mutationKey = ['getPrivatePresignedUrl'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -200,10 +200,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof FileGetPrivatePresignedUrlMutation>>, {data: GetPresignedUrlDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getPrivatePresignedUrl>>, {data: GetPresignedUrlDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  FileGetPrivatePresignedUrlMutation(data,requestOptions)
+          return  getPrivatePresignedUrl(data,requestOptions)
         }
 
         
@@ -211,30 +211,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type FileGetPrivatePresignedUrlMutationMutationResult = NonNullable<Awaited<ReturnType<typeof FileGetPrivatePresignedUrlMutation>>>
-    export type FileGetPrivatePresignedUrlMutationMutationBody = GetPresignedUrlDto
-    export type FileGetPrivatePresignedUrlMutationMutationError = unknown
+    export type GetPrivatePresignedUrlMutationResult = NonNullable<Awaited<ReturnType<typeof getPrivatePresignedUrl>>>
+    export type GetPrivatePresignedUrlMutationBody = GetPresignedUrlDto
+    export type GetPrivatePresignedUrlMutationError = unknown
 
     /**
  * @summary Private 파일 업로드 URL 발급
  */
-export const useFileGetPrivatePresignedUrlMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileGetPrivatePresignedUrlMutation>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useGetPrivatePresignedUrl = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPrivatePresignedUrl>>, TError,{data: GetPresignedUrlDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof FileGetPrivatePresignedUrlMutation>>,
+        Awaited<ReturnType<typeof getPrivatePresignedUrl>>,
         TError,
         {data: GetPresignedUrlDto},
         TContext
       > => {
 
-      const mutationOptions = getFileGetPrivatePresignedUrlMutationMutationOptions(options);
+      const mutationOptions = getGetPrivatePresignedUrlMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary Private 파일 등록
  */
-export const FileRegisterPrivateFileMutation = (
+export const registerPrivateFile = (
     registerFileDto: RegisterFileDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -250,11 +250,11 @@ export const FileRegisterPrivateFileMutation = (
   
 
 
-export const getFileRegisterPrivateFileMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileRegisterPrivateFileMutation>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof FileRegisterPrivateFileMutation>>, TError,{data: RegisterFileDto}, TContext> => {
+export const getRegisterPrivateFileMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerPrivateFile>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerPrivateFile>>, TError,{data: RegisterFileDto}, TContext> => {
 
-const mutationKey = ['fileRegisterPrivateFileMutation'];
+const mutationKey = ['registerPrivateFile'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -264,10 +264,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof FileRegisterPrivateFileMutation>>, {data: RegisterFileDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerPrivateFile>>, {data: RegisterFileDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  FileRegisterPrivateFileMutation(data,requestOptions)
+          return  registerPrivateFile(data,requestOptions)
         }
 
         
@@ -275,30 +275,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type FileRegisterPrivateFileMutationMutationResult = NonNullable<Awaited<ReturnType<typeof FileRegisterPrivateFileMutation>>>
-    export type FileRegisterPrivateFileMutationMutationBody = RegisterFileDto
-    export type FileRegisterPrivateFileMutationMutationError = unknown
+    export type RegisterPrivateFileMutationResult = NonNullable<Awaited<ReturnType<typeof registerPrivateFile>>>
+    export type RegisterPrivateFileMutationBody = RegisterFileDto
+    export type RegisterPrivateFileMutationError = unknown
 
     /**
  * @summary Private 파일 등록
  */
-export const useFileRegisterPrivateFileMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileRegisterPrivateFileMutation>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useRegisterPrivateFile = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerPrivateFile>>, TError,{data: RegisterFileDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof FileRegisterPrivateFileMutation>>,
+        Awaited<ReturnType<typeof registerPrivateFile>>,
         TError,
         {data: RegisterFileDto},
         TContext
       > => {
 
-      const mutationOptions = getFileRegisterPrivateFileMutationMutationOptions(options);
+      const mutationOptions = getRegisterPrivateFileMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 파일 조회
  */
-export const FileGetFileQuery = (
+export const getFile = (
     fileId: string,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -313,69 +313,69 @@ export const FileGetFileQuery = (
 
 
 
-export const getFileGetFileQueryQueryKey = (fileId?: string,) => {
+export const getGetFileQueryKey = (fileId?: string,) => {
     return [
     `/api/v1/files/${fileId}`
     ] as const;
     }
 
     
-export const getFileGetFileQueryQueryOptions = <TData = Awaited<ReturnType<typeof FileGetFileQuery>>, TError = unknown>(fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof FileGetFileQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export const getGetFileQueryOptions = <TData = Awaited<ReturnType<typeof getFile>>, TError = unknown>(fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFile>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getFileGetFileQueryQueryKey(fileId);
+  const queryKey =  queryOptions?.queryKey ?? getGetFileQueryKey(fileId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof FileGetFileQuery>>> = ({ signal }) => FileGetFileQuery(fileId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFile>>> = ({ signal }) => getFile(fileId, requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(fileId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof FileGetFileQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(fileId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type FileGetFileQueryQueryResult = NonNullable<Awaited<ReturnType<typeof FileGetFileQuery>>>
-export type FileGetFileQueryQueryError = unknown
+export type GetFileQueryResult = NonNullable<Awaited<ReturnType<typeof getFile>>>
+export type GetFileQueryError = unknown
 
 
-export function useFileGetFileQuery<TData = Awaited<ReturnType<typeof FileGetFileQuery>>, TError = unknown>(
- fileId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof FileGetFileQuery>>, TError, TData>> & Pick<
+export function useGetFile<TData = Awaited<ReturnType<typeof getFile>>, TError = unknown>(
+ fileId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFile>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof FileGetFileQuery>>,
+          Awaited<ReturnType<typeof getFile>>,
           TError,
-          Awaited<ReturnType<typeof FileGetFileQuery>>
+          Awaited<ReturnType<typeof getFile>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFileGetFileQuery<TData = Awaited<ReturnType<typeof FileGetFileQuery>>, TError = unknown>(
- fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof FileGetFileQuery>>, TError, TData>> & Pick<
+export function useGetFile<TData = Awaited<ReturnType<typeof getFile>>, TError = unknown>(
+ fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFile>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof FileGetFileQuery>>,
+          Awaited<ReturnType<typeof getFile>>,
           TError,
-          Awaited<ReturnType<typeof FileGetFileQuery>>
+          Awaited<ReturnType<typeof getFile>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFileGetFileQuery<TData = Awaited<ReturnType<typeof FileGetFileQuery>>, TError = unknown>(
- fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof FileGetFileQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetFile<TData = Awaited<ReturnType<typeof getFile>>, TError = unknown>(
+ fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFile>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 파일 조회
  */
 
-export function useFileGetFileQuery<TData = Awaited<ReturnType<typeof FileGetFileQuery>>, TError = unknown>(
- fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof FileGetFileQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetFile<TData = Awaited<ReturnType<typeof getFile>>, TError = unknown>(
+ fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFile>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getFileGetFileQueryQueryOptions(fileId,options)
+  const queryOptions = getGetFileQueryOptions(fileId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -390,7 +390,7 @@ export function useFileGetFileQuery<TData = Awaited<ReturnType<typeof FileGetFil
 /**
  * @summary 파일 삭제
  */
-export const FileDeleteFileMutation = (
+export const deleteFile = (
     fileId: string,
  options?: SecondParameter<typeof apiClientProxy>,) => {
       
@@ -403,11 +403,11 @@ export const FileDeleteFileMutation = (
   
 
 
-export const getFileDeleteFileMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileDeleteFileMutation>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof FileDeleteFileMutation>>, TError,{fileId: string}, TContext> => {
+export const getDeleteFileMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFile>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteFile>>, TError,{fileId: string}, TContext> => {
 
-const mutationKey = ['fileDeleteFileMutation'];
+const mutationKey = ['deleteFile'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -417,10 +417,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof FileDeleteFileMutation>>, {fileId: string}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteFile>>, {fileId: string}> = (props) => {
           const {fileId} = props ?? {};
 
-          return  FileDeleteFileMutation(fileId,requestOptions)
+          return  deleteFile(fileId,requestOptions)
         }
 
         
@@ -428,23 +428,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type FileDeleteFileMutationMutationResult = NonNullable<Awaited<ReturnType<typeof FileDeleteFileMutation>>>
+    export type DeleteFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteFile>>>
     
-    export type FileDeleteFileMutationMutationError = unknown
+    export type DeleteFileMutationError = unknown
 
     /**
  * @summary 파일 삭제
  */
-export const useFileDeleteFileMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof FileDeleteFileMutation>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useDeleteFile = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFile>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof FileDeleteFileMutation>>,
+        Awaited<ReturnType<typeof deleteFile>>,
         TError,
         {fileId: string},
         TContext
       > => {
 
-      const mutationOptions = getFileDeleteFileMutationMutationOptions(options);
+      const mutationOptions = getDeleteFileMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

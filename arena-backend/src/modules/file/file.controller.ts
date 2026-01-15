@@ -37,7 +37,7 @@ export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post('presigned-url')
-  @ApiOperation({ summary: '파일 업로드 URL 발급' })
+  @ApiOperation({ summary: '파일 업로드 URL 발급', operationId: 'getPresignedUrl' })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPresignedUrl(
     @CurrentUser() user: CachedUser,
@@ -53,7 +53,7 @@ export class FileController {
   }
 
   @Post('register')
-  @ApiOperation({ summary: '파일 등록' })
+  @ApiOperation({ summary: '파일 등록', operationId: 'registerFile' })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async registerFile(
     @CurrentUser() user: CachedUser,
@@ -68,7 +68,7 @@ export class FileController {
   }
 
   @Post('private/presigned-url')
-  @ApiOperation({ summary: 'Private 파일 업로드 URL 발급' })
+  @ApiOperation({ summary: 'Private 파일 업로드 URL 발급', operationId: 'getPrivatePresignedUrl' })
   @ApiOkResponse({ type: () => withSingleApiResult(PresignedUrlDto) })
   async getPrivatePresignedUrl(
     @CurrentUser() user: CachedUser,
@@ -84,7 +84,7 @@ export class FileController {
   }
 
   @Post('private/register')
-  @ApiOperation({ summary: 'Private 파일 등록' })
+  @ApiOperation({ summary: 'Private 파일 등록', operationId: 'registerPrivateFile' })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async registerPrivateFile(
     @CurrentUser() user: CachedUser,
@@ -99,7 +99,7 @@ export class FileController {
   }
 
   @Get(':fileId')
-  @ApiOperation({ summary: '파일 조회' })
+  @ApiOperation({ summary: '파일 조회', operationId: 'getFile' })
   @ApiOkResponse({ type: () => withSingleApiResult(FileDto) })
   async getFile(
     @Param('fileId') fileId: string,
@@ -109,7 +109,7 @@ export class FileController {
   }
 
   @Delete(':fileId')
-  @ApiOperation({ summary: '파일 삭제' })
+  @ApiOperation({ summary: '파일 삭제', operationId: 'deleteFile' })
   @ApiOkResponse({ type: ApiResultDto })
   async deleteFile(
     @CurrentUser() user: CachedUser,

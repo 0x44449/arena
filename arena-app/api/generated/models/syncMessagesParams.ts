@@ -5,10 +5,10 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { FileDto } from './file-dto';
 
+export type SyncMessagesParams = {
 /**
- * 채널 아이콘 (DM은 null)
- * @nullable
+ * 이 시간 이후 변경된 메시지 조회 (ISO 8601)
  */
-export type ChannelDtoIcon = FileDto | null;
+since: string;
+};

@@ -41,7 +41,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 내 정보 조회
  */
-export const UserGetMeQuery = (
+export const getMe = (
     
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -56,69 +56,69 @@ export const UserGetMeQuery = (
 
 
 
-export const getUserGetMeQueryQueryKey = () => {
+export const getGetMeQueryKey = () => {
     return [
     `/api/v1/users/me`
     ] as const;
     }
 
     
-export const getUserGetMeQueryQueryOptions = <TData = Awaited<ReturnType<typeof UserGetMeQuery>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetMeQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getUserGetMeQueryQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetMeQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof UserGetMeQuery>>> = ({ signal }) => UserGetMeQuery(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({ signal }) => getMe(requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof UserGetMeQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type UserGetMeQueryQueryResult = NonNullable<Awaited<ReturnType<typeof UserGetMeQuery>>>
-export type UserGetMeQueryQueryError = unknown
+export type GetMeQueryResult = NonNullable<Awaited<ReturnType<typeof getMe>>>
+export type GetMeQueryError = unknown
 
 
-export function useUserGetMeQuery<TData = Awaited<ReturnType<typeof UserGetMeQuery>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetMeQuery>>, TError, TData>> & Pick<
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof UserGetMeQuery>>,
+          Awaited<ReturnType<typeof getMe>>,
           TError,
-          Awaited<ReturnType<typeof UserGetMeQuery>>
+          Awaited<ReturnType<typeof getMe>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUserGetMeQuery<TData = Awaited<ReturnType<typeof UserGetMeQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetMeQuery>>, TError, TData>> & Pick<
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof UserGetMeQuery>>,
+          Awaited<ReturnType<typeof getMe>>,
           TError,
-          Awaited<ReturnType<typeof UserGetMeQuery>>
+          Awaited<ReturnType<typeof getMe>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUserGetMeQuery<TData = Awaited<ReturnType<typeof UserGetMeQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetMeQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 내 정보 조회
  */
 
-export function useUserGetMeQuery<TData = Awaited<ReturnType<typeof UserGetMeQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetMeQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getUserGetMeQueryQueryOptions(options)
+  const queryOptions = getGetMeQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -133,7 +133,7 @@ export function useUserGetMeQuery<TData = Awaited<ReturnType<typeof UserGetMeQue
 /**
  * @summary 내 정보 수정
  */
-export const UserUpdateMeMutation = (
+export const updateMe = (
     updateUserDto: UpdateUserDto,
  options?: SecondParameter<typeof apiClientProxy>,) => {
       
@@ -148,11 +148,11 @@ export const UserUpdateMeMutation = (
   
 
 
-export const getUserUpdateMeMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof UserUpdateMeMutation>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof UserUpdateMeMutation>>, TError,{data: UpdateUserDto}, TContext> => {
+export const getUpdateMeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMe>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMe>>, TError,{data: UpdateUserDto}, TContext> => {
 
-const mutationKey = ['userUpdateMeMutation'];
+const mutationKey = ['updateMe'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -162,10 +162,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof UserUpdateMeMutation>>, {data: UpdateUserDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMe>>, {data: UpdateUserDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  UserUpdateMeMutation(data,requestOptions)
+          return  updateMe(data,requestOptions)
         }
 
         
@@ -173,30 +173,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type UserUpdateMeMutationMutationResult = NonNullable<Awaited<ReturnType<typeof UserUpdateMeMutation>>>
-    export type UserUpdateMeMutationMutationBody = UpdateUserDto
-    export type UserUpdateMeMutationMutationError = unknown
+    export type UpdateMeMutationResult = NonNullable<Awaited<ReturnType<typeof updateMe>>>
+    export type UpdateMeMutationBody = UpdateUserDto
+    export type UpdateMeMutationError = unknown
 
     /**
  * @summary 내 정보 수정
  */
-export const useUserUpdateMeMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof UserUpdateMeMutation>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useUpdateMe = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMe>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof UserUpdateMeMutation>>,
+        Awaited<ReturnType<typeof updateMe>>,
         TError,
         {data: UpdateUserDto},
         TContext
       > => {
 
-      const mutationOptions = getUserUpdateMeMutationMutationOptions(options);
+      const mutationOptions = getUpdateMeMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 유저 조회
  */
-export const UserGetUserQuery = (
+export const getUser = (
     userId: string,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -211,69 +211,69 @@ export const UserGetUserQuery = (
 
 
 
-export const getUserGetUserQueryQueryKey = (userId?: string,) => {
+export const getGetUserQueryKey = (userId?: string,) => {
     return [
     `/api/v1/users/${userId}`
     ] as const;
     }
 
     
-export const getUserGetUserQueryQueryOptions = <TData = Awaited<ReturnType<typeof UserGetUserQuery>>, TError = unknown>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetUserQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export const getGetUserQueryOptions = <TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getUserGetUserQueryQueryKey(userId);
+  const queryKey =  queryOptions?.queryKey ?? getGetUserQueryKey(userId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof UserGetUserQuery>>> = ({ signal }) => UserGetUserQuery(userId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) => getUser(userId, requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof UserGetUserQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type UserGetUserQueryQueryResult = NonNullable<Awaited<ReturnType<typeof UserGetUserQuery>>>
-export type UserGetUserQueryQueryError = unknown
+export type GetUserQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>>
+export type GetUserQueryError = unknown
 
 
-export function useUserGetUserQuery<TData = Awaited<ReturnType<typeof UserGetUserQuery>>, TError = unknown>(
- userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetUserQuery>>, TError, TData>> & Pick<
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+ userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof UserGetUserQuery>>,
+          Awaited<ReturnType<typeof getUser>>,
           TError,
-          Awaited<ReturnType<typeof UserGetUserQuery>>
+          Awaited<ReturnType<typeof getUser>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUserGetUserQuery<TData = Awaited<ReturnType<typeof UserGetUserQuery>>, TError = unknown>(
- userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetUserQuery>>, TError, TData>> & Pick<
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof UserGetUserQuery>>,
+          Awaited<ReturnType<typeof getUser>>,
           TError,
-          Awaited<ReturnType<typeof UserGetUserQuery>>
+          Awaited<ReturnType<typeof getUser>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUserGetUserQuery<TData = Awaited<ReturnType<typeof UserGetUserQuery>>, TError = unknown>(
- userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetUserQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 유저 조회
  */
 
-export function useUserGetUserQuery<TData = Awaited<ReturnType<typeof UserGetUserQuery>>, TError = unknown>(
- userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof UserGetUserQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getUserGetUserQueryQueryOptions(userId,options)
+  const queryOptions = getGetUserQueryOptions(userId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -288,7 +288,7 @@ export function useUserGetUserQuery<TData = Awaited<ReturnType<typeof UserGetUse
 /**
  * @summary 회원가입
  */
-export const UserCreateUserMutation = (
+export const createUser = (
     createUserDto: CreateUserDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -304,11 +304,11 @@ export const UserCreateUserMutation = (
   
 
 
-export const getUserCreateUserMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof UserCreateUserMutation>>, TError,{data: CreateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof UserCreateUserMutation>>, TError,{data: CreateUserDto}, TContext> => {
+export const getCreateUserMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserDto}, TContext> => {
 
-const mutationKey = ['userCreateUserMutation'];
+const mutationKey = ['createUser'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -318,10 +318,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof UserCreateUserMutation>>, {data: CreateUserDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, {data: CreateUserDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  UserCreateUserMutation(data,requestOptions)
+          return  createUser(data,requestOptions)
         }
 
         
@@ -329,23 +329,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type UserCreateUserMutationMutationResult = NonNullable<Awaited<ReturnType<typeof UserCreateUserMutation>>>
-    export type UserCreateUserMutationMutationBody = CreateUserDto
-    export type UserCreateUserMutationMutationError = unknown
+    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
+    export type CreateUserMutationBody = CreateUserDto
+    export type CreateUserMutationError = unknown
 
     /**
  * @summary 회원가입
  */
-export const useUserCreateUserMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof UserCreateUserMutation>>, TError,{data: CreateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useCreateUser = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof UserCreateUserMutation>>,
+        Awaited<ReturnType<typeof createUser>>,
         TError,
         {data: CreateUserDto},
         TContext
       > => {
 
-      const mutationOptions = getUserCreateUserMutationMutationOptions(options);
+      const mutationOptions = getCreateUserMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

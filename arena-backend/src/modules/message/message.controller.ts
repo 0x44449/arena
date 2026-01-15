@@ -41,7 +41,7 @@ export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
   @Post('channel/:channelId')
-  @ApiOperation({ summary: '메시지 보내기' })
+  @ApiOperation({ summary: '메시지 보내기', operationId: 'createMessage' })
   @ApiOkResponse({ type: () => withSingleApiResult(MessageDto) })
   async createMessage(
     @CurrentUser() user: CachedUser,
@@ -62,7 +62,7 @@ export class MessageController {
   }
 
   @Get('channel/:channelId')
-  @ApiOperation({ summary: '메시지 목록 조회' })
+  @ApiOperation({ summary: '메시지 목록 조회', operationId: 'getMessages' })
   @ApiOkResponse({ type: () => withInfinityListApiResult(MessageDto) })
   async getMessages(
     @CurrentUser() user: CachedUser,
@@ -90,7 +90,7 @@ export class MessageController {
   }
 
   @Get('channel/:channelId/sync')
-  @ApiOperation({ summary: '메시지 동기화' })
+  @ApiOperation({ summary: '메시지 동기화', operationId: 'syncMessages' })
   @ApiOkResponse({ type: () => withSingleApiResult(MessageSyncDataDto) })
   async syncMessages(
     @CurrentUser() user: CachedUser,

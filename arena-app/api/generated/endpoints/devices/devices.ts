@@ -31,7 +31,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 디바이스 등록
  */
-export const DeviceRegisterDeviceMutation = (
+export const registerDevice = (
     registerDeviceDto: RegisterDeviceDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -47,11 +47,11 @@ export const DeviceRegisterDeviceMutation = (
   
 
 
-export const getDeviceRegisterDeviceMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof DeviceRegisterDeviceMutation>>, TError,{data: RegisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof DeviceRegisterDeviceMutation>>, TError,{data: RegisterDeviceDto}, TContext> => {
+export const getRegisterDeviceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerDevice>>, TError,{data: RegisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerDevice>>, TError,{data: RegisterDeviceDto}, TContext> => {
 
-const mutationKey = ['deviceRegisterDeviceMutation'];
+const mutationKey = ['registerDevice'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -61,10 +61,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof DeviceRegisterDeviceMutation>>, {data: RegisterDeviceDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerDevice>>, {data: RegisterDeviceDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  DeviceRegisterDeviceMutation(data,requestOptions)
+          return  registerDevice(data,requestOptions)
         }
 
         
@@ -72,30 +72,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeviceRegisterDeviceMutationMutationResult = NonNullable<Awaited<ReturnType<typeof DeviceRegisterDeviceMutation>>>
-    export type DeviceRegisterDeviceMutationMutationBody = RegisterDeviceDto
-    export type DeviceRegisterDeviceMutationMutationError = unknown
+    export type RegisterDeviceMutationResult = NonNullable<Awaited<ReturnType<typeof registerDevice>>>
+    export type RegisterDeviceMutationBody = RegisterDeviceDto
+    export type RegisterDeviceMutationError = unknown
 
     /**
  * @summary 디바이스 등록
  */
-export const useDeviceRegisterDeviceMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof DeviceRegisterDeviceMutation>>, TError,{data: RegisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useRegisterDevice = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerDevice>>, TError,{data: RegisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof DeviceRegisterDeviceMutation>>,
+        Awaited<ReturnType<typeof registerDevice>>,
         TError,
         {data: RegisterDeviceDto},
         TContext
       > => {
 
-      const mutationOptions = getDeviceRegisterDeviceMutationMutationOptions(options);
+      const mutationOptions = getRegisterDeviceMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 디바이스 해제
  */
-export const DeviceUnregisterDeviceMutation = (
+export const unregisterDevice = (
     unregisterDeviceDto: UnregisterDeviceDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -111,11 +111,11 @@ export const DeviceUnregisterDeviceMutation = (
   
 
 
-export const getDeviceUnregisterDeviceMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof DeviceUnregisterDeviceMutation>>, TError,{data: UnregisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof DeviceUnregisterDeviceMutation>>, TError,{data: UnregisterDeviceDto}, TContext> => {
+export const getUnregisterDeviceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unregisterDevice>>, TError,{data: UnregisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof unregisterDevice>>, TError,{data: UnregisterDeviceDto}, TContext> => {
 
-const mutationKey = ['deviceUnregisterDeviceMutation'];
+const mutationKey = ['unregisterDevice'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -125,10 +125,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof DeviceUnregisterDeviceMutation>>, {data: UnregisterDeviceDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unregisterDevice>>, {data: UnregisterDeviceDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  DeviceUnregisterDeviceMutation(data,requestOptions)
+          return  unregisterDevice(data,requestOptions)
         }
 
         
@@ -136,23 +136,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeviceUnregisterDeviceMutationMutationResult = NonNullable<Awaited<ReturnType<typeof DeviceUnregisterDeviceMutation>>>
-    export type DeviceUnregisterDeviceMutationMutationBody = UnregisterDeviceDto
-    export type DeviceUnregisterDeviceMutationMutationError = unknown
+    export type UnregisterDeviceMutationResult = NonNullable<Awaited<ReturnType<typeof unregisterDevice>>>
+    export type UnregisterDeviceMutationBody = UnregisterDeviceDto
+    export type UnregisterDeviceMutationError = unknown
 
     /**
  * @summary 디바이스 해제
  */
-export const useDeviceUnregisterDeviceMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof DeviceUnregisterDeviceMutation>>, TError,{data: UnregisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useUnregisterDevice = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unregisterDevice>>, TError,{data: UnregisterDeviceDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof DeviceUnregisterDeviceMutation>>,
+        Awaited<ReturnType<typeof unregisterDevice>>,
         TError,
         {data: UnregisterDeviceDto},
         TContext
       > => {
 
-      const mutationOptions = getDeviceUnregisterDeviceMutationMutationOptions(options);
+      const mutationOptions = getUnregisterDeviceMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

@@ -41,7 +41,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary DM 생성 (이미 있으면 기존 반환)
  */
-export const ChannelCreateDirectChannelMutation = (
+export const createDirectChannel = (
     createDirectChannelDto: CreateDirectChannelDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -57,11 +57,11 @@ export const ChannelCreateDirectChannelMutation = (
   
 
 
-export const getChannelCreateDirectChannelMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ChannelCreateDirectChannelMutation>>, TError,{data: CreateDirectChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof ChannelCreateDirectChannelMutation>>, TError,{data: CreateDirectChannelDto}, TContext> => {
+export const getCreateDirectChannelMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDirectChannel>>, TError,{data: CreateDirectChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDirectChannel>>, TError,{data: CreateDirectChannelDto}, TContext> => {
 
-const mutationKey = ['channelCreateDirectChannelMutation'];
+const mutationKey = ['createDirectChannel'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -71,10 +71,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ChannelCreateDirectChannelMutation>>, {data: CreateDirectChannelDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDirectChannel>>, {data: CreateDirectChannelDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  ChannelCreateDirectChannelMutation(data,requestOptions)
+          return  createDirectChannel(data,requestOptions)
         }
 
         
@@ -82,30 +82,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ChannelCreateDirectChannelMutationMutationResult = NonNullable<Awaited<ReturnType<typeof ChannelCreateDirectChannelMutation>>>
-    export type ChannelCreateDirectChannelMutationMutationBody = CreateDirectChannelDto
-    export type ChannelCreateDirectChannelMutationMutationError = unknown
+    export type CreateDirectChannelMutationResult = NonNullable<Awaited<ReturnType<typeof createDirectChannel>>>
+    export type CreateDirectChannelMutationBody = CreateDirectChannelDto
+    export type CreateDirectChannelMutationError = unknown
 
     /**
  * @summary DM 생성 (이미 있으면 기존 반환)
  */
-export const useChannelCreateDirectChannelMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ChannelCreateDirectChannelMutation>>, TError,{data: CreateDirectChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useCreateDirectChannel = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDirectChannel>>, TError,{data: CreateDirectChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ChannelCreateDirectChannelMutation>>,
+        Awaited<ReturnType<typeof createDirectChannel>>,
         TError,
         {data: CreateDirectChannelDto},
         TContext
       > => {
 
-      const mutationOptions = getChannelCreateDirectChannelMutationMutationOptions(options);
+      const mutationOptions = getCreateDirectChannelMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 그룹 채널 생성
  */
-export const ChannelCreateGroupChannelMutation = (
+export const createGroupChannel = (
     createGroupChannelDto: CreateGroupChannelDto,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -121,11 +121,11 @@ export const ChannelCreateGroupChannelMutation = (
   
 
 
-export const getChannelCreateGroupChannelMutationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ChannelCreateGroupChannelMutation>>, TError,{data: CreateGroupChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
-): UseMutationOptions<Awaited<ReturnType<typeof ChannelCreateGroupChannelMutation>>, TError,{data: CreateGroupChannelDto}, TContext> => {
+export const getCreateGroupChannelMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGroupChannel>>, TError,{data: CreateGroupChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+): UseMutationOptions<Awaited<ReturnType<typeof createGroupChannel>>, TError,{data: CreateGroupChannelDto}, TContext> => {
 
-const mutationKey = ['channelCreateGroupChannelMutation'];
+const mutationKey = ['createGroupChannel'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -135,10 +135,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ChannelCreateGroupChannelMutation>>, {data: CreateGroupChannelDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createGroupChannel>>, {data: CreateGroupChannelDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  ChannelCreateGroupChannelMutation(data,requestOptions)
+          return  createGroupChannel(data,requestOptions)
         }
 
         
@@ -146,30 +146,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ChannelCreateGroupChannelMutationMutationResult = NonNullable<Awaited<ReturnType<typeof ChannelCreateGroupChannelMutation>>>
-    export type ChannelCreateGroupChannelMutationMutationBody = CreateGroupChannelDto
-    export type ChannelCreateGroupChannelMutationMutationError = unknown
+    export type CreateGroupChannelMutationResult = NonNullable<Awaited<ReturnType<typeof createGroupChannel>>>
+    export type CreateGroupChannelMutationBody = CreateGroupChannelDto
+    export type CreateGroupChannelMutationError = unknown
 
     /**
  * @summary 그룹 채널 생성
  */
-export const useChannelCreateGroupChannelMutation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ChannelCreateGroupChannelMutation>>, TError,{data: CreateGroupChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
+export const useCreateGroupChannel = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGroupChannel>>, TError,{data: CreateGroupChannelDto}, TContext>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ChannelCreateGroupChannelMutation>>,
+        Awaited<ReturnType<typeof createGroupChannel>>,
         TError,
         {data: CreateGroupChannelDto},
         TContext
       > => {
 
-      const mutationOptions = getChannelCreateGroupChannelMutationMutationOptions(options);
+      const mutationOptions = getCreateGroupChannelMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     /**
  * @summary 내 채널 목록
  */
-export const ChannelGetMyChannelsQuery = (
+export const getMyChannels = (
     
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -184,69 +184,69 @@ export const ChannelGetMyChannelsQuery = (
 
 
 
-export const getChannelGetMyChannelsQueryQueryKey = () => {
+export const getGetMyChannelsQueryKey = () => {
     return [
     `/api/v1/channels`
     ] as const;
     }
 
     
-export const getChannelGetMyChannelsQueryQueryOptions = <TData = Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export const getGetMyChannelsQueryOptions = <TData = Awaited<ReturnType<typeof getMyChannels>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyChannels>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getChannelGetMyChannelsQueryQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetMyChannelsQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>> = ({ signal }) => ChannelGetMyChannelsQuery(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyChannels>>> = ({ signal }) => getMyChannels(requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyChannels>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ChannelGetMyChannelsQueryQueryResult = NonNullable<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>>
-export type ChannelGetMyChannelsQueryQueryError = unknown
+export type GetMyChannelsQueryResult = NonNullable<Awaited<ReturnType<typeof getMyChannels>>>
+export type GetMyChannelsQueryError = unknown
 
 
-export function useChannelGetMyChannelsQuery<TData = Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError, TData>> & Pick<
+export function useGetMyChannels<TData = Awaited<ReturnType<typeof getMyChannels>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyChannels>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>,
+          Awaited<ReturnType<typeof getMyChannels>>,
           TError,
-          Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>
+          Awaited<ReturnType<typeof getMyChannels>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChannelGetMyChannelsQuery<TData = Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError, TData>> & Pick<
+export function useGetMyChannels<TData = Awaited<ReturnType<typeof getMyChannels>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyChannels>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>,
+          Awaited<ReturnType<typeof getMyChannels>>,
           TError,
-          Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>
+          Awaited<ReturnType<typeof getMyChannels>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChannelGetMyChannelsQuery<TData = Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetMyChannels<TData = Awaited<ReturnType<typeof getMyChannels>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyChannels>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 내 채널 목록
  */
 
-export function useChannelGetMyChannelsQuery<TData = Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetMyChannelsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetMyChannels<TData = Awaited<ReturnType<typeof getMyChannels>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyChannels>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getChannelGetMyChannelsQueryQueryOptions(options)
+  const queryOptions = getGetMyChannelsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -261,7 +261,7 @@ export function useChannelGetMyChannelsQuery<TData = Awaited<ReturnType<typeof C
 /**
  * @summary 채널 상세 조회
  */
-export const ChannelGetChannelQuery = (
+export const getChannel = (
     channelId: string,
  options?: SecondParameter<typeof apiClientProxy>,signal?: AbortSignal
 ) => {
@@ -276,69 +276,69 @@ export const ChannelGetChannelQuery = (
 
 
 
-export const getChannelGetChannelQueryQueryKey = (channelId?: string,) => {
+export const getGetChannelQueryKey = (channelId?: string,) => {
     return [
     `/api/v1/channels/${channelId}`
     ] as const;
     }
 
     
-export const getChannelGetChannelQueryQueryOptions = <TData = Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError = unknown>(channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export const getGetChannelQueryOptions = <TData = Awaited<ReturnType<typeof getChannel>>, TError = unknown>(channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getChannel>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getChannelGetChannelQueryQueryKey(channelId);
+  const queryKey =  queryOptions?.queryKey ?? getGetChannelQueryKey(channelId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof ChannelGetChannelQuery>>> = ({ signal }) => ChannelGetChannelQuery(channelId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getChannel>>> = ({ signal }) => getChannel(channelId, requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(channelId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(channelId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getChannel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ChannelGetChannelQueryQueryResult = NonNullable<Awaited<ReturnType<typeof ChannelGetChannelQuery>>>
-export type ChannelGetChannelQueryQueryError = unknown
+export type GetChannelQueryResult = NonNullable<Awaited<ReturnType<typeof getChannel>>>
+export type GetChannelQueryError = unknown
 
 
-export function useChannelGetChannelQuery<TData = Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError = unknown>(
- channelId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError, TData>> & Pick<
+export function useGetChannel<TData = Awaited<ReturnType<typeof getChannel>>, TError = unknown>(
+ channelId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getChannel>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof ChannelGetChannelQuery>>,
+          Awaited<ReturnType<typeof getChannel>>,
           TError,
-          Awaited<ReturnType<typeof ChannelGetChannelQuery>>
+          Awaited<ReturnType<typeof getChannel>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChannelGetChannelQuery<TData = Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError = unknown>(
- channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError, TData>> & Pick<
+export function useGetChannel<TData = Awaited<ReturnType<typeof getChannel>>, TError = unknown>(
+ channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getChannel>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof ChannelGetChannelQuery>>,
+          Awaited<ReturnType<typeof getChannel>>,
           TError,
-          Awaited<ReturnType<typeof ChannelGetChannelQuery>>
+          Awaited<ReturnType<typeof getChannel>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChannelGetChannelQuery<TData = Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError = unknown>(
- channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetChannel<TData = Awaited<ReturnType<typeof getChannel>>, TError = unknown>(
+ channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getChannel>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 채널 상세 조회
  */
 
-export function useChannelGetChannelQuery<TData = Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError = unknown>(
- channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ChannelGetChannelQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
+export function useGetChannel<TData = Awaited<ReturnType<typeof getChannel>>, TError = unknown>(
+ channelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getChannel>>, TError, TData>>, request?: SecondParameter<typeof apiClientProxy>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getChannelGetChannelQueryQueryOptions(channelId,options)
+  const queryOptions = getGetChannelQueryOptions(channelId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

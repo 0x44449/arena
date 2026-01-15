@@ -5,7 +5,7 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { MessageDto } from './message-dto';
+import type { MessageDto } from './messageDto';
 
 export interface MessageDtoInfinityListResult {
   success: boolean;

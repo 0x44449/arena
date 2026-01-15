@@ -5,9 +5,9 @@
  * Arena Messenger Backend API
  * OpenAPI spec version: 1.0
  */
-import type { ChannelDtoType } from './channel-dto-type';
-import type { ChannelDtoIcon } from './channel-dto-icon';
-import type { ParticipantDto } from './participant-dto';
+import type { ChannelDtoType } from './channelDtoType';
+import type { ChannelDtoIcon } from './channelDtoIcon';
+import type { ParticipantDto } from './participantDto';
 
 export interface ChannelDto {
   /** 채널 ID */
