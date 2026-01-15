@@ -1,4 +1,4 @@
-import { useUserGetMeQuery } from "@/api/generated/endpoints/user/user";
+import { useGetMe } from "@/api/generated/endpoints/users/users";
 import { supabase } from "@/libs/supabase";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
@@ -7,7 +7,7 @@ import { AppState } from "react-native";
 export default function AppLayout() {
   const router = useRouter();
   const segments = useSegments();
-  const { data: me, isLoading: isLoadingMe } = useUserGetMeQuery({
+  const { data: me, isLoading: isLoadingMe } = useGetMe({
     query: { staleTime: Infinity, gcTime: Infinity }
   });
 
