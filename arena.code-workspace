@@ -1,7 +1,11 @@
 {
 	"folders": [
 		{
-			"name": "arena-backend",
+			"name": "arena-backend (Spring)",
+			"path": "apps/backend"
+		},
+		{
+			"name": "arena-backend (NestJS)",
 			"path": "arena-backend"
 		},
 		{

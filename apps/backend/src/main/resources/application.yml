@@ -1,0 +1,48 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: arena-backend
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:arena}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${SUPABASE_JWKS_URI:https://example.supabase.co/rest/v1/.well-known/jwks.json}
+
+springdoc:
+  api-docs:
+    path: /swagger-json
+  swagger-ui:
+    path: /swagger
+
+aws:
+  s3:
+    endpoint: ${S3_ENDPOINT:http://localhost:4566}
+    region: ${AWS_REGION:ap-northeast-2}
+    bucket: ${S3_BUCKET:arena-files}
+    access-key: ${AWS_ACCESS_KEY_ID:test}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:test}
