@@ -1,4 +1,4 @@
-package com.arena.backend;
+package app.sandori.arena.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

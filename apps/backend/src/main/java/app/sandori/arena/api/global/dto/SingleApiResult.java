@@ -1,4 +1,4 @@
-package com.arena.backend.global.dto;
+package app.sandori.arena.api.global.dto;
 
 import lombok.Getter;
 

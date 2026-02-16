@@ -1,4 +1,4 @@
-package com.arena.backend.security;
+package app.sandori.arena.api.security;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -3,7 +3,7 @@
 ## Package Structure
 
 ```
-com.arena.backend/
+app.sandori.arena.api/
 ├── ArenaBackendApplication.java
 ├── config/             # WebConfig, SwaggerConfig
 ├── security/           # SecurityConfig, JWT, @CurrentUser
@@ -26,7 +26,7 @@ com.arena.backend/
 
 | Target | Style | Example |
 |--------|-------|---------|
-| Package | lowercase | `com.arena.backend.domain.user` |
+| Package | lowercase | `app.sandori.arena.api.domain.user` |
 | Class | PascalCase | `UserController`, `UserEntity` |
 | Method | camelCase | `createDirectChannel`, `getMe` |
 | DB Column | camelCase (quoted) | `"channelId"`, `"lastMessageAt"` |

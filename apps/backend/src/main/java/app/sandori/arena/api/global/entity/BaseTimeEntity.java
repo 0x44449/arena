@@ -1,4 +1,4 @@
-package com.arena.backend.global.entity;
+package app.sandori.arena.api.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

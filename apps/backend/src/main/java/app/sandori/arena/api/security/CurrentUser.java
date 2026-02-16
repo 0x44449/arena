@@ -1,4 +1,4 @@
-package com.arena.backend.security;
+package app.sandori.arena.api.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

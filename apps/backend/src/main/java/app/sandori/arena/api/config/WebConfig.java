@@ -1,6 +1,6 @@
-package com.arena.backend.config;
+package app.sandori.arena.api.config;
 
-import com.arena.backend.security.CurrentUserArgumentResolver;
+import app.sandori.arena.api.security.CurrentUserArgumentResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

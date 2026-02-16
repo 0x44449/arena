@@ -52,7 +52,7 @@ docker compose up -d       # Start PostgreSQL 18, Redis, LocalStack (S3), Admine
 ## Architecture
 
 ### Backend (Spring Boot — apps/backend/)
-- **Package**: `com.arena.backend` with domain-based packages under `domain/`
+- **Package**: `app.sandori.arena.api` with domain-based packages under `domain/`
 - **Domain pattern**: `*Controller.java`, `*Service.java`, `*Repository.java`, `*Entity.java`, `dtos/` per domain
 - **Entities**: `domain/*/` — JPA entities (PostgreSQL), extend `BaseTimeEntity`
 - **Global response DTOs** in `global/dto/`: `SingleApiResult<T>`, `ListApiResult<T>`, `InfinityListApiResult<T>`, `ApiResult`

@@ -1,6 +1,6 @@
-package com.arena.backend.global.exception;
+package app.sandori.arena.api.global.exception;
 
-import com.arena.backend.global.dto.ApiResult;
+import app.sandori.arena.api.global.dto.ApiResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,4 +1,4 @@
-package com.arena.backend.global.exception;
+package app.sandori.arena.api.global.exception;
 
 import lombok.Getter;
 

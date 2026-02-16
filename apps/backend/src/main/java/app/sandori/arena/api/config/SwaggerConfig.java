@@ -1,4 +1,4 @@
-package com.arena.backend.config;
+package app.sandori.arena.api.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

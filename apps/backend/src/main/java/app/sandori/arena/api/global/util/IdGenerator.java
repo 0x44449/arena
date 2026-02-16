@@ -1,4 +1,4 @@
-package com.arena.backend.global.util;
+package app.sandori.arena.api.global.util;
 
 import java.security.SecureRandom;
 
