@@ -1,5 +1,9 @@
 # Arena Documentation
 
+## Project
+
+- [Project Direction](PROJECT.md) — 프로젝트 방향성, 핵심 원칙, 기능 범위
+
 ## Architecture
 
 - [Overview](architecture/overview.md) — System architecture and tech stack

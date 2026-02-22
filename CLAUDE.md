@@ -4,105 +4,135 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Arena is a real-time chat/messenger application. Monorepo with three apps:
-- **arena-app/** — React Native mobile/web client (Expo 54, React 19, TypeScript)
-- **apps/backend/** — Spring Boot 3.5 REST + WebSocket server (Java 21) — **active development**
-- **arena-backend/** — NestJS 11 REST + WebSocket server (TypeScript) — legacy, being replaced
+Arena — 소규모 조직(5~20명)을 위한 경량 그룹웨어. 모바일 메신저를 중심으로 업무에 필요한 기능을 가볍게 제공한다.
 
-## Common Commands
+- **코어**: 메신저 + Org/Team 관리
+- **플러그인**: 게시판/공지, 업무 관리, 캘린더 (필요시 활성화)
+- 자세한 프로젝트 방향은 `docs/PROJECT.md` 참조
 
-### Backend — Spring Boot (apps/backend/)
+## Monorepo Structure
+
+```
+apps/
+  backend/    — Spring Boot 3.5 REST + WebSocket (Java 21)
+  mobile/     — React Native / Expo (TypeScript)
+  web/        — 관리용 웹앱 (미정)
+infra/docker/ — Docker Compose 배포 구성
+docs/         — 프로젝트 문서
+legacy/       — 참고용 기존 코드 (삭제 예정)
+```
+
+## Build & Run Commands
+
+### Backend (apps/backend/)
 ```bash
+cd apps/backend
 ./gradlew build            # Compile + test
-./gradlew bootRun          # Dev server (port 8003)
+./gradlew bootRun          # Dev server (port 8080)
 ./gradlew test             # Run tests
 ./gradlew clean build      # Clean build
 ```
 
-### Backend — NestJS Legacy (arena-backend/)
+### Docker Deployment
 ```bash
-npm run start:dev          # Dev server with watch (port 8002)
-npm run build              # Compile to dist/
-npm run lint               # ESLint with auto-fix
-npm run typecheck          # tsc --noEmit
-npm run test               # Jest unit tests
-npm run test:e2e           # E2E tests
-npm run migration:run      # Apply TypeORM migrations
-npm run migration:generate --name=MigrationName  # Generate migration from entity changes
-npm run seed               # Seed database
-npm run format             # Prettier
-```
-
-### Frontend (arena-app/)
-```bash
-npm start                  # Expo dev server
-npm run ios                # Run on iOS
-npm run android            # Run on Android
-npm run web                # Run on web
-npm run lint               # ESLint
-npm run typecheck          # tsc --noEmit
-npm run orval              # Regenerate API client from backend swagger
-```
-
-### Infrastructure (arena-backend/)
-```bash
-docker compose up -d       # Start PostgreSQL 18, Redis, LocalStack (S3), Adminer
+docker compose -f infra/docker/docker-compose.yml up -d   # Start all services
+./deploy.sh                   # Full deploy (supports --no-cache, --down, --clean)
+./deploy.sh --no-cache api    # Rebuild specific service without cache
 ```
 
 ## Architecture
 
-### Backend (Spring Boot — apps/backend/)
-- **Package**: `app.sandori.arena.api` with domain-based packages under `domain/`
-- **Domain pattern**: `*Controller.java`, `*Service.java`, `*Repository.java`, `*Entity.java`, `dtos/` per domain
-- **Entities**: `domain/*/` — JPA entities (PostgreSQL), extend `BaseTimeEntity`
-- **Global response DTOs** in `global/dto/`: `SingleApiResult<T>`, `ListApiResult<T>`, `InfinityListApiResult<T>`, `ApiResult`
-- **Auth**: Supabase JWT (ES256) via Spring Security OAuth2 Resource Server + JWKS. `@CurrentUser JwtPayload` annotation
-- **File storage**: S3 via AWS SDK v2 (LocalStack in dev)
-- **ID generation**: `IdGenerator.generate()` — SecureRandom 12-char alphanumeric
-- **Swagger**: springdoc-openapi at `/swagger` (UI), `/swagger-json` (spec)
-- **JPA naming**: `globally_quoted_identifiers=true` + `PhysicalNamingStrategyStandardImpl` to match existing camelCase columns
-- **Server port**: 8003
+### Backend (Spring Boot)
 
-### Backend (NestJS Legacy — arena-backend/)
-- **NestJS modular structure**: each domain in `src/modules/` (user, channel, message, contact, device, file, session, gateway)
-- **Module pattern**: `*.module.ts`, `*.controller.ts`, `*.service.ts`, `dtos/` per module
-- **Entities**: `src/entities/` — TypeORM entities (PostgreSQL)
-- **Global response DTOs** in `src/dtos/`: `SingleApiResultDto<T>`, `ListApiResultDto<T>`, `InfinityListApiResultDto<T>`, `ApiResultDto`
-- **Auth**: Supabase JWT validated via JWKS (`jwt-strategy.ts`). JWT `sub` = user ID
-- **WebSocket**: Socket.IO gateway (`src/modules/gateway/arena.gateway.ts`) with signal pub/sub system (`src/signal/`)
-- **File storage**: S3 via AWS SDK (LocalStack in dev)
-- **ID generation**: nanoid (`src/utils/id-generator.ts`)
-- **Swagger**: served at `/swagger`, JSON at `/swagger-json`
-- **Controller routing**: base path on class `@Controller("/api/v1/resource")`, details on methods
-- **Server port**: 8002
+- **Package**: `app.sandori.arena.api`
+  - `config/` — SwaggerConfig, WebConfig 등 설정
+  - `global/dto/` — 공통 응답 DTO (`ApiResult`, `SingleApiResult<T>`, `ListApiResult<T>`, `InfinityListApiResult<T>`)
+  - `global/entity/` — `BaseTimeEntity` (createdAt, updatedAt, deletedAt)
+  - `global/exception/` — `WellKnownException`, `GlobalExceptionHandler`
+  - `global/util/` — `IdGenerator` (SecureRandom 12-char alphanumeric)
+  - `security/` — Spring Security + Supabase JWT (OAuth2 Resource Server + JWKS)
+  - `domain/` — 도메인별 패키지 (Controller, Service, Repository, Entity, dtos/)
+- **Auth**: Supabase JWT (ES256). `@CurrentUser JwtPayload` 어노테이션으로 현재 사용자 주입
+- **DB**: PostgreSQL, JPA with `PhysicalNamingStrategyStandardImpl` + `globally_quoted_identifiers=true`
+- **Swagger**: springdoc-openapi — UI: `/swagger`, JSON: `/swagger-json`
 
-### Frontend
-- **Expo Router** file-based routing in `app/` — routing only, no logic
-- **Screen implementations** in `screens/` — where actual UI logic lives
-  - Level 1 files: externally importable
-  - `controls/` subfolder: internal to that screen only
-- **`components/`**: only for truly cross-screen shared UI
-- **Offline-first**: SQLite via expo-sqlite with structured layers:
-  - `offline/db/schema/` — table name, column constants, row types, parse helpers
-  - `offline/db/queries/` — CRUD functions importing from schema
-  - `offline/db/migrations/` — immutable, sequential (`XXX_description.ts`)
-- **API client**: auto-generated by Orval from backend Swagger spec (`api/generated/`)
-- **Auth**: Supabase (Google + Kakao social login), token injected via Axios interceptor (`api/api-client.ts`)
-- **State**: `useState` first, Zustand for cross-screen sharing. React Query not used (doesn't fit messenger caching model)
-- **Path alias**: `@/` maps to project root (tsconfig)
+### 도메인 구조 (계획)
+
+| 도메인 | 역할 |
+|--------|------|
+| user | 개인 계정 관리 |
+| org | 조직 생성/관리, 멤버 초대 |
+| team | Org 내 하위 그룹 |
+| channel | 1:1, 그룹, 채널 기반 채팅방 |
+| message | 메시지 CRUD, 검색 |
+| file | 파일/이미지 업로드 (S3) |
+
+### Frontend (Mobile — React Native / Expo)
+
+- **Expo Router** file-based routing in `app/` — 라우팅만, 로직 없음
+- **Screen implementations** in `screens/` — 실제 UI 로직
+  - `controls/` subfolder: 해당 스크린 전용 컴포넌트
+- **`components/`**: 스크린 간 공유 UI만
+- **Offline-first**: SQLite via expo-sqlite
+  - `offline/db/schema/` — 테이블명, 컬럼 상수, 타입, 파서
+  - `offline/db/queries/` — CRUD 함수
+  - `offline/db/migrations/` — 순차적 마이그레이션
+- **API client**: Orval로 자동 생성 (`api/generated/`)
+- **Auth**: Supabase (소셜 로그인), Axios interceptor로 토큰 주입
+- **State**: useState 우선, Zustand (크로스 스크린)
+
+### Infrastructure
+
+- **배포**: Docker Compose (`infra/docker/`)
+- **Docker ports**: API=18080, Web=13000 (외부 포트는 1만번대, `.env`로 관리)
+- **서비스**: PostgreSQL, Redis, MinIO (S3 호환), Backend API, (향후 Mobile/Web)
+- **Dockerfile**: Multi-stage build, non-root user, health check
+- **deploy.sh**: `--no-cache`, `--down`, `--clean` 옵션 지원
+
+## Tech Stack
+
+- Backend: Spring Boot 3.5, Java 21, PostgreSQL, Redis
+- Mobile: React Native, Expo, TypeScript, SQLite
+- Web: 미정
+- Auth: Supabase Auth
+- File Storage: MinIO (S3 호환, Docker) / S3 (production)
+- Infra: Docker Compose
 
 ## Coding Conventions
 
-These rules apply across the project — do NOT violate them:
+1. **No premature abstraction**: 인라인 우선. 명시적 요청 없이 공통 함수 추출 금지. 클래스 수 최소화
+2. **YAGNI**: 지금 필요한 것만 구현. 하드코딩 우선, 인터페이스는 구현체 2개 이상일 때만
+3. **Happy path first**: 에러 핸들링은 실제 실패가 발생할 때 추가
+4. **One component per file**: `export default function ComponentName()`. index.ts 재수출 금지
+5. **Frontend DB queries**: params 첫번째 인자(object), optional `db` 두번째 인자(트랜잭션)
+6. **Server DTOs on frontend**: Orval 생성 타입 사용. 별도 UI 모델은 조인 필요시만
+7. **Backend DTO placement**: `global/dto/` (공통 응답), `domain/*/dtos/` (요청/도메인별 응답)
+8. **Feature-based packages**: 레이어가 아닌 기능 단위로 패키지 구성. 공통 코드는 가장 가까운 공통 위치에
 
-1. **No premature abstraction**: keep logic inline. Do not extract common functions unless explicitly requested. Explicit code over clever abstractions.
-2. **One component per file**: `export default function ComponentName()`. No index.ts re-exports.
-3. **Frontend DB queries**: params as first arg (object), optional `db` as second arg (for transactions). `upsertMany` self-wraps in transaction only when no external `db` is passed.
-4. **Server DTOs on frontend**: use Orval-generated types from `api/generated/models/`. Only create separate UI models when joins require it.
-5. **Backend DTO placement**: Spring Boot: `global/dto/` (response), `domain/*/dtos/` (request). NestJS: `src/dtos/` (response), `src/modules/*/dtos/` (request).
+### Comment Rules
 
-## Environment Setup
+- **Language**: 모든 주석은 한글
+- **Content**: "무엇"이 아닌 "왜"를 설명. 매직넘버, 우회 코드, 특수 케이스 설명
+- **Markers**: `// TODO:` 미완성 작업, `// FIXME:` 알려진 이슈
 
-Backend requires `.env` file (see `.env.template`). Key vars: `DB_*` for PostgreSQL, `S3_*` / `AWS_*` for LocalStack, `REDIS_PORT`, `SUPABASE_JWKS_URI`, `SEED_USER_*` for seeding.
+## Workflow
 
-Frontend API endpoint is hardcoded to `http://localhost:8002` in `api/api-client.ts`.
+### 구현 규칙
+
+- 요청된 범위 내에서만 작업한다
+- 요청하지 않은 에러 처리, 로깅, 검증, "개선"을 추가하지 않는다
+- 불명확한 부분은 구현 전에 확인한다
+- 불확실한 부분은 `// TODO:` 로 남긴다
+
+### 커밋 규칙
+
+- **컨펌 없이 절대 커밋하지 않는다**
+- 커밋 메시지: `<type>: <subject>` (한글, 50자 이내)
+- Type: `feat`, `fix`, `refactor`, `chore`, `docs`
+- Body(선택): 변경 사항 간략 나열
+- `git push`는 명시적으로 요청할 때만 수행
+
+## Environment
+
+Docker 환경 변수는 `infra/docker/.env`로 관리 (`.env.example` 참조).
+Backend 로컬 실행 시 `apps/backend/.env` 필요 (`.env.template` 참조).
