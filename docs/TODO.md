@@ -57,22 +57,20 @@ Org가 있어야 메신저의 채널/메시지가 의미를 가진다. 백엔드
 
 ---
 
-## Phase 2: 채널/채팅방 (백엔드)
+## Phase 2: 대화방 (백엔드)
 
-메신저의 기반 구조. 실시간 메시징 전에 채널 관리가 먼저 필요하다.
+DM(1:1)과 그룹 채팅만 먼저 구현. 채널형 대화방(공지 채널 등)은 성격 정의 후 별도 진행.
 
-### Channel
+### Channel (DM / GROUP)
 
-- [ ] Channel 엔티티 (channelId, orgId, type[DM/GROUP/CHANNEL], name, timestamps)
+- [ ] Channel 엔티티 (channelId, orgId, type[DM/GROUP], name, timestamps)
 - [ ] ChannelMember 엔티티 (channelMemberId, channelId, userId, lastReadMessageId, timestamps)
 - [ ] 1:1 DM 생성 API — 기존 DM 있으면 반환
 - [ ] 그룹 채팅 생성 API
-- [ ] 채널 생성 API (OWNER만)
-- [ ] 내 채널 목록 조회 API (최근 메시지, 안읽은 수 포함)
-- [ ] 채널 상세 조회 API (멤버 목록 포함)
-- [ ] 채널 멤버 초대/퇴장 API
-- [ ] 채널 나가기 API
-- [ ] 채널 삭제 API
+- [ ] 내 대화방 목록 조회 API (최근 메시지, 안읽은 수 포함)
+- [ ] 대화방 상세 조회 API (멤버 목록 포함)
+- [ ] 그룹 채팅 멤버 초대/퇴장 API
+- [ ] 대화방 나가기 API
 - [ ] Flyway 마이그레이션 (channels, channel_members 테이블)
 
 ---
