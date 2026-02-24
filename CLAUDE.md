@@ -119,6 +119,7 @@ docker compose -f infra/docker/docker-compose.yml up -d   # Start all services
 6. **Server DTOs on frontend**: Orval 생성 타입 사용. 별도 UI 모델은 조인 필요시만
 7. **Backend DTO placement**: `global/dto/` (공통 응답), `domain/*/dtos/` (요청/도메인별 응답)
 8. **Feature-based packages**: 레이어가 아닌 기능 단위로 패키지 구성. 공통 코드는 가장 가까운 공통 위치에
+9. **No FK constraints**: DB 마이그레이션에서 Foreign Key를 생성하지 않는다. 명시적으로 요청할 때만 추가
 
 ### Comment Rules
 
