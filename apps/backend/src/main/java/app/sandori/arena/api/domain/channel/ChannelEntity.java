@@ -27,8 +27,8 @@ public class ChannelEntity {
     @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "createdBy")
-    private String createdBy;
+    @Column(name = "createdByProfileId")
+    private String createdByProfileId;
 
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -42,12 +42,12 @@ public class ChannelEntity {
     protected ChannelEntity() {
     }
 
-    public ChannelEntity(String orgId, String type, String name, String createdBy) {
+    public ChannelEntity(String orgId, String type, String name, String createdByProfileId) {
         this.channelId = IdGenerator.generate();
         this.orgId = orgId;
         this.type = type;
         this.name = name;
-        this.createdBy = createdBy;
+        this.createdByProfileId = createdByProfileId;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -56,7 +56,7 @@ public class ChannelEntity {
     public String getOrgId() { return orgId; }
     public String getType() { return type; }
     public String getName() { return name; }
-    public String getCreatedBy() { return createdBy; }
+    public String getCreatedByProfileId() { return createdByProfileId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public LocalDateTime getDeletedAt() { return deletedAt; }

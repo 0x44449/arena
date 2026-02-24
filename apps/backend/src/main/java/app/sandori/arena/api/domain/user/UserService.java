@@ -26,7 +26,7 @@ public class UserService {
         UserEntity user = new UserEntity(uid, email);
         userRepository.save(user);
 
-        ProfileEntity profile = new ProfileEntity(user.getUserId(), null, request.name());
+        ProfileEntity profile = new ProfileEntity(user.getUserId(), null, request.name(), null);
         profileRepository.save(profile);
 
         return UserWithProfileDto.from(user, profile);

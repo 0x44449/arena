@@ -27,8 +27,8 @@ public class InviteCodeEntity {
     @Column(name = "code", nullable = false, length = 8)
     private String code;
 
-    @Column(name = "createdBy", nullable = false)
-    private String createdBy;
+    @Column(name = "createdByProfileId", nullable = false)
+    private String createdByProfileId;
 
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -39,11 +39,11 @@ public class InviteCodeEntity {
     protected InviteCodeEntity() {
     }
 
-    public InviteCodeEntity(String orgId, String createdBy) {
+    public InviteCodeEntity(String orgId, String createdByProfileId) {
         this.inviteCodeId = IdGenerator.generate();
         this.orgId = orgId;
         this.code = generateCode();
-        this.createdBy = createdBy;
+        this.createdByProfileId = createdByProfileId;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -58,7 +58,7 @@ public class InviteCodeEntity {
     public String getInviteCodeId() { return inviteCodeId; }
     public String getOrgId() { return orgId; }
     public String getCode() { return code; }
-    public String getCreatedBy() { return createdBy; }
+    public String getCreatedByProfileId() { return createdByProfileId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getDeletedAt() { return deletedAt; }
 

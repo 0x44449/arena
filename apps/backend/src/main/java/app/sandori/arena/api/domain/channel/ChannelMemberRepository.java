@@ -8,9 +8,9 @@ public interface ChannelMemberRepository extends JpaRepository<ChannelMemberEnti
 
     List<ChannelMemberEntity> findAllByChannelIdAndDeletedAtIsNull(String channelId);
 
-    List<ChannelMemberEntity> findAllByUserIdAndDeletedAtIsNull(String userId);
+    List<ChannelMemberEntity> findAllByProfileIdAndDeletedAtIsNull(String profileId);
 
-    Optional<ChannelMemberEntity> findByChannelIdAndUserIdAndDeletedAtIsNull(String channelId, String userId);
+    Optional<ChannelMemberEntity> findByChannelIdAndProfileIdAndDeletedAtIsNull(String channelId, String profileId);
 
-    boolean existsByChannelIdAndUserIdAndDeletedAtIsNull(String channelId, String userId);
+    boolean existsByChannelIdAndProfileIdAndDeletedAtIsNull(String channelId, String profileId);
 }

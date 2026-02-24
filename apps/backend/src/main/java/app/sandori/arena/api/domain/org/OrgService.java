@@ -4,37 +4,31 @@ import app.sandori.arena.api.domain.org.dtos.CreateOrgDto;
 import app.sandori.arena.api.domain.org.dtos.InviteCodeDto;
 import app.sandori.arena.api.domain.org.dtos.JoinOrgDto;
 import app.sandori.arena.api.domain.org.dtos.OrgDto;
-import app.sandori.arena.api.domain.org.dtos.OrgMemberDto;
 import app.sandori.arena.api.domain.org.dtos.UpdateOrgDto;
 import app.sandori.arena.api.domain.profile.ProfileEntity;
 import app.sandori.arena.api.domain.profile.ProfileRepository;
+import app.sandori.arena.api.domain.profile.dtos.ProfileDto;
 import app.sandori.arena.api.domain.user.UserEntity;
 import app.sandori.arena.api.domain.user.UserRepository;
 import app.sandori.arena.api.global.exception.WellKnownException;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrgService {
 
     private final OrgRepository orgRepository;
-    private final OrgMemberRepository orgMemberRepository;
     private final InviteCodeRepository inviteCodeRepository;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
 
     public OrgService(
             OrgRepository orgRepository,
-            OrgMemberRepository orgMemberRepository,
             InviteCodeRepository inviteCodeRepository,
             UserRepository userRepository,
             ProfileRepository profileRepository
     ) {
         this.orgRepository = orgRepository;
-        this.orgMemberRepository = orgMemberRepository;
         this.inviteCodeRepository = inviteCodeRepository;
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
@@ -46,45 +40,41 @@ public class OrgService {
         OrgEntity org = new OrgEntity(request.name(), request.description().orElse(null));
         orgRepository.save(org);
 
-        OrgMemberEntity member = new OrgMemberEntity(org.getOrgId(), user.getUserId(), OrgMemberEntity.ROLE_OWNER);
-        orgMemberRepository.save(member);
-
-        // 기본 프로필 이름을 Org 프로필로 복사
-        ProfileEntity defaultProfile = profileRepository
-                .findByUserIdAndOrgIdIsNullAndDeletedAtIsNull(user.getUserId())
-                .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
-        ProfileEntity orgProfile = new ProfileEntity(user.getUserId(), org.getOrgId(), defaultProfile.getName());
+        // 기본 프로필 이름으로 Org 프로필 생성 (OWNER)
+        ProfileEntity defaultProfile = findDefaultProfile(user.getUserId());
+        ProfileEntity orgProfile = new ProfileEntity(
+                user.getUserId(), org.getOrgId(), defaultProfile.getName(), ProfileEntity.ROLE_OWNER);
         profileRepository.save(orgProfile);
 
-        return OrgDto.from(org, OrgMemberEntity.ROLE_OWNER);
+        return OrgDto.from(org, orgProfile.getRole());
     }
 
     public List<OrgDto> getMyOrgs(String uid) {
         UserEntity user = findUserByUid(uid);
 
-        List<OrgMemberEntity> memberships = orgMemberRepository.findAllByUserIdAndDeletedAtIsNull(user.getUserId());
+        List<ProfileEntity> orgProfiles = profileRepository
+                .findAllByUserIdAndOrgIdIsNotNullAndDeletedAtIsNull(user.getUserId());
 
-        return memberships.stream()
-                .map(m -> {
-                    OrgEntity org = orgRepository.findByOrgIdAndDeletedAtIsNull(m.getOrgId()).orElse(null);
+        return orgProfiles.stream()
+                .map(profile -> {
+                    OrgEntity org = orgRepository.findByOrgIdAndDeletedAtIsNull(profile.getOrgId()).orElse(null);
                     if (org == null) return null;
-                    return OrgDto.from(org, m.getRole());
+                    return OrgDto.from(org, profile.getRole());
                 })
                 .filter(o -> o != null)
                 .toList();
     }
 
     public OrgDto getOrg(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        OrgMemberEntity member = findActiveMember(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
         OrgEntity org = findActiveOrg(orgId);
 
-        return OrgDto.from(org, member.getRole());
+        return OrgDto.from(org, profile.getRole());
     }
 
     public OrgDto updateOrg(String uid, String orgId, UpdateOrgDto request) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
         OrgEntity org = findActiveOrg(orgId);
 
         request.name().ifPresent(org::changeName);
@@ -92,71 +82,63 @@ public class OrgService {
         request.avatarFileId().ifPresent(org::changeAvatarFileId);
 
         orgRepository.save(org);
-        return OrgDto.from(org, OrgMemberEntity.ROLE_OWNER);
+        return OrgDto.from(org, ProfileEntity.ROLE_OWNER);
     }
 
-    public List<OrgMemberDto> getMembers(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        findActiveMember(orgId, user.getUserId());
+    public List<ProfileDto> getMembers(String uid, String orgId) {
+        findOrgProfile(uid, orgId);
 
-        List<OrgMemberEntity> members = orgMemberRepository.findAllByOrgIdAndDeletedAtIsNull(orgId);
-        List<ProfileEntity> profiles = profileRepository.findAllByOrgIdAndDeletedAtIsNull(orgId);
-
-        Map<String, ProfileEntity> profileMap = profiles.stream()
-                .collect(Collectors.toMap(ProfileEntity::getUserId, Function.identity()));
-
-        return members.stream()
-                .map(m -> OrgMemberDto.from(m, profileMap.get(m.getUserId())))
+        return profileRepository.findAllByOrgIdAndDeletedAtIsNull(orgId).stream()
+                .map(ProfileDto::from)
                 .toList();
     }
 
-    public void removeMember(String uid, String orgId, String orgMemberId) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+    public void removeMember(String uid, String orgId, String profileId) {
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
+        requireOwner(myProfile);
 
-        OrgMemberEntity target = orgMemberRepository.findByOrgMemberIdAndDeletedAtIsNull(orgMemberId)
-                .orElseThrow(() -> new WellKnownException("MEMBER_NOT_FOUND"));
+        ProfileEntity target = profileRepository.findByProfileIdAndDeletedAtIsNull(profileId)
+                .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
 
-        if (!target.getOrgId().equals(orgId)) {
-            throw new WellKnownException("MEMBER_NOT_FOUND");
+        if (!orgId.equals(target.getOrgId())) {
+            throw new WellKnownException("PROFILE_NOT_FOUND");
         }
 
-        // OWNER 자신은 추방 불가
-        if (target.getUserId().equals(user.getUserId())) {
+        // 자신은 추방 불가
+        if (myProfile.getProfileId().equals(target.getProfileId())) {
             throw new WellKnownException("CANNOT_REMOVE_SELF");
         }
 
         target.softDelete();
-        orgMemberRepository.save(target);
+        profileRepository.save(target);
     }
 
     public void leaveOrg(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        OrgMemberEntity member = findActiveMember(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
 
         // OWNER는 탈퇴 불가
-        if (OrgMemberEntity.ROLE_OWNER.equals(member.getRole())) {
+        if (ProfileEntity.ROLE_OWNER.equals(profile.getRole())) {
             throw new WellKnownException("OWNER_CANNOT_LEAVE");
         }
 
-        member.softDelete();
-        orgMemberRepository.save(member);
+        profile.softDelete();
+        profileRepository.save(profile);
     }
 
     public InviteCodeDto createInviteCode(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
         findActiveOrg(orgId);
 
-        InviteCodeEntity inviteCode = new InviteCodeEntity(orgId, user.getUserId());
+        InviteCodeEntity inviteCode = new InviteCodeEntity(orgId, profile.getProfileId());
         inviteCodeRepository.save(inviteCode);
 
         return InviteCodeDto.from(inviteCode);
     }
 
     public List<InviteCodeDto> getInviteCodes(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
 
         return inviteCodeRepository.findAllByOrgIdAndDeletedAtIsNull(orgId).stream()
                 .map(InviteCodeDto::from)
@@ -164,8 +146,8 @@ public class OrgService {
     }
 
     public void deleteInviteCode(String uid, String orgId, String inviteCodeId) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
 
         InviteCodeEntity inviteCode = inviteCodeRepository.findByInviteCodeIdAndDeletedAtIsNull(inviteCodeId)
                 .orElseThrow(() -> new WellKnownException("INVITE_CODE_NOT_FOUND"));
@@ -186,23 +168,19 @@ public class OrgService {
 
         String orgId = inviteCode.getOrgId();
 
-        if (orgMemberRepository.existsByOrgIdAndUserIdAndDeletedAtIsNull(orgId, user.getUserId())) {
+        if (profileRepository.existsByUserIdAndOrgIdAndDeletedAtIsNull(user.getUserId(), orgId)) {
             throw new WellKnownException("ALREADY_MEMBER");
         }
 
         OrgEntity org = findActiveOrg(orgId);
 
-        OrgMemberEntity member = new OrgMemberEntity(orgId, user.getUserId(), OrgMemberEntity.ROLE_USER);
-        orgMemberRepository.save(member);
-
-        // Org 전용 프로필 생성 (기본 프로필 이름 복사)
-        ProfileEntity defaultProfile = profileRepository
-                .findByUserIdAndOrgIdIsNullAndDeletedAtIsNull(user.getUserId())
-                .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
-        ProfileEntity orgProfile = new ProfileEntity(user.getUserId(), orgId, defaultProfile.getName());
+        // Org 전용 프로필 생성 (USER)
+        ProfileEntity defaultProfile = findDefaultProfile(user.getUserId());
+        ProfileEntity orgProfile = new ProfileEntity(
+                user.getUserId(), orgId, defaultProfile.getName(), ProfileEntity.ROLE_USER);
         profileRepository.save(orgProfile);
 
-        return OrgDto.from(org, OrgMemberEntity.ROLE_USER);
+        return OrgDto.from(org, ProfileEntity.ROLE_USER);
     }
 
     private UserEntity findUserByUid(String uid) {
@@ -210,19 +188,24 @@ public class OrgService {
                 .orElseThrow(() -> new WellKnownException("USER_NOT_FOUND"));
     }
 
+    private ProfileEntity findDefaultProfile(String userId) {
+        return profileRepository.findByUserIdAndOrgIdIsNullAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
+    }
+
+    private ProfileEntity findOrgProfile(String uid, String orgId) {
+        UserEntity user = findUserByUid(uid);
+        return profileRepository.findByUserIdAndOrgIdAndDeletedAtIsNull(user.getUserId(), orgId)
+                .orElseThrow(() -> new WellKnownException("NOT_ORG_MEMBER"));
+    }
+
     private OrgEntity findActiveOrg(String orgId) {
         return orgRepository.findByOrgIdAndDeletedAtIsNull(orgId)
                 .orElseThrow(() -> new WellKnownException("ORG_NOT_FOUND"));
     }
 
-    private OrgMemberEntity findActiveMember(String orgId, String userId) {
-        return orgMemberRepository.findByOrgIdAndUserIdAndDeletedAtIsNull(orgId, userId)
-                .orElseThrow(() -> new WellKnownException("NOT_ORG_MEMBER"));
-    }
-
-    private void requireOwner(String orgId, String userId) {
-        OrgMemberEntity member = findActiveMember(orgId, userId);
-        if (!OrgMemberEntity.ROLE_OWNER.equals(member.getRole())) {
+    private void requireOwner(ProfileEntity profile) {
+        if (!ProfileEntity.ROLE_OWNER.equals(profile.getRole())) {
             throw new WellKnownException("PERMISSION_DENIED");
         }
     }

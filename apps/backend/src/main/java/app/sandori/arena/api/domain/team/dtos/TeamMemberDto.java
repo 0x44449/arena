@@ -9,8 +9,8 @@ public record TeamMemberDto(
     @Schema(description = "Team 멤버 ID")
     String teamMemberId,
 
-    @Schema(description = "사용자 ID")
-    String userId,
+    @Schema(description = "프로필 ID")
+    String profileId,
 
     @Schema(description = "프로필 이름")
     String name,
@@ -21,7 +21,7 @@ public record TeamMemberDto(
     public static TeamMemberDto from(TeamMemberEntity member, ProfileEntity profile) {
         return new TeamMemberDto(
             member.getTeamMemberId(),
-            member.getUserId(),
+            member.getProfileId(),
             profile != null ? profile.getName() : null,
             profile != null ? profile.getAvatarFileId() : null
         );

@@ -18,8 +18,8 @@ public class ChannelMemberEntity {
     @Column(name = "channelId", nullable = false)
     private String channelId;
 
-    @Column(name = "userId", nullable = false)
-    private String userId;
+    @Column(name = "profileId", nullable = false)
+    private String profileId;
 
     @Column(name = "lastReadMessageId")
     private String lastReadMessageId;
@@ -33,16 +33,16 @@ public class ChannelMemberEntity {
     protected ChannelMemberEntity() {
     }
 
-    public ChannelMemberEntity(String channelId, String userId) {
+    public ChannelMemberEntity(String channelId, String profileId) {
         this.channelMemberId = IdGenerator.generate();
         this.channelId = channelId;
-        this.userId = userId;
+        this.profileId = profileId;
         this.createdAt = LocalDateTime.now();
     }
 
     public String getChannelMemberId() { return channelMemberId; }
     public String getChannelId() { return channelId; }
-    public String getUserId() { return userId; }
+    public String getProfileId() { return profileId; }
     public String getLastReadMessageId() { return lastReadMessageId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getDeletedAt() { return deletedAt; }

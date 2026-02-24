@@ -5,7 +5,6 @@ import app.sandori.arena.api.domain.channel.dtos.ChannelMemberDto;
 import app.sandori.arena.api.domain.channel.dtos.CreateDmDto;
 import app.sandori.arena.api.domain.channel.dtos.CreateGroupDto;
 import app.sandori.arena.api.domain.channel.dtos.InviteMembersDto;
-import app.sandori.arena.api.domain.org.OrgMemberRepository;
 import app.sandori.arena.api.domain.profile.ProfileEntity;
 import app.sandori.arena.api.domain.profile.ProfileRepository;
 import app.sandori.arena.api.domain.user.UserEntity;
@@ -23,155 +22,161 @@ public class ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ChannelMemberRepository channelMemberRepository;
-    private final OrgMemberRepository orgMemberRepository;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
 
     public ChannelService(
             ChannelRepository channelRepository,
             ChannelMemberRepository channelMemberRepository,
-            OrgMemberRepository orgMemberRepository,
             UserRepository userRepository,
             ProfileRepository profileRepository
     ) {
         this.channelRepository = channelRepository;
         this.channelMemberRepository = channelMemberRepository;
-        this.orgMemberRepository = orgMemberRepository;
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
     }
 
     public ChannelDto createDm(String uid, String orgId, CreateDmDto request) {
-        UserEntity user = findUserByUid(uid);
-        requireOrgMember(orgId, user.getUserId());
-        requireOrgMember(orgId, request.targetUserId());
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
+
+        ProfileEntity targetProfile = profileRepository.findByProfileIdAndDeletedAtIsNull(request.targetProfileId())
+                .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
+        if (!orgId.equals(targetProfile.getOrgId())) {
+            throw new WellKnownException("NOT_ORG_MEMBER");
+        }
 
         // 자기 자신과 DM 불가
-        if (user.getUserId().equals(request.targetUserId())) {
+        if (myProfile.getProfileId().equals(targetProfile.getProfileId())) {
             throw new WellKnownException("CANNOT_DM_SELF");
         }
 
         // 기존 DM 있으면 반환
-        var existing = channelRepository.findDmBetween(orgId, user.getUserId(), request.targetUserId());
+        var existing = channelRepository.findDmBetween(orgId, myProfile.getProfileId(), targetProfile.getProfileId());
         if (existing.isPresent()) {
-            return toChannelDto(existing.get(), orgId);
+            return toChannelDto(existing.get());
         }
 
-        ChannelEntity channel = new ChannelEntity(orgId, ChannelEntity.TYPE_DM, null, user.getUserId());
+        ChannelEntity channel = new ChannelEntity(orgId, ChannelEntity.TYPE_DM, null, myProfile.getProfileId());
         channelRepository.save(channel);
 
-        channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), user.getUserId()));
-        channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), request.targetUserId()));
+        channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), myProfile.getProfileId()));
+        channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), targetProfile.getProfileId()));
 
-        return toChannelDto(channel, orgId);
+        return toChannelDto(channel);
     }
 
     public ChannelDto createGroup(String uid, String orgId, CreateGroupDto request) {
-        UserEntity user = findUserByUid(uid);
-        requireOrgMember(orgId, user.getUserId());
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
 
         // 모든 멤버가 Org 소속인지 확인
-        for (String memberId : request.memberUserIds()) {
-            requireOrgMember(orgId, memberId);
-        }
-
-        ChannelEntity channel = new ChannelEntity(orgId, ChannelEntity.TYPE_GROUP, request.name(), user.getUserId());
-        channelRepository.save(channel);
-
-        // 생성자 + 지정 멤버 추가
-        channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), user.getUserId()));
-        for (String memberId : request.memberUserIds()) {
-            if (!memberId.equals(user.getUserId())) {
-                channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), memberId));
+        for (String profileId : request.memberProfileIds()) {
+            ProfileEntity p = profileRepository.findByProfileIdAndDeletedAtIsNull(profileId)
+                    .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
+            if (!orgId.equals(p.getOrgId())) {
+                throw new WellKnownException("NOT_ORG_MEMBER");
             }
         }
 
-        return toChannelDto(channel, orgId);
+        ChannelEntity channel = new ChannelEntity(orgId, ChannelEntity.TYPE_GROUP, request.name(), myProfile.getProfileId());
+        channelRepository.save(channel);
+
+        // 생성자 + 지정 멤버 추가
+        channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), myProfile.getProfileId()));
+        for (String profileId : request.memberProfileIds()) {
+            if (!profileId.equals(myProfile.getProfileId())) {
+                channelMemberRepository.save(new ChannelMemberEntity(channel.getChannelId(), profileId));
+            }
+        }
+
+        return toChannelDto(channel);
     }
 
     public List<ChannelDto> getMyChannels(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        requireOrgMember(orgId, user.getUserId());
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
 
-        // 내가 속한 대화방 ID 목록
-        List<ChannelMemberEntity> myMemberships = channelMemberRepository.findAllByUserIdAndDeletedAtIsNull(user.getUserId());
-        List<String> channelIds = myMemberships.stream()
-                .map(ChannelMemberEntity::getChannelId)
-                .toList();
+        List<ChannelMemberEntity> myMemberships = channelMemberRepository
+                .findAllByProfileIdAndDeletedAtIsNull(myProfile.getProfileId());
 
         List<ChannelDto> result = new ArrayList<>();
-        for (String channelId : channelIds) {
-            ChannelEntity channel = channelRepository.findByChannelIdAndDeletedAtIsNull(channelId).orElse(null);
+        for (ChannelMemberEntity membership : myMemberships) {
+            ChannelEntity channel = channelRepository.findByChannelIdAndDeletedAtIsNull(membership.getChannelId())
+                    .orElse(null);
             if (channel == null || !channel.getOrgId().equals(orgId)) continue;
-            result.add(toChannelDto(channel, orgId));
+            result.add(toChannelDto(channel));
         }
 
         return result;
     }
 
     public ChannelDto getChannel(String uid, String orgId, String channelId) {
-        UserEntity user = findUserByUid(uid);
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
         ChannelEntity channel = findActiveChannel(channelId, orgId);
-        requireChannelMember(channelId, user.getUserId());
+        requireChannelMember(channelId, myProfile.getProfileId());
 
-        return toChannelDto(channel, orgId);
+        return toChannelDto(channel);
     }
 
     public ChannelDto inviteMembers(String uid, String orgId, String channelId, InviteMembersDto request) {
-        UserEntity user = findUserByUid(uid);
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
         ChannelEntity channel = findActiveChannel(channelId, orgId);
-        requireChannelMember(channelId, user.getUserId());
+        requireChannelMember(channelId, myProfile.getProfileId());
 
-        // DM은 초대 불가
         if (ChannelEntity.TYPE_DM.equals(channel.getType())) {
             throw new WellKnownException("CANNOT_INVITE_TO_DM");
         }
 
-        for (String memberId : request.userIds()) {
-            requireOrgMember(orgId, memberId);
-            if (!channelMemberRepository.existsByChannelIdAndUserIdAndDeletedAtIsNull(channelId, memberId)) {
-                channelMemberRepository.save(new ChannelMemberEntity(channelId, memberId));
+        for (String profileId : request.profileIds()) {
+            ProfileEntity p = profileRepository.findByProfileIdAndDeletedAtIsNull(profileId)
+                    .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
+            if (!orgId.equals(p.getOrgId())) {
+                throw new WellKnownException("NOT_ORG_MEMBER");
+            }
+            if (!channelMemberRepository.existsByChannelIdAndProfileIdAndDeletedAtIsNull(channelId, profileId)) {
+                channelMemberRepository.save(new ChannelMemberEntity(channelId, profileId));
             }
         }
 
-        return toChannelDto(channel, orgId);
+        return toChannelDto(channel);
     }
 
     public void leaveChannel(String uid, String orgId, String channelId) {
-        UserEntity user = findUserByUid(uid);
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
         ChannelEntity channel = findActiveChannel(channelId, orgId);
 
-        // DM은 나가기 불가
         if (ChannelEntity.TYPE_DM.equals(channel.getType())) {
             throw new WellKnownException("CANNOT_LEAVE_DM");
         }
 
         ChannelMemberEntity member = channelMemberRepository
-                .findByChannelIdAndUserIdAndDeletedAtIsNull(channelId, user.getUserId())
+                .findByChannelIdAndProfileIdAndDeletedAtIsNull(channelId, myProfile.getProfileId())
                 .orElseThrow(() -> new WellKnownException("NOT_CHANNEL_MEMBER"));
 
         member.softDelete();
         channelMemberRepository.save(member);
     }
 
-    private ChannelDto toChannelDto(ChannelEntity channel, String orgId) {
+    private ChannelDto toChannelDto(ChannelEntity channel) {
         List<ChannelMemberEntity> members = channelMemberRepository
                 .findAllByChannelIdAndDeletedAtIsNull(channel.getChannelId());
-        List<ProfileEntity> profiles = profileRepository.findAllByOrgIdAndDeletedAtIsNull(orgId);
 
-        Map<String, ProfileEntity> profileMap = profiles.stream()
-                .collect(Collectors.toMap(ProfileEntity::getUserId, Function.identity()));
+        Map<String, ProfileEntity> profileMap = members.stream()
+                .map(m -> profileRepository.findByProfileIdAndDeletedAtIsNull(m.getProfileId()).orElse(null))
+                .filter(p -> p != null)
+                .collect(Collectors.toMap(ProfileEntity::getProfileId, Function.identity()));
 
         List<ChannelMemberDto> memberDtos = members.stream()
-                .map(m -> ChannelMemberDto.from(m, profileMap.get(m.getUserId())))
+                .map(m -> ChannelMemberDto.from(m, profileMap.get(m.getProfileId())))
                 .toList();
 
         return ChannelDto.from(channel, memberDtos);
     }
 
-    private UserEntity findUserByUid(String uid) {
-        return userRepository.findByUidAndDeletedAtIsNull(uid)
+    private ProfileEntity findOrgProfile(String uid, String orgId) {
+        UserEntity user = userRepository.findByUidAndDeletedAtIsNull(uid)
                 .orElseThrow(() -> new WellKnownException("USER_NOT_FOUND"));
+        return profileRepository.findByUserIdAndOrgIdAndDeletedAtIsNull(user.getUserId(), orgId)
+                .orElseThrow(() -> new WellKnownException("NOT_ORG_MEMBER"));
     }
 
     private ChannelEntity findActiveChannel(String channelId, String orgId) {
@@ -183,14 +188,8 @@ public class ChannelService {
         return channel;
     }
 
-    private void requireOrgMember(String orgId, String userId) {
-        if (!orgMemberRepository.existsByOrgIdAndUserIdAndDeletedAtIsNull(orgId, userId)) {
-            throw new WellKnownException("NOT_ORG_MEMBER");
-        }
-    }
-
-    private void requireChannelMember(String channelId, String userId) {
-        if (!channelMemberRepository.existsByChannelIdAndUserIdAndDeletedAtIsNull(channelId, userId)) {
+    private void requireChannelMember(String channelId, String profileId) {
+        if (!channelMemberRepository.existsByChannelIdAndProfileIdAndDeletedAtIsNull(channelId, profileId)) {
             throw new WellKnownException("NOT_CHANNEL_MEMBER");
         }
     }

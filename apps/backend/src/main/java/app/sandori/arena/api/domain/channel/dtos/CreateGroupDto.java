@@ -13,8 +13,8 @@ public record CreateGroupDto(
     @Size(max = 50)
     String name,
 
-    @Schema(description = "초기 멤버 사용자 ID 목록 (본인 제외)")
+    @Schema(description = "초기 멤버 프로필 ID 목록 (본인 제외)")
     @NotEmpty
-    List<String> memberUserIds
+    List<String> memberProfileIds
 ) {
 }

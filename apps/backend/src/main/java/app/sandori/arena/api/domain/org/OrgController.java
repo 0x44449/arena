@@ -4,8 +4,8 @@ import app.sandori.arena.api.domain.org.dtos.CreateOrgDto;
 import app.sandori.arena.api.domain.org.dtos.InviteCodeDto;
 import app.sandori.arena.api.domain.org.dtos.JoinOrgDto;
 import app.sandori.arena.api.domain.org.dtos.OrgDto;
-import app.sandori.arena.api.domain.org.dtos.OrgMemberDto;
 import app.sandori.arena.api.domain.org.dtos.UpdateOrgDto;
+import app.sandori.arena.api.domain.profile.dtos.ProfileDto;
 import app.sandori.arena.api.global.dto.ApiResult;
 import app.sandori.arena.api.global.dto.ListApiResult;
 import app.sandori.arena.api.global.dto.SingleApiResult;
@@ -105,26 +105,26 @@ public class OrgController {
         return ResponseEntity.ok(ApiResult.success());
     }
 
-    @Operation(summary = "Org 멤버 목록")
+    @Operation(summary = "Org 멤버 목록", description = "Org에 속한 프로필 목록")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/{orgId}/members")
-    public ResponseEntity<ListApiResult<OrgMemberDto>> getMembers(
+    public ResponseEntity<ListApiResult<ProfileDto>> getMembers(
             @CurrentUser JwtPayload jwt,
             @Parameter(description = "Org ID") @PathVariable String orgId
     ) {
-        List<OrgMemberDto> result = orgService.getMembers(jwt.uid(), orgId);
+        List<ProfileDto> result = orgService.getMembers(jwt.uid(), orgId);
         return ResponseEntity.ok(ListApiResult.of(result));
     }
 
     @Operation(summary = "Org 멤버 추방", description = "OWNER만 가능. 자신은 추방 불가")
     @ApiResponse(responseCode = "200", description = "추방 성공")
-    @DeleteMapping("/{orgId}/members/{orgMemberId}")
+    @DeleteMapping("/{orgId}/members/{profileId}")
     public ResponseEntity<ApiResult> removeMember(
             @CurrentUser JwtPayload jwt,
             @Parameter(description = "Org ID") @PathVariable String orgId,
-            @Parameter(description = "멤버 ID") @PathVariable String orgMemberId
+            @Parameter(description = "프로필 ID") @PathVariable String profileId
     ) {
-        orgService.removeMember(jwt.uid(), orgId, orgMemberId);
+        orgService.removeMember(jwt.uid(), orgId, profileId);
         return ResponseEntity.ok(ApiResult.success());
     }
 

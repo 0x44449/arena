@@ -42,11 +42,15 @@ public class ProfileEntity {
     protected ProfileEntity() {
     }
 
-    public ProfileEntity(String userId, String orgId, String name) {
+    public static final String ROLE_OWNER = "OWNER";
+    public static final String ROLE_USER = "USER";
+
+    public ProfileEntity(String userId, String orgId, String name, String role) {
         this.profileId = IdGenerator.generate();
         this.userId = userId;
         this.orgId = orgId;
         this.name = name;
+        this.role = role;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -68,6 +72,11 @@ public class ProfileEntity {
 
     public void changeAvatarFileId(String avatarFileId) {
         this.avatarFileId = avatarFileId;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 }

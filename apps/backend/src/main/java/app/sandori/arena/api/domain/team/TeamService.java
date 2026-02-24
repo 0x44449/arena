@@ -1,7 +1,5 @@
 package app.sandori.arena.api.domain.team;
 
-import app.sandori.arena.api.domain.org.OrgMemberEntity;
-import app.sandori.arena.api.domain.org.OrgMemberRepository;
 import app.sandori.arena.api.domain.profile.ProfileEntity;
 import app.sandori.arena.api.domain.profile.ProfileRepository;
 import app.sandori.arena.api.domain.team.dtos.AddTeamMemberDto;
@@ -23,27 +21,24 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
-    private final OrgMemberRepository orgMemberRepository;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
 
     public TeamService(
             TeamRepository teamRepository,
             TeamMemberRepository teamMemberRepository,
-            OrgMemberRepository orgMemberRepository,
             UserRepository userRepository,
             ProfileRepository profileRepository
     ) {
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
-        this.orgMemberRepository = orgMemberRepository;
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
     }
 
     public TeamDto createTeam(String uid, String orgId, CreateTeamDto request) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
 
         TeamEntity team = new TeamEntity(orgId, request.name());
         teamRepository.save(team);
@@ -52,8 +47,7 @@ public class TeamService {
     }
 
     public List<TeamDto> getTeams(String uid, String orgId) {
-        UserEntity user = findUserByUid(uid);
-        requireOrgMember(orgId, user.getUserId());
+        findOrgProfile(uid, orgId);
 
         List<TeamEntity> teams = teamRepository.findAllByOrgIdAndDeletedAtIsNull(orgId);
 
@@ -66,8 +60,7 @@ public class TeamService {
     }
 
     public TeamDto getTeam(String uid, String orgId, String teamId) {
-        UserEntity user = findUserByUid(uid);
-        requireOrgMember(orgId, user.getUserId());
+        findOrgProfile(uid, orgId);
 
         TeamEntity team = findActiveTeam(teamId, orgId);
         int count = teamMemberRepository.findAllByTeamIdAndDeletedAtIsNull(teamId).size();
@@ -76,8 +69,8 @@ public class TeamService {
     }
 
     public TeamDto updateTeam(String uid, String orgId, String teamId, UpdateTeamDto request) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
 
         TeamEntity team = findActiveTeam(teamId, orgId);
         request.name().ifPresent(team::changeName);
@@ -88,8 +81,8 @@ public class TeamService {
     }
 
     public void deleteTeam(String uid, String orgId, String teamId) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
 
         TeamEntity team = findActiveTeam(teamId, orgId);
         team.softDelete();
@@ -97,48 +90,46 @@ public class TeamService {
     }
 
     public TeamMemberDto addMember(String uid, String orgId, String teamId, AddTeamMemberDto request) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity myProfile = findOrgProfile(uid, orgId);
+        requireOwner(myProfile);
         findActiveTeam(teamId, orgId);
 
-        // 추가 대상이 Org 멤버인지 확인
-        if (!orgMemberRepository.existsByOrgIdAndUserIdAndDeletedAtIsNull(orgId, request.userId())) {
+        // 추가 대상 프로필이 해당 Org 소속인지 확인
+        ProfileEntity targetProfile = profileRepository.findByProfileIdAndDeletedAtIsNull(request.profileId())
+                .orElseThrow(() -> new WellKnownException("PROFILE_NOT_FOUND"));
+        if (!orgId.equals(targetProfile.getOrgId())) {
             throw new WellKnownException("NOT_ORG_MEMBER");
         }
 
-        if (teamMemberRepository.existsByTeamIdAndUserIdAndDeletedAtIsNull(teamId, request.userId())) {
+        if (teamMemberRepository.existsByTeamIdAndProfileIdAndDeletedAtIsNull(teamId, request.profileId())) {
             throw new WellKnownException("ALREADY_TEAM_MEMBER");
         }
 
-        TeamMemberEntity member = new TeamMemberEntity(teamId, request.userId());
+        TeamMemberEntity member = new TeamMemberEntity(teamId, request.profileId());
         teamMemberRepository.save(member);
 
-        ProfileEntity profile = profileRepository
-                .findByUserIdAndOrgIdAndDeletedAtIsNull(request.userId(), orgId)
-                .orElse(null);
-
-        return TeamMemberDto.from(member, profile);
+        return TeamMemberDto.from(member, targetProfile);
     }
 
     public List<TeamMemberDto> getMembers(String uid, String orgId, String teamId) {
-        UserEntity user = findUserByUid(uid);
-        requireOrgMember(orgId, user.getUserId());
+        findOrgProfile(uid, orgId);
         findActiveTeam(teamId, orgId);
 
         List<TeamMemberEntity> members = teamMemberRepository.findAllByTeamIdAndDeletedAtIsNull(teamId);
-        List<ProfileEntity> profiles = profileRepository.findAllByOrgIdAndDeletedAtIsNull(orgId);
 
-        Map<String, ProfileEntity> profileMap = profiles.stream()
-                .collect(Collectors.toMap(ProfileEntity::getUserId, Function.identity()));
+        Map<String, ProfileEntity> profileMap = members.stream()
+                .map(m -> profileRepository.findByProfileIdAndDeletedAtIsNull(m.getProfileId()).orElse(null))
+                .filter(p -> p != null)
+                .collect(Collectors.toMap(ProfileEntity::getProfileId, Function.identity()));
 
         return members.stream()
-                .map(m -> TeamMemberDto.from(m, profileMap.get(m.getUserId())))
+                .map(m -> TeamMemberDto.from(m, profileMap.get(m.getProfileId())))
                 .toList();
     }
 
     public void removeMember(String uid, String orgId, String teamId, String teamMemberId) {
-        UserEntity user = findUserByUid(uid);
-        requireOwner(orgId, user.getUserId());
+        ProfileEntity profile = findOrgProfile(uid, orgId);
+        requireOwner(profile);
         findActiveTeam(teamId, orgId);
 
         TeamMemberEntity member = teamMemberRepository.findByTeamMemberIdAndDeletedAtIsNull(teamMemberId)
@@ -152,9 +143,14 @@ public class TeamService {
         teamMemberRepository.save(member);
     }
 
-    private UserEntity findUserByUid(String uid) {
-        return userRepository.findByUidAndDeletedAtIsNull(uid)
+    /**
+     * uid로 User를 찾고, 해당 Org의 프로필을 반환. 프로필이 없으면 Org 멤버가 아님.
+     */
+    private ProfileEntity findOrgProfile(String uid, String orgId) {
+        UserEntity user = userRepository.findByUidAndDeletedAtIsNull(uid)
                 .orElseThrow(() -> new WellKnownException("USER_NOT_FOUND"));
+        return profileRepository.findByUserIdAndOrgIdAndDeletedAtIsNull(user.getUserId(), orgId)
+                .orElseThrow(() -> new WellKnownException("NOT_ORG_MEMBER"));
     }
 
     private TeamEntity findActiveTeam(String teamId, String orgId) {
@@ -166,16 +162,8 @@ public class TeamService {
         return team;
     }
 
-    private void requireOrgMember(String orgId, String userId) {
-        if (!orgMemberRepository.existsByOrgIdAndUserIdAndDeletedAtIsNull(orgId, userId)) {
-            throw new WellKnownException("NOT_ORG_MEMBER");
-        }
-    }
-
-    private void requireOwner(String orgId, String userId) {
-        OrgMemberEntity member = orgMemberRepository.findByOrgIdAndUserIdAndDeletedAtIsNull(orgId, userId)
-                .orElseThrow(() -> new WellKnownException("NOT_ORG_MEMBER"));
-        if (!OrgMemberEntity.ROLE_OWNER.equals(member.getRole())) {
+    private void requireOwner(ProfileEntity profile) {
+        if (!ProfileEntity.ROLE_OWNER.equals(profile.getRole())) {
             throw new WellKnownException("PERMISSION_DENIED");
         }
     }

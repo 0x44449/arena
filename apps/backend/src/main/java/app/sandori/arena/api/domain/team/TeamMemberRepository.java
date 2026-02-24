@@ -10,5 +10,5 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, St
 
     Optional<TeamMemberEntity> findByTeamMemberIdAndDeletedAtIsNull(String teamMemberId);
 
-    boolean existsByTeamIdAndUserIdAndDeletedAtIsNull(String teamId, String userId);
+    boolean existsByTeamIdAndProfileIdAndDeletedAtIsNull(String teamId, String profileId);
 }

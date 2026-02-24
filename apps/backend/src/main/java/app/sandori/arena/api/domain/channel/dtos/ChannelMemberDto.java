@@ -9,8 +9,8 @@ public record ChannelMemberDto(
     @Schema(description = "멤버 ID")
     String channelMemberId,
 
-    @Schema(description = "사용자 ID")
-    String userId,
+    @Schema(description = "프로필 ID")
+    String profileId,
 
     @Schema(description = "프로필 이름")
     String name,
@@ -21,7 +21,7 @@ public record ChannelMemberDto(
     public static ChannelMemberDto from(ChannelMemberEntity member, ProfileEntity profile) {
         return new ChannelMemberDto(
             member.getChannelMemberId(),
-            member.getUserId(),
+            member.getProfileId(),
             profile != null ? profile.getName() : null,
             profile != null ? profile.getAvatarFileId() : null
         );

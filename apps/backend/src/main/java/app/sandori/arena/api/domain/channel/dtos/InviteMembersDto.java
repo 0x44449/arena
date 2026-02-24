@@ -6,8 +6,8 @@ import java.util.List;
 
 @Schema(description = "대화방 멤버 초대 요청")
 public record InviteMembersDto(
-    @Schema(description = "초대할 사용자 ID 목록")
+    @Schema(description = "초대할 프로필 ID 목록")
     @NotEmpty
-    List<String> userIds
+    List<String> profileIds
 ) {
 }

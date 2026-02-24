@@ -18,8 +18,8 @@ public class TeamMemberEntity {
     @Column(name = "teamId", nullable = false)
     private String teamId;
 
-    @Column(name = "userId", nullable = false)
-    private String userId;
+    @Column(name = "profileId", nullable = false)
+    private String profileId;
 
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -30,16 +30,16 @@ public class TeamMemberEntity {
     protected TeamMemberEntity() {
     }
 
-    public TeamMemberEntity(String teamId, String userId) {
+    public TeamMemberEntity(String teamId, String profileId) {
         this.teamMemberId = IdGenerator.generate();
         this.teamId = teamId;
-        this.userId = userId;
+        this.profileId = profileId;
         this.createdAt = LocalDateTime.now();
     }
 
     public String getTeamMemberId() { return teamMemberId; }
     public String getTeamId() { return teamId; }
-    public String getUserId() { return userId; }
+    public String getProfileId() { return profileId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getDeletedAt() { return deletedAt; }
 
