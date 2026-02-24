@@ -53,7 +53,7 @@ public class TeamService {
 
         return teams.stream()
                 .map(team -> {
-                    int count = teamMemberRepository.findAllByTeamIdAndDeletedAtIsNull(team.getTeamId()).size();
+                    int count = teamMemberRepository.findAllByTeamId(team.getTeamId()).size();
                     return TeamDto.from(team, count);
                 })
                 .toList();
@@ -63,7 +63,7 @@ public class TeamService {
         findOrgProfile(uid, orgId);
 
         TeamEntity team = findActiveTeam(teamId, orgId);
-        int count = teamMemberRepository.findAllByTeamIdAndDeletedAtIsNull(teamId).size();
+        int count = teamMemberRepository.findAllByTeamId(teamId).size();
 
         return TeamDto.from(team, count);
     }
@@ -76,7 +76,7 @@ public class TeamService {
         request.name().ifPresent(team::changeName);
         teamRepository.save(team);
 
-        int count = teamMemberRepository.findAllByTeamIdAndDeletedAtIsNull(teamId).size();
+        int count = teamMemberRepository.findAllByTeamId(teamId).size();
         return TeamDto.from(team, count);
     }
 
@@ -101,21 +101,21 @@ public class TeamService {
             throw new WellKnownException("NOT_ORG_MEMBER");
         }
 
-        if (teamMemberRepository.existsByTeamIdAndProfileIdAndDeletedAtIsNull(teamId, request.profileId())) {
+        if (teamMemberRepository.existsByTeamIdAndProfileId(teamId, request.profileId())) {
             throw new WellKnownException("ALREADY_TEAM_MEMBER");
         }
 
         TeamMemberEntity member = new TeamMemberEntity(teamId, request.profileId());
         teamMemberRepository.save(member);
 
-        return TeamMemberDto.from(member, targetProfile);
+        return TeamMemberDto.from(targetProfile);
     }
 
     public List<TeamMemberDto> getMembers(String uid, String orgId, String teamId) {
         findOrgProfile(uid, orgId);
         findActiveTeam(teamId, orgId);
 
-        List<TeamMemberEntity> members = teamMemberRepository.findAllByTeamIdAndDeletedAtIsNull(teamId);
+        List<TeamMemberEntity> members = teamMemberRepository.findAllByTeamId(teamId);
 
         Map<String, ProfileEntity> profileMap = members.stream()
                 .map(m -> profileRepository.findByProfileIdAndDeletedAtIsNull(m.getProfileId()).orElse(null))
@@ -123,24 +123,20 @@ public class TeamService {
                 .collect(Collectors.toMap(ProfileEntity::getProfileId, Function.identity()));
 
         return members.stream()
-                .map(m -> TeamMemberDto.from(m, profileMap.get(m.getProfileId())))
+                .map(m -> TeamMemberDto.from(profileMap.get(m.getProfileId())))
                 .toList();
     }
 
-    public void removeMember(String uid, String orgId, String teamId, String teamMemberId) {
+    public void removeMember(String uid, String orgId, String teamId, String profileId) {
         ProfileEntity profile = findOrgProfile(uid, orgId);
         requireOwner(profile);
         findActiveTeam(teamId, orgId);
 
-        TeamMemberEntity member = teamMemberRepository.findByTeamMemberIdAndDeletedAtIsNull(teamMemberId)
-                .orElseThrow(() -> new WellKnownException("TEAM_MEMBER_NOT_FOUND"));
-
-        if (!member.getTeamId().equals(teamId)) {
+        if (!teamMemberRepository.existsByTeamIdAndProfileId(teamId, profileId)) {
             throw new WellKnownException("TEAM_MEMBER_NOT_FOUND");
         }
 
-        member.softDelete();
-        teamMemberRepository.save(member);
+        teamMemberRepository.deleteById(new TeamMemberId(teamId, profileId));
     }
 
     /**

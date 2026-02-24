@@ -1,14 +1,11 @@
 package app.sandori.arena.api.domain.team;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, String> {
+public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, TeamMemberId> {
 
-    List<TeamMemberEntity> findAllByTeamIdAndDeletedAtIsNull(String teamId);
+    List<TeamMemberEntity> findAllByTeamId(String teamId);
 
-    Optional<TeamMemberEntity> findByTeamMemberIdAndDeletedAtIsNull(String teamMemberId);
-
-    boolean existsByTeamIdAndProfileIdAndDeletedAtIsNull(String teamId, String profileId);
+    boolean existsByTeamIdAndProfileId(String teamId, String profileId);
 }

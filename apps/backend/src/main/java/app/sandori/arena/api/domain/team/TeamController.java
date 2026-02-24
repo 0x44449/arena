@@ -125,14 +125,14 @@ public class TeamController {
 
     @Operation(summary = "Team 멤버 제거", description = "OWNER만 가능")
     @ApiResponse(responseCode = "200", description = "제거 성공")
-    @DeleteMapping("/{teamId}/members/{teamMemberId}")
+    @DeleteMapping("/{teamId}/members/{profileId}")
     public ResponseEntity<ApiResult> removeMember(
             @CurrentUser JwtPayload jwt,
             @Parameter(description = "Org ID") @PathVariable String orgId,
             @Parameter(description = "Team ID") @PathVariable String teamId,
-            @Parameter(description = "Team 멤버 ID") @PathVariable String teamMemberId
+            @Parameter(description = "프로필 ID") @PathVariable String profileId
     ) {
-        teamService.removeMember(jwt.uid(), orgId, teamId, teamMemberId);
+        teamService.removeMember(jwt.uid(), orgId, teamId, profileId);
         return ResponseEntity.ok(ApiResult.success());
     }
 }

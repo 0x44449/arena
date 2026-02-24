@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChannelMemberRepository extends JpaRepository<ChannelMemberEntity, String> {
+public interface ChannelMemberRepository extends JpaRepository<ChannelMemberEntity, ChannelMemberId> {
 
-    List<ChannelMemberEntity> findAllByChannelIdAndDeletedAtIsNull(String channelId);
+    List<ChannelMemberEntity> findAllByChannelId(String channelId);
 
-    List<ChannelMemberEntity> findAllByProfileIdAndDeletedAtIsNull(String profileId);
+    List<ChannelMemberEntity> findAllByProfileId(String profileId);
 
-    Optional<ChannelMemberEntity> findByChannelIdAndProfileIdAndDeletedAtIsNull(String channelId, String profileId);
+    Optional<ChannelMemberEntity> findByChannelIdAndProfileId(String channelId, String profileId);
 
-    boolean existsByChannelIdAndProfileIdAndDeletedAtIsNull(String channelId, String profileId);
+    boolean existsByChannelIdAndProfileId(String channelId, String profileId);
 }

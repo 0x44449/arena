@@ -96,7 +96,7 @@ public class ChannelService {
         ProfileEntity myProfile = findOrgProfile(uid, orgId);
 
         List<ChannelMemberEntity> myMemberships = channelMemberRepository
-                .findAllByProfileIdAndDeletedAtIsNull(myProfile.getProfileId());
+                .findAllByProfileId(myProfile.getProfileId());
 
         List<ChannelDto> result = new ArrayList<>();
         for (ChannelMemberEntity membership : myMemberships) {
@@ -132,7 +132,7 @@ public class ChannelService {
             if (!orgId.equals(p.getOrgId())) {
                 throw new WellKnownException("NOT_ORG_MEMBER");
             }
-            if (!channelMemberRepository.existsByChannelIdAndProfileIdAndDeletedAtIsNull(channelId, profileId)) {
+            if (!channelMemberRepository.existsByChannelIdAndProfileId(channelId, profileId)) {
                 channelMemberRepository.save(new ChannelMemberEntity(channelId, profileId));
             }
         }
@@ -148,17 +148,16 @@ public class ChannelService {
             throw new WellKnownException("CANNOT_LEAVE_DM");
         }
 
-        ChannelMemberEntity member = channelMemberRepository
-                .findByChannelIdAndProfileIdAndDeletedAtIsNull(channelId, myProfile.getProfileId())
-                .orElseThrow(() -> new WellKnownException("NOT_CHANNEL_MEMBER"));
+        if (!channelMemberRepository.existsByChannelIdAndProfileId(channelId, myProfile.getProfileId())) {
+            throw new WellKnownException("NOT_CHANNEL_MEMBER");
+        }
 
-        member.softDelete();
-        channelMemberRepository.save(member);
+        channelMemberRepository.deleteById(new ChannelMemberId(channelId, myProfile.getProfileId()));
     }
 
     private ChannelDto toChannelDto(ChannelEntity channel) {
         List<ChannelMemberEntity> members = channelMemberRepository
-                .findAllByChannelIdAndDeletedAtIsNull(channel.getChannelId());
+                .findAllByChannelId(channel.getChannelId());
 
         Map<String, ProfileEntity> profileMap = members.stream()
                 .map(m -> profileRepository.findByProfileIdAndDeletedAtIsNull(m.getProfileId()).orElse(null))
@@ -166,7 +165,7 @@ public class ChannelService {
                 .collect(Collectors.toMap(ProfileEntity::getProfileId, Function.identity()));
 
         List<ChannelMemberDto> memberDtos = members.stream()
-                .map(m -> ChannelMemberDto.from(m, profileMap.get(m.getProfileId())))
+                .map(m -> ChannelMemberDto.from(profileMap.get(m.getProfileId())))
                 .toList();
 
         return ChannelDto.from(channel, memberDtos);
@@ -189,7 +188,7 @@ public class ChannelService {
     }
 
     private void requireChannelMember(String channelId, String profileId) {
-        if (!channelMemberRepository.existsByChannelIdAndProfileIdAndDeletedAtIsNull(channelId, profileId)) {
+        if (!channelMemberRepository.existsByChannelIdAndProfileId(channelId, profileId)) {
             throw new WellKnownException("NOT_CHANNEL_MEMBER");
         }
     }

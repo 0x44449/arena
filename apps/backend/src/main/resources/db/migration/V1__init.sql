@@ -40,12 +40,12 @@ CREATE TABLE "orgs" (
 
 -- invite_codes: Org 초대 코드
 CREATE TABLE "invite_codes" (
-    "inviteCodeId"      TEXT         NOT NULL,
-    "orgId"             TEXT         NOT NULL,
-    "code"              VARCHAR(8)   NOT NULL,
-    "createdByProfileId" TEXT        NOT NULL,
-    "createdAt"         TIMESTAMPTZ  NOT NULL,
-    "deletedAt"         TIMESTAMPTZ,
+    "inviteCodeId" TEXT         NOT NULL,
+    "orgId"        TEXT         NOT NULL,
+    "code"         VARCHAR(8)   NOT NULL,
+    "creatorId"    TEXT         NOT NULL,
+    "createdAt"    TIMESTAMPTZ  NOT NULL,
+    "deletedAt"    TIMESTAMPTZ,
     CONSTRAINT "pk_invite_codes" PRIMARY KEY ("inviteCodeId")
 );
 CREATE UNIQUE INDEX "uk_invite_codes_code" ON "invite_codes" ("code") WHERE "deletedAt" IS NULL;
@@ -61,38 +61,32 @@ CREATE TABLE "teams" (
     CONSTRAINT "pk_teams" PRIMARY KEY ("teamId")
 );
 
--- team_members: profileId 기반
+-- team_members: 복합 PK, hard delete
 CREATE TABLE "team_members" (
-    "teamMemberId" TEXT         NOT NULL,
-    "teamId"       TEXT         NOT NULL,
-    "profileId"    TEXT         NOT NULL,
-    "createdAt"    TIMESTAMPTZ  NOT NULL,
-    "deletedAt"    TIMESTAMPTZ,
-    CONSTRAINT "pk_team_members" PRIMARY KEY ("teamMemberId")
+    "teamId"    TEXT         NOT NULL,
+    "profileId" TEXT         NOT NULL,
+    "createdAt" TIMESTAMPTZ  NOT NULL,
+    CONSTRAINT "pk_team_members" PRIMARY KEY ("teamId", "profileId")
 );
-CREATE UNIQUE INDEX "uk_team_members_active" ON "team_members" ("teamId", "profileId") WHERE "deletedAt" IS NULL;
 
 -- channels: DM / GROUP 대화방
 CREATE TABLE "channels" (
-    "channelId"          TEXT         NOT NULL,
-    "orgId"              TEXT         NOT NULL,
-    "type"               VARCHAR(10)  NOT NULL,
-    "name"               VARCHAR(50),
-    "createdByProfileId" TEXT,
-    "createdAt"          TIMESTAMPTZ  NOT NULL,
-    "updatedAt"          TIMESTAMPTZ  NOT NULL,
-    "deletedAt"          TIMESTAMPTZ,
+    "channelId"  TEXT         NOT NULL,
+    "orgId"      TEXT         NOT NULL,
+    "type"       VARCHAR(10)  NOT NULL,
+    "name"       VARCHAR(50),
+    "creatorId"  TEXT,
+    "createdAt"  TIMESTAMPTZ  NOT NULL,
+    "updatedAt"  TIMESTAMPTZ  NOT NULL,
+    "deletedAt"  TIMESTAMPTZ,
     CONSTRAINT "pk_channels" PRIMARY KEY ("channelId")
 );
 
--- channel_members: profileId 기반
+-- channel_members: 복합 PK, hard delete
 CREATE TABLE "channel_members" (
-    "channelMemberId"   TEXT         NOT NULL,
     "channelId"         TEXT         NOT NULL,
     "profileId"         TEXT         NOT NULL,
     "lastReadMessageId" TEXT,
     "createdAt"         TIMESTAMPTZ  NOT NULL,
-    "deletedAt"         TIMESTAMPTZ,
-    CONSTRAINT "pk_channel_members" PRIMARY KEY ("channelMemberId")
+    CONSTRAINT "pk_channel_members" PRIMARY KEY ("channelId", "profileId")
 );
-CREATE UNIQUE INDEX "uk_channel_members_active" ON "channel_members" ("channelId", "profileId") WHERE "deletedAt" IS NULL;
