@@ -56,16 +56,27 @@ docker compose -f infra/docker/docker-compose.yml up -d   # Start all services
 - **DB**: PostgreSQL, JPA with `PhysicalNamingStrategyStandardImpl` + `globally_quoted_identifiers=true`
 - **Swagger**: springdoc-openapi — UI: `/swagger`, JSON: `/swagger-json`
 
-### 도메인 구조 (계획)
+### Profile 기반 시스템
 
-| 도메인 | 역할 |
-|--------|------|
-| user | 개인 계정 관리 |
-| org | 조직 생성/관리, 멤버 초대 |
-| team | Org 내 하위 그룹 |
-| channel | 1:1, 그룹, 채널 기반 채팅방 |
-| message | 메시지 CRUD, 검색 |
-| file | 파일/이미지 업로드 (S3) |
+**User는 인증용, 모든 활동은 Profile 기준으로 동작한다.**
+
+- User = 가입/인증 증빙. Supabase uid와 1:1 매핑
+- Profile = 실제 활동 주체. 기본 프로필(orgId=null) + Org별 프로필(orgId 지정)
+- Org 멤버십 = Profile 자체 (별도 멤버십 테이블 없음). `profile.role`로 OWNER/USER 구분
+- Team 멤버, Channel 멤버, 메시지 발신자 등 모든 참조는 `profileId` 사용
+- Org 가입 시 기본 프로필 이름을 복사해 Org 전용 프로필 자동 생성
+
+### 도메인 구조
+
+| 도메인 | 역할 | 상태 |
+|--------|------|------|
+| user | 계정 가입/인증 (Supabase uid 연동) | 구현 완료 |
+| profile | 기본/Org별 프로필 관리, Org 멤버십 | 구현 완료 |
+| org | 조직 생성/관리, 초대 코드 | 구현 완료 |
+| team | Org 내 하위 그룹 (profileId 기반) | 구현 완료 |
+| channel | DM, 그룹 대화방 (profileId 기반) | 구현 완료 |
+| message | 메시지 CRUD, 검색 | 미구현 |
+| file | 파일/이미지 업로드 (S3) | 미구현 |
 
 ### Frontend (Mobile — React Native / Expo)
 
