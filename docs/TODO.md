@@ -2,9 +2,11 @@
 
 MVP 목표: **코어(메신저 + Org/Team 관리)를 완성도 높게 구현**
 
+> **핵심 설계**: Profile 기반 시스템. User는 인증용, 모든 활동은 profileId 기준.
+
 ---
 
-## Phase 0: 현재 작업 정리
+## Phase 0: 프로젝트 스캐폴드 ✅
 
 - [x] 모노레포 스캐폴드 (apps/backend, apps/mobile, infra/docker)
 - [x] Docker Compose 환경 구성 (PostgreSQL, Redis, MinIO, API)
@@ -12,74 +14,61 @@ MVP 목표: **코어(메신저 + Org/Team 관리)를 완성도 높게 구현**
 - [x] Supabase JWT 인증 연동 (OAuth2 Resource Server + JWKS)
 - [x] 공통 응답 DTO (ApiResult, SingleApiResult, ListApiResult, InfinityListApiResult)
 - [x] 공통 예외 처리 (WellKnownException, GlobalExceptionHandler)
-- [x] BaseTimeEntity, IdGenerator
+- [x] IdGenerator (SecureRandom 12-char)
 - [x] User 도메인 (가입, 내 정보 조회)
 - [x] Profile 도메인 (기본 프로필, 수정)
 - [x] Flyway 마이그레이션 (V1: users, profiles)
 - [x] 모바일 스캐폴드 (Expo Router, Supabase 연동, Zustand auth store)
-- [ ] 커밋 안 된 변경사항 정리 및 커밋
 
 ---
 
-## Phase 1: Org/Team 관리 (백엔드)
-
-Org가 있어야 메신저의 채널/메시지가 의미를 가진다. 백엔드 API를 먼저 완성한다.
+## Phase 1: Org/Team 관리 (백엔드) ✅
 
 ### Org
 
-- [ ] Org 엔티티 (orgId, name, description, avatarFileId, timestamps)
-- [ ] OrgMember 엔티티 (orgMemberId, orgId, userId, role[OWNER/USER], timestamps)
-- [ ] Org 생성 API — 생성자가 자동으로 OWNER
-- [ ] Org 조회 API — 내가 속한 Org 목록
-- [ ] Org 상세 조회 API
-- [ ] Org 수정 API (OWNER만)
-- [ ] 초대 코드 생성/관리 API (OWNER만)
-- [ ] 초대 코드로 Org 가입 API — 가입 시 Org용 프로필 자동 생성
-- [ ] Org 멤버 목록 조회 API
-- [ ] Org 멤버 추방 API (OWNER만)
-- [ ] Org 탈퇴 API
-- [ ] Flyway 마이그레이션 (orgs, org_members, invite_codes 테이블)
+- [x] Org 엔티티 + Flyway V2 (orgs, invite_codes)
+- [x] Org 생성 API — 생성자의 Profile에 OWNER role 부여
+- [x] 내 Org 목록 API (Profile 기반 조회)
+- [x] Org 상세/수정 API (OWNER만 수정)
+- [x] 초대 코드 생성/목록/삭제 API (OWNER만)
+- [x] 초대 코드로 가입 API — Org용 Profile 자동 생성 (USER role)
+- [x] 멤버 목록 API (ProfileDto 반환)
+- [x] 멤버 추방 API (OWNER만, profileId 기준)
+- [x] Org 탈퇴 API (OWNER 탈퇴 불가)
 
 ### Team
 
-- [ ] Team 엔티티 (teamId, orgId, name, timestamps)
-- [ ] TeamMember 엔티티 (teamMemberId, teamId, userId, timestamps)
-- [ ] Team 생성 API (OWNER만)
-- [ ] Team 목록 조회 API (Org 내)
-- [ ] Team 멤버 추가/제거 API (OWNER만)
-- [ ] Team 삭제 API (OWNER만)
-- [ ] Flyway 마이그레이션 (teams, team_members 테이블)
+- [x] Team 엔티티 + Flyway V3 (teams, team_members)
+- [x] Team CRUD API (생성/목록/상세/수정/삭제 — OWNER만)
+- [x] Team 멤버 추가/목록/제거 API (profileId 기반, Org 멤버만 추가 가능)
 
-### Profile 확장
+### Profile 기반 전환
 
-- [ ] Org별 프로필 조회/수정 API
-- [ ] Org 가입 시 프로필 자동 분리 로직 연동
+- [x] OrgMember 제거 → Profile이 Org 멤버십 겸임 (role: OWNER/USER)
+- [x] TeamMember, ChannelMember: userId → profileId 전환
+- [x] Flyway V5 (org_members DROP, 컬럼 리네이밍)
 
 ---
 
-## Phase 2: 대화방 (백엔드)
+## Phase 2: 대화방 (백엔드) ✅
 
-DM(1:1)과 그룹 채팅만 먼저 구현. 채널형 대화방(공지 채널 등)은 성격 정의 후 별도 진행.
+DM(1:1)과 그룹 채팅만 구현. 채널형 대화방은 성격 정의 후 별도 진행.
 
-### Channel (DM / GROUP)
-
-- [ ] Channel 엔티티 (channelId, orgId, type[DM/GROUP], name, timestamps)
-- [ ] ChannelMember 엔티티 (channelMemberId, channelId, userId, lastReadMessageId, timestamps)
-- [ ] 1:1 DM 생성 API — 기존 DM 있으면 반환
-- [ ] 그룹 채팅 생성 API
-- [ ] 내 대화방 목록 조회 API (최근 메시지, 안읽은 수 포함)
-- [ ] 대화방 상세 조회 API (멤버 목록 포함)
-- [ ] 그룹 채팅 멤버 초대/퇴장 API
-- [ ] 대화방 나가기 API
-- [ ] Flyway 마이그레이션 (channels, channel_members 테이블)
+- [x] Channel 엔티티 + Flyway V4 (channels, channel_members)
+- [x] DM 생성 API — 기존 DM 있으면 반환, 자기 자신 DM 차단
+- [x] 그룹 채팅 생성 API (이름 + 초기 멤버 profileIds)
+- [x] 내 대화방 목록 API (멤버 프로필 포함)
+- [x] 대화방 상세 API (멤버 목록 포함)
+- [x] 그룹 멤버 초대 API (DM은 차단)
+- [x] 대화방 나가기 API (DM은 차단)
 
 ---
 
-## Phase 3: 메시지 (백엔드)
+## Phase 3: 메시지 (백엔드) ← 다음
 
 ### Message CRUD
 
-- [ ] Message 엔티티 (messageId, channelId, senderId, content, type[TEXT/IMAGE/FILE], timestamps)
+- [ ] Message 엔티티 (messageId, channelId, senderProfileId, content, type[TEXT/IMAGE/FILE], timestamps)
 - [ ] 메시지 전송 API (REST)
 - [ ] 메시지 목록 조회 API (커서 기반 페이지네이션)
 - [ ] 메시지 삭제 API (본인 메시지만)
@@ -96,7 +85,7 @@ DM(1:1)과 그룹 채팅만 먼저 구현. 채널형 대화방(공지 채널 등
 
 ### 파일 업로드
 
-- [ ] File 엔티티 (fileId, uploaderId, fileName, fileSize, mimeType, s3Key, timestamps)
+- [ ] File 엔티티 (fileId, uploaderProfileId, fileName, fileSize, mimeType, s3Key, timestamps)
 - [ ] 파일 업로드 API (MinIO/S3)
 - [ ] 파일 다운로드/조회 API (presigned URL)
 - [ ] 이미지 썸네일 생성 (선택)
@@ -154,9 +143,8 @@ DM(1:1)과 그룹 채팅만 먼저 구현. 채널형 대화방(공지 채널 등
 
 ### 채팅 목록
 
-- [ ] 채널 목록 화면 (최근 메시지, 안읽은 수 표시)
+- [ ] 대화방 목록 화면 (최근 메시지, 안읽은 수 표시)
 - [ ] 새 대화 시작 (DM / 그룹 채팅 생성)
-- [ ] 채널 검색
 
 ### 채팅방
 
@@ -171,10 +159,6 @@ DM(1:1)과 그룹 채팅만 먼저 구현. 채널형 대화방(공지 채널 등
 - [ ] WebSocket 연결 관리
 - [ ] 실시간 메시지 수신 + UI 반영
 - [ ] 오프라인 → 온라인 복귀 시 동기화
-
-### 검색
-
-- [ ] 메시지 검색 화면
 
 ### 푸시 알림
 
@@ -198,14 +182,14 @@ DM(1:1)과 그룹 채팅만 먼저 구현. 채널형 대화방(공지 채널 등
 ## 진행 순서 요약
 
 ```
-Phase 0  현재 작업 정리
-Phase 1  Org/Team (백엔드)         ← 지금 여기서 시작
-Phase 2  채널/채팅방 (백엔드)
-Phase 3  메시지 + 실시간 + 파일 (백엔드)
+Phase 0  프로젝트 스캐폴드            ✅
+Phase 1  Org/Team (백엔드)           ✅
+Phase 2  대화방 (백엔드)              ✅
+Phase 3  메시지 + 실시간 + 파일 (백엔드) ← 다음
 Phase 4  모바일 기반 (API 연동, SQLite, 인증)
 Phase 5  모바일 Org/Team
 Phase 6  모바일 메신저
 Phase 7  마무리
 ```
 
-> Phase 4는 Phase 1~2와 병렬로 진행 가능 (API 스펙이 확정되면 Orval로 미리 생성)
+> Phase 4는 Phase 3와 병렬로 진행 가능 (API 스펙이 확정되면 Orval로 미리 생성)
