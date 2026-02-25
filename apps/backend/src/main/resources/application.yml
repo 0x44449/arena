@@ -42,6 +42,8 @@ springdoc:
     path: /swagger-json
   swagger-ui:
     path: /swagger
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
 
 aws:
   s3:

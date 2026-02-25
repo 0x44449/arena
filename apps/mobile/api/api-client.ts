@@ -1,9 +1,11 @@
 import { supabase } from "@/libs/supabase";
 import axios, { type AxiosRequestConfig } from "axios";
+import Constants from "expo-constants";
 
-// TODO: 환경변수로 이동
+const extra = Constants.expoConfig?.extra;
+
 const apiClient = axios.create({
-  baseURL: "http://localhost:18080",
+  baseURL: extra?.apiBaseUrl ?? "http://localhost:18080",
 });
 
 apiClient.interceptors.request.use(async (config) => {

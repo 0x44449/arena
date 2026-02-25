@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Arena — 소규모 조직(5~20명)을 위한 경량 그룹웨어. 모바일 메신저를 중심으로 업무에 필요한 기능을 가볍게 제공한다.
+Arena — 5~20인 소규모 팀을 위한 모바일 기반 경량 그룹웨어. 카톡으로 버티는 소규모 업장에 메신저 중심의 업무 도구를 제공한다.
 
 - **코어**: 메신저 + Org/Team 관리
-- **플러그인**: 게시판/공지, 업무 관리, 캘린더 (필요시 활성화)
-- 자세한 프로젝트 방향은 `docs/PROJECT.md` 참조
+- **확장**: 공지확인, 간단 결재(휴가/경비), 출퇴근 기록(근태관리)
+- 자세한 시장 분석 및 제품 전략은 `docs/PROJECT.md` 참조
 
 ## Monorepo Structure
 
@@ -75,8 +75,10 @@ docker compose -f infra/docker/docker-compose.yml up -d   # Start all services
 | org | 조직 생성/관리, 초대 코드 | 구현 완료 |
 | team | Org 내 하위 그룹 (profileId 기반) | 구현 완료 |
 | channel | DM, 그룹 대화방 (profileId 기반) | 구현 완료 |
-| message | 메시지 CRUD, 검색 | 미구현 |
+| message | 메시지 CRUD, 검색 | REST 구현 |
 | file | 파일/이미지 업로드 (S3) | 미구현 |
+| attendance | 출퇴근 기록 (근태관리) | 미구현 |
+| approval | 간단 결재 (휴가/경비) | 미구현 |
 
 ### Frontend (Mobile — React Native / Expo)
 

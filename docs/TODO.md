@@ -1,81 +1,30 @@
-# Arena MVP TODO
+# Arena TODO
 
-MVP 목표: **코어(메신저 + Org/Team 관리)를 완성도 높게 구현**
+## 제품 목표
 
-> **핵심 설계**: Profile 기반 시스템. User는 인증용, 모든 활동은 profileId 기준.
+메신저 코어를 카톡 수준으로 완성한 뒤, 공지확인 → 간단 결재 → 출퇴근 기록 순으로 확장한다.
 
----
-
-## Phase 0: 프로젝트 스캐폴드 ✅
-
-- [x] 모노레포 스캐폴드 (apps/backend, apps/mobile, infra/docker)
-- [x] Docker Compose 환경 구성 (PostgreSQL, Redis, MinIO, API)
-- [x] 백엔드 스캐폴드 (Spring Boot 3.5, Java 21, Security, Swagger)
-- [x] Supabase JWT 인증 연동 (OAuth2 Resource Server + JWKS)
-- [x] 공통 응답 DTO (ApiResult, SingleApiResult, ListApiResult, InfinityListApiResult)
-- [x] 공통 예외 처리 (WellKnownException, GlobalExceptionHandler)
-- [x] IdGenerator (SecureRandom 12-char)
-- [x] User 도메인 (가입, 내 정보 조회)
-- [x] Profile 도메인 (기본 프로필, 수정)
-- [x] Flyway 마이그레이션 (V1: users, profiles)
-- [x] 모바일 스캐폴드 (Expo Router, Supabase 연동, Zustand auth store)
+> **설계 원칙**: Profile 기반 시스템. User는 인증용, 모든 활동은 profileId 기준.
 
 ---
 
-## Phase 1: Org/Team 관리 (백엔드) ✅
+## 현재 상태
 
-### Org
-
-- [x] Org 엔티티 + Flyway V2 (orgs, invite_codes)
-- [x] Org 생성 API — 생성자의 Profile에 OWNER role 부여
-- [x] 내 Org 목록 API (Profile 기반 조회)
-- [x] Org 상세/수정 API (OWNER만 수정)
-- [x] 초대 코드 생성/목록/삭제 API (OWNER만)
-- [x] 초대 코드로 가입 API — Org용 Profile 자동 생성 (USER role)
-- [x] 멤버 목록 API (ProfileDto 반환)
-- [x] 멤버 추방 API (OWNER만, profileId 기준)
-- [x] Org 탈퇴 API (OWNER 탈퇴 불가)
-
-### Team
-
-- [x] Team 엔티티 + Flyway V3 (teams, team_members)
-- [x] Team CRUD API (생성/목록/상세/수정/삭제 — OWNER만)
-- [x] Team 멤버 추가/목록/제거 API (profileId 기반, Org 멤버만 추가 가능)
-
-### Profile 기반 전환
-
-- [x] OrgMember 제거 → Profile이 Org 멤버십 겸임 (role: OWNER/USER)
-- [x] TeamMember, ChannelMember: userId → profileId 전환
-- [x] Flyway V5 (org_members DROP, 컬럼 리네이밍)
+```
+백엔드 Phase 0~2  프로젝트 스캐폴드 + Org/Team + 채널     ✅
+백엔드 Phase 3    메시지 REST CRUD                       ✅
+백엔드 Phase 3    실시간(WebSocket) + 파일 업로드          ⬜
+모바일            스캐폴드 (라우팅 스켈레톤, Supabase 초기화) ✅
+모바일            실제 화면/기능                           ⬜
+```
 
 ---
 
-## Phase 2: 대화방 (백엔드) ✅
+## Part 1: 메신저 코어 (MVP)
 
-DM(1:1)과 그룹 채팅만 구현. 채널형 대화방은 성격 정의 후 별도 진행.
+MVP = 코어(메신저 + Org/Team)를 완성도 높게 구현하는 것. 메신저는 기능이 부족하면 사람들이 불편을 느끼므로, 카톡에 준할 정도의 완성도를 갖춘다.
 
-- [x] Channel 엔티티 + Flyway V4 (channels, channel_members)
-- [x] DM 생성 API — 기존 DM 있으면 반환, 자기 자신 DM 차단
-- [x] 그룹 채팅 생성 API (이름 + 초기 멤버 profileIds)
-- [x] 내 대화방 목록 API (멤버 프로필 포함)
-- [x] 대화방 상세 API (멤버 목록 포함)
-- [x] 그룹 멤버 초대 API (DM은 차단)
-- [x] 대화방 나가기 API (DM은 차단)
-
----
-
-## Phase 3: 메시지 (백엔드) ← 다음
-
-### Message CRUD
-
-- [ ] Message 엔티티 (messageId, channelId, senderProfileId, content, type[TEXT/IMAGE/FILE], timestamps)
-- [ ] 메시지 전송 API (REST)
-- [ ] 메시지 목록 조회 API (커서 기반 페이지네이션)
-- [ ] 메시지 삭제 API (본인 메시지만)
-- [ ] 메시지 검색 API (채널 내, 전체)
-- [ ] Flyway 마이그레이션 (messages 테이블 + 인덱스)
-
-### 실시간 통신
+### 백엔드 — 실시간 통신
 
 - [ ] WebSocket 엔드포인트 설정 (STOMP or raw WebSocket)
 - [ ] 메시지 발송 시 WebSocket으로 실시간 전달
@@ -83,113 +32,178 @@ DM(1:1)과 그룹 채팅만 구현. 채널형 대화방은 성격 정의 후 별
 - [ ] 읽음 확인 (lastReadMessageId 업데이트 + 브로드캐스트)
 - [ ] 접속 상태 관리 (Redis 기반)
 
-### 파일 업로드
+### 백엔드 — 파일 업로드
 
-- [ ] File 엔티티 (fileId, uploaderProfileId, fileName, fileSize, mimeType, s3Key, timestamps)
-- [ ] 파일 업로드 API (MinIO/S3)
+- [ ] File 엔티티 + Flyway 마이그레이션
+- [ ] 파일 업로드 API (MinIO/S3) — **만료 없이 영구 보관**
 - [ ] 파일 다운로드/조회 API (presigned URL)
-- [ ] 이미지 썸네일 생성 (선택)
 - [ ] 메시지에 파일 첨부 연동
-- [ ] Flyway 마이그레이션 (files 테이블)
+- [ ] 이미지 썸네일 생성 (선택)
 
----
+### 백엔드 — 푸시 알림
 
-## Phase 4: 모바일 앱 — 기반 구축
+- [ ] 디바이스 토큰 등록 API
+- [ ] 푸시 발송 서비스 (FCM/APNs)
+- [ ] 메시지 수신 시 오프라인 유저에게 푸시
 
-백엔드 API가 어느 정도 갖춰진 후 본격 진행.
-
-### API 연동
+### 모바일 — 기반 구축
 
 - [ ] Orval 설정 + API 클라이언트 자동 생성
-- [ ] Axios interceptor 정리 (base URL 환경변수화)
-
-### 오프라인 DB
-
+- [ ] Axios base URL 환경변수화
 - [ ] SQLite 스키마 설계 (users, profiles, orgs, channels, messages)
 - [ ] expo-sqlite 초기화 + 마이그레이션 구조
 - [ ] 기본 CRUD 쿼리 함수
 
-### 인증 UI
+### 모바일 — 인증
 
-- [ ] 소셜 로그인 화면 구현 (카카오, 구글 — Supabase OAuth)
+- [ ] 소셜 로그인 화면 (카카오, 구글 — Supabase OAuth)
 - [ ] 로그인 후 유저 등록 플로우 (서버에 유저 생성 호출)
 - [ ] 로그아웃
 
----
-
-## Phase 5: 모바일 앱 — Org/Team
-
-### Org
+### 모바일 — Org/Team
 
 - [ ] Org 목록 화면 (내가 속한 조직)
 - [ ] Org 생성 화면
 - [ ] 초대 코드 입력으로 Org 가입
 - [ ] Org 설정/관리 화면 (OWNER)
 - [ ] 멤버 목록 화면
-
-### Team
-
-- [ ] Team 목록 화면 (Org 내)
-- [ ] Team 생성/관리 (OWNER)
-
-### 프로필
-
+- [ ] Team 목록/생성/관리 화면
 - [ ] Org별 프로필 편집 화면
-- [ ] 프로필 이미지 업로드
 
----
-
-## Phase 6: 모바일 앱 — 메신저
-
-### 채팅 목록
+### 모바일 — 메신저
 
 - [ ] 대화방 목록 화면 (최근 메시지, 안읽은 수 표시)
 - [ ] 새 대화 시작 (DM / 그룹 채팅 생성)
-
-### 채팅방
-
 - [ ] 채팅방 화면 (메시지 목록, 무한 스크롤)
 - [ ] 메시지 입력/전송
 - [ ] 이미지/파일 첨부 전송
 - [ ] 메시지 삭제
 - [ ] 읽음 확인 표시
+- [ ] 메시지 검색
 
-### 실시간
+### 모바일 — 실시간 + 오프라인
 
 - [ ] WebSocket 연결 관리
 - [ ] 실시간 메시지 수신 + UI 반영
 - [ ] 오프라인 → 온라인 복귀 시 동기화
-
-### 푸시 알림
-
-- [ ] Expo Push Notification 설정
-- [ ] 백엔드 푸시 발송 연동 (FCM/APNs)
+- [ ] 푸시 알림 설정 (Expo Push Notification)
 - [ ] 알림 탭 시 해당 채팅방으로 이동
 
----
+### 마무리
 
-## Phase 7: 마무리 및 품질
-
-- [ ] 에러 핸들링 전반 점검
 - [ ] API 응답 일관성 점검
 - [ ] 모바일 UX 전반 점검 (로딩, 에러, 빈 상태)
 - [ ] 오프라인 동기화 안정성 테스트
-- [ ] 배포 파이프라인 점검 (Docker 빌드, 환경변수)
-- [ ] 기본 테스트 작성 (핵심 플로우)
+- [ ] 배포 파이프라인 점검
 
 ---
 
-## 진행 순서 요약
+## Part 2: 공지 확인
 
-```
-Phase 0  프로젝트 스캐폴드            ✅
-Phase 1  Org/Team (백엔드)           ✅
-Phase 2  대화방 (백엔드)              ✅
-Phase 3  메시지 + 실시간 + 파일 (백엔드) ← 다음
-Phase 4  모바일 기반 (API 연동, SQLite, 인증)
-Phase 5  모바일 Org/Team
-Phase 6  모바일 메신저
-Phase 7  마무리
-```
+전통적 게시판 대신, 채팅 내 공지 고정 + 읽음 확인 추적으로 해결한다. 카톡 대비 차별점: 공지가 대화에 묻히지 않는다.
 
-> Phase 4는 Phase 3와 병렬로 진행 가능 (API 스펙이 확정되면 Orval로 미리 생성)
+### 백엔드
+
+- [ ] 공지 고정 API (메시지 → 채널 공지로 지정, 해제)
+- [ ] 공지 읽음 확인 추적 (프로필별 확인 여부)
+- [ ] 채널 공지 목록 조회 API
+
+### 모바일
+
+- [ ] 채팅방 내 공지 고정 UI
+- [ ] 공지 배너 (채팅방 상단 고정)
+- [ ] 공지 읽음 확인 표시 (누가 읽었는지)
+- [ ] 공지 목록 화면
+
+---
+
+## Part 3: 간단 결재
+
+대기업식 결재라인이 아닌, **요청 → 승인/반려 → 기록 자동 누적** 흐름. 핵심 가치는 히스토리가 남는 것.
+
+### 백엔드
+
+- [ ] Approval 엔티티 설계 (요청자, 승인자, 유형, 상태, 내용)
+- [ ] 휴가/연차 신청 API
+- [ ] 경비 청구 API (영수증 파일 첨부)
+- [ ] 승인/반려 API
+- [ ] 내 결재 목록 조회 API (요청한 것 + 승인할 것)
+- [ ] 승인 시 채널 자동 공지 연동
+
+### 모바일
+
+- [ ] 결재 요청 화면 (휴가, 경비)
+- [ ] 결재 승인/반려 화면
+- [ ] 결재 목록/히스토리 화면
+- [ ] 채팅에서 결재 요청 바로가기
+
+---
+
+## Part 4: 출퇴근 기록 (근태관리)
+
+5인 이상 사업장 주 52시간제 필수. **"안 쓰면 법 위반"** → 강력한 도입 동기.
+
+### 백엔드
+
+- [ ] Attendance 엔티티 설계 (프로필, 출근/퇴근 시각, 위치)
+- [ ] 출근/퇴근 기록 API
+- [ ] 근태 기록 조회 API (일별, 주별, 월별)
+- [ ] 근무 시간 자동 계산
+
+### 모바일
+
+- [ ] 출퇴근 버튼 (GPS 기반 위치 기록)
+- [ ] 내 근태 기록 화면
+- [ ] 관리자 근태 현황 대시보드
+
+---
+
+## Part 5: 기능 간 연동
+
+Part 2~4가 개별 완성된 뒤 연결한다.
+
+- [ ] 휴가 승인 → 연차 잔여일수 자동 차감
+- [ ] 경비 승인 → 영수증 파일 자동 아카이빙
+- [ ] 승인/근태 알림 → 메신저 자동 공지
+- [ ] 관리자 대시보드 (근무시간 + 연차 + 경비 한눈에)
+
+---
+
+## 완료된 항목
+
+### 백엔드 — 프로젝트 스캐폴드 ✅
+
+- [x] 모노레포 스캐폴드 (apps/backend, apps/mobile, infra/docker)
+- [x] Docker Compose 환경 구성 (PostgreSQL, Redis, MinIO, API)
+- [x] 백엔드 스캐폴드 (Spring Boot 3.5, Java 21, Security, Swagger)
+- [x] Supabase JWT 인증 연동 (OAuth2 Resource Server + JWKS)
+- [x] 공통 응답 DTO, 예외 처리, IdGenerator
+- [x] User 도메인 (가입, 내 정보 조회)
+- [x] Profile 도메인 (기본 프로필, 수정)
+- [x] Flyway 마이그레이션 V1 (users, profiles, orgs, invite_codes, teams, team_members, channels, channel_members)
+
+### 백엔드 — Org/Team ✅
+
+- [x] Org CRUD + 초대 코드 + 멤버 관리
+- [x] Team CRUD + 멤버 관리 (profileId 기반)
+- [x] Profile 기반 전환 (OrgMember 제거 → Profile이 멤버십 겸임)
+
+### 백엔드 — 대화방 ✅
+
+- [x] Channel 엔티티 (DM, GROUP)
+- [x] DM 생성 (기존 DM 있으면 반환, 자기 자신 차단)
+- [x] 그룹 채팅 생성/멤버 초대/나가기
+- [x] 대화방 목록/상세 조회
+
+### 백엔드 — 메시지 REST ✅
+
+- [x] Message 엔티티 + Flyway V2
+- [x] 메시지 전송/삭제 API (soft delete)
+- [x] 커서 기반 양방향 페이지네이션
+- [x] 채널 내 키워드 검색
+
+### 모바일 — 스캐폴드 ✅
+
+- [x] Expo Router 라우팅 구조 (auth/app/tabs)
+- [x] Supabase 클라이언트 초기화 + auth store (Zustand)
+- [x] Axios API 클라이언트 (토큰 인터셉터)
