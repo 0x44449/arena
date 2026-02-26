@@ -35,7 +35,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${SUPABASE_JWKS_URI:https://example.supabase.co/rest/v1/.well-known/jwks.json}
+          jwk-set-uri: ${SUPABASE_JWKS_URI:https://example.supabase.co/auth/v1/.well-known/jwks.json}
 
 springdoc:
   api-docs:
@@ -44,6 +44,10 @@ springdoc:
     path: /swagger
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
+
+logging:
+  level:
+    org.springframework.security: ${SECURITY_LOG_LEVEL:DEBUG}
 
 aws:
   s3:

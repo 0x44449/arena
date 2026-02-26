@@ -25,25 +25,39 @@ export const apiClientProxy = async <T>(
   } = await supabase.auth.getSession();
   const token = session?.access_token;
 
+  if (token) {
+    try {
+      const header = JSON.parse(atob(token.split(".")[0]));
+      console.log(`[API] ${config.method?.toUpperCase()} ${config.url} token=OK alg=${header.alg}`);
+    } catch {
+      console.log(`[API] ${config.method?.toUpperCase()} ${config.url} token=OK`);
+    }
+  } else {
+    console.log(`[API] ${config.method?.toUpperCase()} ${config.url} token=NONE`);
+  }
+
+  // Orval이 @CurrentUser 파라미터를 params(쿼리)로 생성하므로 jwt 키 제거
+  const { jwt: _jwt, ...cleanParams } = config.params ?? {};
+
   const source = axios.CancelToken.source();
-  const promise = apiClient({
-    ...config,
-    ...options,
-    headers: {
-      ...config.headers,
-      ...options?.headers,
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-    cancelToken: source.token,
-  });
-
-  // @ts-ignore — Orval 호환
-  promise.cancel = () => {
-    source.cancel("Query was cancelled");
-  };
-
-  const { data } = await promise;
-  return data;
+  try {
+    const response = await apiClient({
+      ...config,
+      ...options,
+      params: { ...cleanParams, ...options?.params },
+      headers: {
+        ...config.headers,
+        ...options?.headers,
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      cancelToken: source.token,
+    });
+    console.log(`[API] ${config.method?.toUpperCase()} ${config.url} → ${response.status}`);
+    return response.data;
+  } catch (e: any) {
+    console.error(`[API] ${config.method?.toUpperCase()} ${config.url} → ${e.response?.status ?? "NETWORK_ERROR"}`, e.response?.data ?? e.message);
+    throw e;
+  }
 };
 
 export default apiClient;
